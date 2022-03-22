@@ -1,0 +1,52 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<title> Main UI </title>
+	</head>
+	<body>
+		<div class="Main">
+			<div id="Top">
+				<div id="Topbar" class="BackgroundElement">
+					<button class="TopbarButton" id="LoginButton" (click)="setMain($event,'login')">Login</button>
+					<button class="TopbarButton" id="RegisterButton" (click)="setMain($event,'register')">Register</button>
+					<input type="text" placeholder="Search" id="SearchInput" autocomplete="off">
+				</div>
+			</div>
+			<div id="Bottom">
+				<div id="SidebarMain" class="BackgroundElement">
+					<h2>Navigation</h2>
+					<button class="SidebarButton" id="FirstButton">Feed</button>
+					<button class="SidebarButton">Your profile</button>
+					<button class="SidebarButton">Settings</button>
+				</div>
+				<div id="BodyMain" class="BackgroundElement">
+					<div *ngIf="bodyHTML=='login'" id="Login">
+						<h2>Log in</h2>
+						<label id="LogLabel">Username:</label> <input type="text" placeholder="Enter your username" id="UserInput" [(ngModel)]="username" autocomplete="off">
+						<br>
+						<label id="LogLabel">Password:</label> <input type="password" placeholder="Enter your password" id="PassInput" [(ngModel)]="password" autocomplete="off">
+						<br>
+						<button class="MainbarButton" id="LoginMainButton" (click)="login($event)">Login</button>
+						<br>
+						<b>{{formError}}</b>
+					</div>
+					<div *ngIf="bodyHTML=='register'" id="Register">
+						<h2>Create a new account</h2>
+						<label id="LogLabel">Email:</label> <input type="text" placeholder="Enter your email adress" id="EmailInput" [(ngModel)]="email" autocomplete="off">
+						<br>
+						<label id="LogLabel">Username:</label> <input type="text" placeholder="Enter username" id="UserInput" [(ngModel)]="username" autocomplete="off">
+						<br>
+						<label id="LogLabel">Password:</label> <input type="password" placeholder="Enter password" id="PassInput" [(ngModel)]="password" autocomplete="off">
+						<br>
+						<button class="MainbarButton" id="RegisterMainButton" (click)="register($event)">Register</button>
+						<br>
+						<b>{{formError}}</b>
+					</div>
+				</div>
+				<div id="FriendbarMain" class="BackgroundElement">
+					<h2>Friends</h2>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>
