@@ -1,1 +1,0 @@
-Move to using Angular instead of React for frontend
