@@ -5,14 +5,18 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "cd client && npm start",
     "start": "node server/index.js",
-	"build": "cd client && npm install && npm run build"
+    "build": "cd client && npm install && npm run build"
   },
   "keywords": [],
   "proxy": "http://localhost:3001",
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.17.3"
+    "express": "^4.17.3",
+    "pg": "^8.7.3",
+    "sanitize-html": "^2.7.0",
+    "ws": "^8.5.0"
   }
 }
