@@ -23,10 +23,14 @@ const dbclient = new Client({
   port: 5432
 }); dbclient.connect();
 
-app.use(express.static(path.resolve(__dirname, '../client/build')));
+app.use(express.static(path.join(__dirname,'..',String.raw`socialmediasite_frontend\dist\socialmediasite_frontend`)));
+
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname,'..',String.raw`socialmediasite_frontend\dist\socialmediasite_frontend\index.html`));
+});
 
 app.get("/api", (req, res) => {
-  RegisterUser('TestUser','TestPass','TestEmail@email.com');
+  //RegisterUser('TestUser','TestPass','TestEmail@email.com');
   res.json({ message: "Hello from server!" });
 });
 
