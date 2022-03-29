@@ -2,6 +2,6 @@ export interface LoginResponse {
     username: string;
     password: string;
 
-    success: boolean;
-    session: string;
+    success?: boolean;
+    session?: string;
 }

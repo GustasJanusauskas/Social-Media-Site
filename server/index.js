@@ -1,5 +1,7 @@
 'use strict';
 
+import {UserInfo} from './userinfo';
+
 const fs = require('fs');
 const ws = require('ws');
 const { Client } = require('pg');
@@ -15,6 +17,7 @@ const emailRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+")
 const PORT = process.env.PORT || 3001;
 const app = express();
 
+//CONFIG
 const dbclient = new Client({
   user: 'postgres',
   host: 'localhost',
@@ -23,14 +26,17 @@ const dbclient = new Client({
   port: 5432
 }); dbclient.connect();
 
-app.use(express.static(path.join(__dirname,'..',String.raw`socialmediasite_frontend\dist\socialmediasite_frontend`)));
 app.use(express.json())
 
+//FILES
+app.use(express.static(path.join(__dirname,'..',String.raw`socialmediasite_frontend\dist\socialmediasite_frontend`)));
+
+//HTTP
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname,'..',String.raw`socialmediasite_frontend\dist\socialmediasite_frontend\index.html`));
 });
 
-//LOGIN TESTS
+//TESTS
 app.get("/testReg", (req, res) => {
   RegisterUser('TestUser','TestPassword','TestEmail@email.com',(success,msg) => {
     res.json({
@@ -50,7 +56,21 @@ app.get("/testLog", (req, res) => {
     });
   });
 });
-//LOGIN TESTS OVER
+
+//API
+app.put("/userinfo", (req, res) => {
+  GetUserInfo(req.body.session,(success,msg) => {
+    if (!success) {
+      //fail path
+      return;
+    }
+
+    res.json({
+      success: success,
+      session: msg
+    });
+  });
+});
 
 app.put("/login", (req, res) => {
   LoginUser(req.body.username,req.body.password,req.headers.host,(success,msg) => {
@@ -68,6 +88,47 @@ app.listen(PORT, () => {
 });
 
 //FUNCTIONS
+
+function GetUserInfo(session,callback) {
+  var query = 'SELECT * FROM sessions WHERE sessionid = $1';
+  var data = [session];
+
+  var result = new UserInfo();
+  dbclient.query(query,data, (err, res) => {
+    if (err || res.rows.length == 0) {
+      if (err) console.log("DB ERROR GetUserID: \n" + err);
+      callback(false); //TODO
+      return;
+    }
+
+    var userID = res.rows[0].usr_id;
+    var innerQuery = 'SELECT * FROM users,profiles WHERE usr_id = $1';
+    var innerData = [userID];
+
+    dbclient.query(innerQuery,innerData, (err, res) => {
+      if (err || res.rows.length == 0) {
+        if (err) console.log("DB ERROR GetUserInfo: \n" + err);
+        callback(false); //TODO
+        return;
+      }
+      console.log(res.rows[0]);
+
+      result.email = res.rows[0].email;
+      result.username = res.rows[0].username;
+      result.creationdate = res.rows[0].created;
+
+      result.firstName = res.rows[0].firstName;
+      result.lastName = res.rows[0].lastName;
+      result.description = res.rows[0].description;
+      result.picture = res.rows[0].picture;
+
+      result.success = true;
+      //TODO friend list, post list
+
+      callback(true,result);
+    });
+  });
+}
 
 function LoginUser (user,passw,ip,callback) {
   //Check data

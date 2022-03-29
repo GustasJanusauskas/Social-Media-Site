@@ -13,17 +13,35 @@ import {LoginResponse} from './loginresponse';
 
 export class AppComponent {
   emailRegex : RegExp = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-
   title = 'socialmediasite';
 
+  // Login/Register
   email: string = '';
   username: string = '';
   password: string = '';
-
-  bodyHTML: string = '';
   formError : string = '';
 
+  //UserData
+  loggedInAs: string = 'Not logged in';
+
+  //Main Body
+  bodyHTML: string = '';
+
   constructor(private userdataService: UserdataService) {}
+
+  //Updates friends list, 'logged in as' labels
+  updateUI() {
+    var session = this.getCookie('session');
+    if (!session || session.length < 64 ) return;
+
+    this.userdataService.getUserInfo(session).subscribe(data => {
+      if (!data.success) return;
+
+      //cast data to UserInfo, update loggedInAs
+
+      //Update friends list
+    });
+  }
 
   setMain(event: Event,text: string) {
     this.formError = '';
