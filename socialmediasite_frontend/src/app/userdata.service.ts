@@ -3,7 +3,7 @@ import { HttpClient, HttpHandler, HttpHeaders } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError, retry } from 'rxjs/operators';
 
-import {User} from './user';
+import {LoginResponse} from './loginresponse';
 
 const httpOptions = {
   headers: new HttpHeaders({
@@ -18,7 +18,8 @@ export class UserdataService {
 
   constructor(private http: HttpClient) {}
 
-  loginUser(user: string, password: string): Observable<unknown> {
-    return this.http.put('/login',new User(user,password),httpOptions);
+  loginUser(user: string, pass: string): Observable<LoginResponse> {
+    var data: LoginResponse = {username: user, password: pass, success: false, session: ''};
+    return this.http.put<LoginResponse>('/login',data,httpOptions);
   }
 }

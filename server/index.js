@@ -24,6 +24,7 @@ const dbclient = new Client({
 }); dbclient.connect();
 
 app.use(express.static(path.join(__dirname,'..',String.raw`socialmediasite_frontend\dist\socialmediasite_frontend`)));
+app.use(express.json())
 
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname,'..',String.raw`socialmediasite_frontend\dist\socialmediasite_frontend\index.html`));
@@ -31,7 +32,7 @@ app.get("/", (req, res) => {
 
 //LOGIN TESTS
 app.get("/testReg", (req, res) => {
-  RegisterUser('TestUser','TestPass','TestEmail@email.com',(success,msg) => {
+  RegisterUser('TestUser','TestPassword','TestEmail@email.com',(success,msg) => {
     res.json({
       success: success,
       session: msg
@@ -40,8 +41,10 @@ app.get("/testReg", (req, res) => {
 });
 
 app.get("/testLog", (req, res) => {
-  LoginUser('TestUser','TestPass',req.headers.host,(success,msg) => {
+  LoginUser('TestUser','TestPassword',req.headers.host,(success,msg) => {
     res.json({
+      username: '',
+      password: '',
       success: success,
       session: msg
     });
@@ -50,9 +53,10 @@ app.get("/testLog", (req, res) => {
 //LOGIN TESTS OVER
 
 app.put("/login", (req, res) => {
-  LoginUser('TestUser','TestPass',req.headers.host,(success,msg) => {
-    console.log(req);
+  LoginUser(req.body.username,req.body.password,req.headers.host,(success,msg) => {
     res.json({
+      username: '',
+      password: '',
       success: success,
       session: msg
     });
