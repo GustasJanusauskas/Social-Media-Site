@@ -1,6 +1,6 @@
 'use strict';
 
-import {UserInfo} from './userinfo';
+const {UserInfo} = require('./userinfo');
 
 const fs = require('fs');
 const ws = require('ws');

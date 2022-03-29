@@ -1,4 +1,6 @@
-export default class UserInfo {
+'use strict';
+
+module.export = class UserInfo {
     session = "";
     success = false;
 
