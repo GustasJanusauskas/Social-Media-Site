@@ -12,6 +12,11 @@ CREATE TABLE users(
 	PRIMARY KEY(usr_id)
 );
 
+CREATE TABLE sessions(
+	usr_id bigint UNIQUE NOT NULL,
+	sessionID varchar(64) UNIQUE
+);
+
 CREATE TABLE profiles(
 	usr_id bigint UNIQUE NOT NULL,
 	firstname varchar(128),

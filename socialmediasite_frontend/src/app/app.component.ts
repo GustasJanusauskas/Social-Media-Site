@@ -1,6 +1,7 @@
 import { Component, Input, NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
+import { UserdataService } from './userdata.service';
 
 @Component({
   selector: 'app-root',
@@ -20,6 +21,8 @@ export class AppComponent {
   bodyHTML: string = '';
   formError : string = '';
 
+  constructor(private userdataService: UserdataService) {}
+
   setMain(event: Event,text: string) {
     this.formError = '';
     this.bodyHTML = text;
@@ -35,7 +38,11 @@ export class AppComponent {
       this.formError = 'Password must be between 12 and 128 characters long.';
       return;
     }
-    //Send to backend
+
+    this.formError = 'Logging in..';
+    //Send data to backend
+    this.userdataService.loginUser(this.username,this.password).subscribe();
+
   }
 
   register(event: Event) {

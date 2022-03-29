@@ -1,0 +1,3 @@
+psql -U postgres
+root
+\c socialsitedb;

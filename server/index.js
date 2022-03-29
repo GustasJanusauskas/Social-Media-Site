@@ -29,44 +29,158 @@ app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname,'..',String.raw`socialmediasite_frontend\dist\socialmediasite_frontend\index.html`));
 });
 
-app.get("/api", (req, res) => {
-  //RegisterUser('TestUser','TestPass','TestEmail@email.com');
-  res.json({ message: "Hello from server!" });
+//LOGIN TESTS
+app.get("/testReg", (req, res) => {
+  RegisterUser('TestUser','TestPass','TestEmail@email.com',(success,msg) => {
+    res.json({
+      success: success,
+      session: msg
+    });
+  });
+});
+
+app.get("/testLog", (req, res) => {
+  LoginUser('TestUser','TestPass',req.headers.host,(success,msg) => {
+    res.json({
+      success: success,
+      session: msg
+    });
+  });
+});
+//LOGIN TESTS OVER
+
+app.put("/login", (req, res) => {
+  LoginUser('TestUser','TestPass',req.headers.host,(success,msg) => {
+    console.log(req);
+    res.json({
+      success: success,
+      session: msg
+    });
+  });
 });
 
 app.listen(PORT, () => {
   console.log(`Server listening on ${PORT}`);
 });
 
-function RegisterUser(user,passw,email) {
-  if (!email || !user || !passw) {
-    //toSend[ip].send("Make sure all the fields are filled.");
+//FUNCTIONS
+
+function LoginUser (user,passw,ip,callback) {
+  //Check data
+  if (!user || !passw) {
+    callback(false,"Make sure all the fields are filled.");
     return;
   }
 
-  if (email.length > 256 || user.length > 64) {
-    //toSend[ip].send("Username or email is too long.");
+  if (user.length > 128 || user.length < 4) {
+    callback(false,"Username or email has to be between 4 and 128 characters long.");
+    return;
+  }
+
+  var query;
+  var data = [user];
+  //Check if user is logging in with email, else assume a username
+  if(emailRegex.test(user.toLowerCase())) query = 'SELECT * FROM users WHERE email = $1';
+  else query = 'SELECT * FROM users WHERE username = $1';
+
+  dbclient.query(query,data, (err, res) => {
+    if (err || res.rows.length == 0) {
+      if (err) console.log("DB ERROR Login: \n" + err);
+      callback(false, "User not found, check email/username.");
+      return;
+    }
+
+    //Hash password
+    var passSalt = res.rows[0].salt;
+    var passPepper = res.rows[0].pepper;
+    var finalPass = crypto.createHash('BLAKE2b512').update(passSalt + passw + passPepper).digest('hex');
+    //Check if password matches DB..
+    var DBErr = false;
+    if (finalPass == res.rows[0].password) {
+      //Generate and update session string
+      var sessionID = RandomString(64).replace('^','a');
+      var innerData = [sessionID,res.rows[0].usr_id];
+      var innerQuery = 'UPDATE sessions SET sessionID = $1 WHERE usr_id = $2;';
+
+      dbclient.query(innerQuery,innerData, (err, res) => {
+        if (err) {
+            console.log("DB ERROR UpdateSession: \n" + err);
+            DBErr = true;
+            return;
+        }
+      });
+
+      //Check for unhandled DB errors.
+      if (DBErr) {
+        callback(false,"Database Error.");
+        return;
+      }
+
+      //Succesful login
+      console.log("User " + user + " logged in.");
+      callback(true,sessionID);
+    }
+    else {
+      callback(false,"Wrong password.");
+    }
+  });
+}
+
+//Registers a new user
+function RegisterUser(user,passw,email,callback) {
+  //Check data
+  if (!email || !user || !passw) {
+    callback(false,"Make sure all the fields are filled.");
+    return;
+  }
+
+  if (email.length > 256 || user.length < 4 || user.length > 128) {
+    callback(false,"Username or email has to be between 4 and 128 characters long.");
     return;
   }
 
   if(!emailRegex.test(email.toLowerCase())) {
-    //toSend[ip].send("Email invalid.");
+    callback(false,"Email is invalid.");
     return;
   }
 
+  //Hash password
   var passSalt = RandomString(8);
   var passPepper = RandomString(8);
-
   var finalPass = crypto.createHash('BLAKE2b512').update(passSalt + passw + passPepper).digest('hex');
-  var query = 'INSERT INTO users(username,password,email,created,salt,pepper) VALUES($1,$2,$3,NOW(),$4,$5)';
+
+  //Create user row
+  var query = 'INSERT INTO users(username,password,email,created,salt,pepper) VALUES($1,$2,$3,NOW(),$4,$5) RETURNING usr_id;';
   var data = [user,finalPass,email,passSalt,passPepper];
 
+  var DBErr = false;
   dbclient.query(query,data, (err, res) => {
     if (err) {
-        //toSend[ip].send("Account already exists.");
-        console.log("DB ERROR: \n" + err);
+        callback(false,"Account already exists.");
+        console.log("DB ERROR RegUser: \n" + err);
+        DBErr = true;
+        return;
     }
-    else return;//toSend[ip].send("Account created!");
+
+    //Create session row for user, session string empty until login
+    var innerData = [res.rows[0].usr_id];
+    var innerQuery = 'INSERT INTO sessions(usr_id,sessionID) VALUES($1,NULL)';
+
+    dbclient.query(innerQuery,innerData, (err, res) => {
+      if (err) {
+          console.log("DB ERROR RegSession: \n" + err);
+          DBErr = true;
+          return;
+      }
+      return;
+    });
+
+    //Check for unhandled DB errors.
+    if (DBErr) {
+      callback(false,"Database Error.");
+      return;
+    }
+    else callback(true,"Account created!");
   });
 }
 
