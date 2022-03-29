@@ -8,7 +8,7 @@
 }
 
 body {
-	background-image: url('assets/MountainBackground.jpg');
+	background-image: url('images/MountainBackground.jpg');
 	background-size: cover;
 	background-repeat: no-repeat;
 	background-attachment: fixed;
@@ -92,7 +92,7 @@ input {
 	height: 2em;
 	width: 24em;
 
-	background: url('assets/Search.png') no-repeat 0.35em 0.35em;
+	background: url('images/Search.png') no-repeat 0.35em 0.35em;
 	background-color: azure;
 	background-size: 1.5em;
 	padding-left: 2em;
