@@ -28,4 +28,9 @@ export class UserdataService {
     var data: LoginResponse = {username: user, password: pass};
     return this.http.put<LoginResponse>('/login',data,httpOptions);
   }
+
+  registerUser(user: string, pass: string, email: string): Observable<LoginResponse> {
+    var data: LoginResponse = {username: user, password: pass, email: email};
+    return this.http.put<LoginResponse>('/register',data,httpOptions);
+  }
 }

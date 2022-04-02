@@ -12,7 +12,7 @@ import {LoginResponse} from './loginresponse';
 })
 
 export class AppComponent {
-  emailRegex : RegExp = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+  emailRegex : RegExp = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
   title = 'socialmediasite';
 
   // Login/Register
@@ -87,7 +87,16 @@ export class AppComponent {
       return;
     }
 
-    
+    this.formError = 'Registering user...';
+    //Send data to backend
+    this.userdataService.registerUser(this.username,this.password,this.email).subscribe(data => {
+      if (data.success) {
+        this.formError = 'User registered! You can now log in.';
+      }
+      else {
+        this.formError = '' + data.session;
+      }
+    });
   }
 
   setCookie(cname: string, cvalue: string, exdays: number) {

@@ -83,6 +83,17 @@ app.put("/login", (req, res) => {
   });
 });
 
+app.put("/register", (req, res) => {
+  RegisterUser(req.body.username,req.body.password,req.body.email,(success,msg) => {
+    res.json({
+      username: '',
+      password: '',
+      success: success,
+      session: msg
+    });
+  });
+});
+
 app.listen(PORT, () => {
   console.log(`Server listening on ${PORT}`);
 });
