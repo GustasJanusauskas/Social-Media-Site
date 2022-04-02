@@ -1,6 +1,7 @@
 export interface UserInfo {
     session: string;
     success?: boolean;
+    error?: string;
 
     email?: string;
     username?: string;

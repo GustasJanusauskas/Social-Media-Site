@@ -1,6 +1,6 @@
 'use strict';
 
-module.export = class UserInfo {
+class UserInfo {
     session = "";
     success = false;
 
@@ -15,5 +15,7 @@ module.export = class UserInfo {
     friends = [0,0];
     posts = [""];
 
-    constructor() { }
+    constructor(a) { this.session = a}
 }
+
+module.exports = UserInfo;

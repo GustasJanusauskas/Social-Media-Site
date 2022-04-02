@@ -1,6 +1,6 @@
 'use strict';
 
-const {UserInfo} = require('./userinfo');
+const UserInfo = require('./userinfo');
 
 const fs = require('fs');
 const ws = require('ws');
@@ -59,16 +59,8 @@ app.get("/testLog", (req, res) => {
 
 //API
 app.put("/userinfo", (req, res) => {
-  GetUserInfo(req.body.session,(success,msg) => {
-    if (!success) {
-      //fail path
-      return;
-    }
-
-    res.json({
-      success: success,
-      session: msg
-    });
+  GetUserInfo(req.body.session,(success,inf) => {
+    res.json(inf);
   });
 });
 
@@ -100,6 +92,9 @@ app.listen(PORT, () => {
 
 //FUNCTIONS
 
+// SQL for AddPost function
+// UPDATE profiles SET posts = array_append(posts,$2) WHERE usr_id = $1;
+
 function GetUserInfo(session,callback) {
   var query = 'SELECT * FROM sessions WHERE sessionid = $1';
   var data = [session];
@@ -108,18 +103,20 @@ function GetUserInfo(session,callback) {
   dbclient.query(query,data, (err, res) => {
     if (err || res.rows.length == 0) {
       if (err) console.log("DB ERROR GetUserID: \n" + err);
-      callback(false); //TODO
+      result.error = 'Failed to get user ID from session.';
+      callback(false,result);
       return;
     }
 
     var userID = res.rows[0].usr_id;
-    var innerQuery = 'SELECT * FROM users,profiles WHERE usr_id = $1';
+    var innerQuery = 'SELECT username, password, email, created, salt, pepper, firstname, lastname, description, picture, friends, posts FROM users, profiles WHERE profiles.usr_id = users.usr_id AND users.usr_id = $1;';
     var innerData = [userID];
 
     dbclient.query(innerQuery,innerData, (err, res) => {
       if (err || res.rows.length == 0) {
         if (err) console.log("DB ERROR GetUserInfo: \n" + err);
-        callback(false); //TODO
+        result.error = 'Failed to get user info.';
+        callback(false,result);
         return;
       }
       console.log(res.rows[0]);
@@ -128,13 +125,16 @@ function GetUserInfo(session,callback) {
       result.username = res.rows[0].username;
       result.creationdate = res.rows[0].created;
 
-      result.firstName = res.rows[0].firstName;
-      result.lastName = res.rows[0].lastName;
-      result.description = res.rows[0].description;
-      result.picture = res.rows[0].picture;
+      result.firstName = res.rows[0].firstname;
+      result.lastName = res.rows[0].lastname;
+      result.profileDesc = res.rows[0].description;
+      result.avatarPath = res.rows[0].picture;
+
+      result.friends = res.rows[0].friends;
+      result.posts = res.rows[0].posts;
 
       result.success = true;
-      //TODO friend list, post list
+      console.log(result);
 
       callback(true,result);
     });

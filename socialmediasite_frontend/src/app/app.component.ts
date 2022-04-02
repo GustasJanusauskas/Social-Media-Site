@@ -4,6 +4,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { UserdataService } from './userdata.service';
 
 import {LoginResponse} from './loginresponse';
+import {UserInfo} from './userinfo';
 
 @Component({
   selector: 'app-root',
@@ -35,8 +36,12 @@ export class AppComponent {
     if (!session || session.length < 64 ) return;
 
     this.userdataService.getUserInfo(session).subscribe(data => {
-      if (!data.success) return;
+      if (!data.success) {
+        console.log(data.error);
+        return;
+      }
 
+      this.loggedInAs = '' + data.username;
       //cast data to UserInfo, update loggedInAs
 
       //Update friends list
@@ -65,6 +70,7 @@ export class AppComponent {
       if (data.success) {
         this.formError = 'Logged in succesfully.';
         this.setCookie('session','' + data.session,30);
+        this.updateUI();
       }
       else {
         this.formError = '' + data.session;
