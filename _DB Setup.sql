@@ -3,7 +3,7 @@ CREATE DATABASE socialsitedb;
 
 CREATE TABLE users(
 	usr_id bigserial UNIQUE NOT NULL,
-	username varchar(64) UNIQUE NOT NULL,
+	username varchar(128) UNIQUE NOT NULL,
 	password varchar(128) NOT NULL,
 	email varchar(256) UNIQUE NOT NULL,
 	created timestamp,

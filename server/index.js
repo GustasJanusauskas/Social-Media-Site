@@ -119,7 +119,6 @@ function GetUserInfo(session,callback) {
         callback(false,result);
         return;
       }
-      console.log(res.rows[0]);
 
       result.email = res.rows[0].email;
       result.username = res.rows[0].username;
@@ -134,7 +133,6 @@ function GetUserInfo(session,callback) {
       result.posts = res.rows[0].posts;
 
       result.success = true;
-      console.log(result);
 
       callback(true,result);
     });
@@ -238,13 +236,24 @@ function RegisterUser(user,passw,email,callback) {
         return;
     }
 
-    //Create session row for user, session string empty until login
+    //Create session for user, session string empty until login
     var innerData = [res.rows[0].usr_id];
-    var innerQuery = 'INSERT INTO sessions(usr_id,sessionID) VALUES($1,NULL)';
+    var innerQuery = 'INSERT INTO sessions(usr_id,sessionID) VALUES($1,NULL);';
 
     dbclient.query(innerQuery,innerData, (err, res) => {
       if (err) {
           console.log("DB ERROR RegSession: \n" + err);
+          DBErr = true;
+          return;
+      }
+      return;
+    });
+
+    //Create user profile row
+    innerQuery = 'INSERT INTO profiles(usr_id) VALUES($1);';
+    dbclient.query(innerQuery,innerData, (err, res) => {
+      if (err) {
+          console.log("DB ERROR RegProfile: \n" + err);
           DBErr = true;
           return;
       }
