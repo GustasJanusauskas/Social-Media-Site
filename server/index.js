@@ -65,7 +65,7 @@ app.put("/userinfo", (req, res) => {
 });
 
 app.put("/login", (req, res) => {
-  LoginUser(req.body.username,req.body.password,req.headers.host,(success,msg) => {
+  LoginUser( sanitizeHtml( req.body.username ),req.body.password,req.headers.host,(success,msg) => {
     res.json({
       username: '',
       password: '',
@@ -76,7 +76,7 @@ app.put("/login", (req, res) => {
 });
 
 app.put("/register", (req, res) => {
-  RegisterUser(req.body.username,req.body.password,req.body.email,(success,msg) => {
+  RegisterUser( sanitizeHtml( req.body.username ),req.body.password,req.body.email,(success,msg) => {
     res.json({
       username: '',
       password: '',
