@@ -87,7 +87,7 @@ app.put("/register", (req, res) => {
 });
 
 app.put("/addPost", (req, res) => {
-  RegisterUser( req.body.session, sanitizeHtml( req.body.title ), sanitizeHtml( req.body.body ), (success,msg) => {
+  AddPost( req.body.session, sanitizeHtml( req.body.title ), sanitizeHtml( req.body.body ), (success,msg) => {
     if (!success) console.log(msg);
   });
 });
