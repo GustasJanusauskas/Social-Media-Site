@@ -24,7 +24,15 @@ CREATE TABLE profiles(
 	description varchar(1024),
 	picture varchar(256),
 	friends bigint[],
-	posts varchar(4096)[]
+	posts bigint[]
+);
+
+CREATE TABLE posts(
+	post_id bigserial UNIQUE NOT NULL,
+	usr_id bigint UNIQUE NOT NULL,
+	ptitle varchar(256),
+	pbody varchar(4096),
+	PRIMARY KEY(post_id)
 );
 
 CREATE TABLE messages(

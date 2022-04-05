@@ -86,14 +86,58 @@ app.put("/register", (req, res) => {
   });
 });
 
+app.put("/addPost", (req, res) => {
+  RegisterUser( req.body.session, sanitizeHtml( req.body.title ), sanitizeHtml( req.body.body ), (success,msg) => {
+    if (!success) console.log(msg);
+  });
+});
+
 app.listen(PORT, () => {
   console.log(`Server listening on ${PORT}`);
 });
 
 //FUNCTIONS
 
-// SQL for AddPost function
-// UPDATE profiles SET posts = array_append(posts,$2) WHERE usr_id = $1;
+function AddPost(session,title,body,callback) {
+  //Getting UserID from session
+  var query = 'SELECT * FROM sessions WHERE sessionid = $1';
+  var data = [session];
+
+  dbclient.query(query,data, (err, res) => {
+    if (err || res.rows.length == 0) {
+      if (err) console.log("DB ERROR GetUserID: \n" + err);
+      callback(false,'Failed to get user ID from session.');
+      return;
+    }
+
+    //Add post info
+    var userID = res.rows[0].usr_id;
+    var innerQuery = 'INSERT INTO posts(usr_id,ptitle,pbody) VALUES($1,$2,$3) RETURNING post_id;';
+    var innerData = [userID,title,body];
+
+    dbclient.query(innerQuery,innerData, (err, res) => {
+      if (err || res.rows.length == 0) {
+        if (err) console.log("DB ERROR AddPost: \n" + err);
+        callback(false,'Failed to add post.');
+        return;
+      }
+
+      //Add post ID to user profile
+      var innerInQuery = 'UPDATE profiles SET posts = array_append(posts,$2) WHERE usr_id = $1;';
+      var innerInData = [userID,res.rows[0].post_id];
+
+      dbclient.query(innerInQuery,innerInData, (err, res) => {
+        if (err || res.rows.length == 0) {
+          if (err) console.log("DB ERROR RegPost: \n" + err);
+          callback(false,'Failed to register post.');
+          return;
+        }
+
+        callback(true,'Post registered successfully.');
+      });
+    });
+  });
+}
 
 function GetUserInfo(session,callback) {
   var query = 'SELECT * FROM sessions WHERE sessionid = $1';
