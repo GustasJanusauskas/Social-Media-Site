@@ -58,6 +58,12 @@ app.get("/testLog", (req, res) => {
 });
 
 //API
+app.put("/publicuserinfo", (req, res) => {
+  GetPublicUserInfo(req.body.ID,(success,inf) => {
+    res.json(inf);
+  });
+});
+
 app.put("/userinfo", (req, res) => {
   GetUserInfo(req.body.session,(success,inf) => {
     res.json(inf);
@@ -138,6 +144,37 @@ function AddPost(session,title,body,callback) {
         callback(true,'Post registered successfully.');
       });
     });
+  });
+}
+
+function GetPublicUserInfo(ID,callback) {
+  var userID = ID;
+  var innerQuery = 'SELECT username, created, firstname, lastname, description, picture, friends, posts FROM users, profiles WHERE profiles.usr_id = users.usr_id AND users.usr_id = $1;';
+  var innerData = [userID];
+
+  var result = new UserInfo();
+  dbclient.query(innerQuery,innerData, (err, res) => {
+    if (err || res.rows.length == 0) {
+      if (err) console.log("DB ERROR GetUserInfo: \n" + err);
+      result.error = 'Failed to get user info.';
+      callback(false,result);
+      return;
+    }
+
+    result.username = res.rows[0].username;
+    result.creationdate = res.rows[0].created;
+
+    result.firstName = res.rows[0].firstname;
+    result.lastName = res.rows[0].lastname;
+    result.profileDesc = res.rows[0].description;
+    result.avatarPath = res.rows[0].picture;
+
+    result.friends = res.rows[0].friends;
+    result.posts = res.rows[0].posts;
+
+    result.success = true;
+
+    callback(true,result);
   });
 }
 

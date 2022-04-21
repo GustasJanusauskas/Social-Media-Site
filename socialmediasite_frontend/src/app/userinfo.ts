@@ -13,4 +13,6 @@ export interface UserInfo {
     avatarPath?: string;
     friends?: number[];
     posts?: string[];
+
+    ID?: number;
 }

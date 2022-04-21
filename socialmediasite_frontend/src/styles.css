@@ -65,18 +65,22 @@ textarea {
 	resize: none;
 }
 
-#EmailInput, #UserInput, #PassInput, #PostTitleInput {
+#EmailInput, #UserInput, #PassInput {
 	height: 2em;
 	width: 16em;
 	padding-left: 0.5em;
 	margin-bottom: 0.75em;
 }
 
-#PostBodyInput {
+#PostBodyInput, #PostTitleInput {
 	height: 16em;
-	width: 16em;
+	width: 24em;
 	padding-left: 0.5em;
 	margin-bottom: 0.75em;
+}
+
+#PostTitleInput {
+	height: 2em;
 }
 
 #Login, #Register, #AddPost {

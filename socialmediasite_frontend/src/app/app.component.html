@@ -3,12 +3,13 @@
 	<head>
 		<title> Main UI </title>
 	</head>
-	<body (onload)="updateUI()">
+	<body>
 		<div class="Main">
 			<div id="Top">
 				<div id="Topbar" class="BackgroundElement">
-					<button class="TopbarButton" id="LoginButton" (click)="setMain($event,'login')">Login</button>
-					<button class="TopbarButton" id="RegisterButton" (click)="setMain($event,'register')">Register</button>
+					<button *ngIf="userinfo.session == ''" class="TopbarButton" id="LoginButton" (click)="setMain($event,'login')">Login</button>
+					<button *ngIf="userinfo.session == ''" class="TopbarButton" id="RegisterButton" (click)="setMain($event,'register')">Register</button>
+					<b *ngIf="userinfo.session != ''">Logged in as {{loggedInAs}}</b>
 					<input type="text" placeholder="Search" id="SearchInput" autocomplete="off">
 				</div>
 			</div>
@@ -17,7 +18,7 @@
 					<h2>Navigation</h2>
 					<button class="SidebarButton" id="FirstButton">Feed</button>
 					<button class="SidebarButton" (click)="setMain($event,'post')">Add Post</button>
-					<button class="SidebarButton">Your profile ( {{loggedInAs}} )</button>
+					<button class="SidebarButton" (click)="setMain($event,'ownprofile')">Your profile ( {{loggedInAs}} )</button>
 					<button class="SidebarButton">Settings</button>
 				</div>
 				<div id="BodyMain" class="BackgroundElement">
@@ -57,9 +58,15 @@
 						<br>
 						<b>{{formError}}</b>
 					</div>
+					<div *ngIf="bodyHTML=='ownprofile'" id="Profile">
+						<h2>Name</h2>
+					</div>
 				</div>
 				<div id="FriendbarMain" class="BackgroundElement">
 					<h2>Friends</h2>
+					<div id="FriendbarInner">
+						<li *ngFor="let friend of friendList;">{{friend}}</li> 
+					</div>
 				</div>
 			</div>
 		</div>

@@ -24,6 +24,8 @@ export class AppComponent {
 
   //UserData
   loggedInAs: string = 'Not logged in';
+  userinfo: UserInfo = {session:''};
+  friendList: string[] = [];
 
   //Add Post
   postTitle: string = '';
@@ -33,7 +35,7 @@ export class AppComponent {
   //Main Body
   bodyHTML: string = '';
 
-  constructor(private userdataService: UserdataService) {}
+  constructor(private userdataService: UserdataService) {this.updateUI();}
 
   //Updates friends list, 'logged in as' labels
   updateUI() {
@@ -46,10 +48,27 @@ export class AppComponent {
         return;
       }
 
+      //Update userinfo, displayed data
+      this.userinfo = data;
       this.loggedInAs = '' + data.username;
-      //cast data to UserInfo, update loggedInAs
-
+      
       //Update friends list
+      this.friendList = [];
+      data.friends?.forEach((value) => {
+        this.userdataService.getPublicUserInfo(value).subscribe(data => {
+          if (data.error) {
+            console.log('Error for friend with user ID ' + value + ': ' + data.error);
+            return;
+          }
+          
+          if ( (data.firstName == undefined || data.firstName?.length <= 0) && (data.lastName == undefined || data.lastName?.length <= 0) ) {
+            this.friendList.push('' + data.username);
+          }
+          else {
+            this.friendList.push(data.firstName + ' ' + data.lastName);
+          }
+        });
+      });
     });
   }
 
@@ -104,9 +123,13 @@ export class AppComponent {
     //Send data to backend
     this.userdataService.loginUser(this.username,this.password).subscribe(data => {
       if (data.success) {
+        //Set session string, update UI, clear form
         this.formError = 'Logged in succesfully.';
         this.setCookie('session','' + data.session,30);
         this.updateUI();
+
+        this.username = '';
+        this.password = '';
       }
       else {
         this.formError = '' + data.session;

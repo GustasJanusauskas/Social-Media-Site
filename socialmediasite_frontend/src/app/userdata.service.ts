@@ -20,6 +20,11 @@ export class UserdataService {
 
   constructor(private http: HttpClient) {}
 
+  getPublicUserInfo(userID: number): Observable<UserInfo> {
+    var data: UserInfo = {session:'',ID:userID};
+    return this.http.put<UserInfo>('/publicuserinfo',data,httpOptions);
+  }
+
   getUserInfo(session: string): Observable<UserInfo> {
     var data: UserInfo = {session:session};
     return this.http.put<UserInfo>('/userinfo',data,httpOptions);
