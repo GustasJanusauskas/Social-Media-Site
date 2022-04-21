@@ -25,6 +25,11 @@ export class AppComponent {
   //UserData
   loggedInAs: string = 'Not logged in';
 
+  //Add Post
+  postTitle: string = '';
+  postBody: string = '';
+  postCharLeft : number = 4096;
+
   //Main Body
   bodyHTML: string = '';
 
@@ -45,6 +50,37 @@ export class AppComponent {
       //cast data to UserInfo, update loggedInAs
 
       //Update friends list
+    });
+  }
+
+  addPost(event: Event) {
+    if (this.postTitle.length <= 0 || this.postBody.length <= 0) {
+      this.formError = 'Post must have a title and body.';
+      return;
+    }
+    if (this.postTitle.length > 256) {
+      this.formError = 'Post title too long must be under 256 characters.';
+      return;
+    }
+    if (this.postBody.length > 256) {
+      this.formError = 'Post too long, must be under 4096 characters.';
+      return;
+    }
+
+    var session = this.getCookie('session');
+    if (!session || session.length < 64 ) {
+      this.formError = 'Must be logged in to make a post.';
+      return;
+    }
+
+    this.formError = 'Posting..';
+    this.userdataService.addPost(session,this.postTitle,this.postBody).subscribe(data => {
+      if (data.success) {
+        this.formError = 'Post added to wall!';
+      }
+      else {
+        this.formError = 'Failed to add post, please try again later.';
+      }
     });
   }
 
@@ -103,6 +139,10 @@ export class AppComponent {
         this.formError = '' + data.session;
       }
     });
+  }
+
+  updateCharCounter(event: Event) {
+    this.postCharLeft = 4096 - this.postBody.length;
   }
 
   setCookie(cname: string, cvalue: string, exdays: number) {

@@ -5,6 +5,7 @@ import { catchError, retry } from 'rxjs/operators';
 
 import {LoginResponse} from './loginresponse';
 import {UserInfo} from './userinfo';
+import {PostInfo} from './postinfo';
 
 const httpOptions = {
   headers: new HttpHeaders({
@@ -32,5 +33,10 @@ export class UserdataService {
   registerUser(user: string, pass: string, email: string): Observable<LoginResponse> {
     var data: LoginResponse = {username: user, password: pass, email: email};
     return this.http.put<LoginResponse>('/register',data,httpOptions);
+  }
+
+  addPost(session: string, postTitle: string, postBody: string) {
+    var data: PostInfo = {session:session,title:postTitle,body:postBody};
+    return this.http.put<PostInfo>('/addPost',data,httpOptions);
   }
 }

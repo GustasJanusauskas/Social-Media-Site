@@ -89,6 +89,9 @@ app.put("/register", (req, res) => {
 app.put("/addPost", (req, res) => {
   AddPost( req.body.session, sanitizeHtml( req.body.title ), sanitizeHtml( req.body.body ), (success,msg) => {
     if (!success) console.log(msg);
+    res.json({
+      success:success
+    });
   });
 });
 
@@ -97,7 +100,6 @@ app.listen(PORT, () => {
 });
 
 //FUNCTIONS
-
 function AddPost(session,title,body,callback) {
   //Getting UserID from session
   var query = 'SELECT * FROM sessions WHERE sessionid = $1';
@@ -127,7 +129,7 @@ function AddPost(session,title,body,callback) {
       var innerInData = [userID,res.rows[0].post_id];
 
       dbclient.query(innerInQuery,innerInData, (err, res) => {
-        if (err || res.rows.length == 0) {
+        if (err) {
           if (err) console.log("DB ERROR RegPost: \n" + err);
           callback(false,'Failed to register post.');
           return;

@@ -29,7 +29,7 @@ CREATE TABLE profiles(
 
 CREATE TABLE posts(
 	post_id bigserial UNIQUE NOT NULL,
-	usr_id bigint UNIQUE NOT NULL,
+	usr_id bigint NOT NULL,
 	ptitle varchar(256),
 	pbody varchar(4096),
 	PRIMARY KEY(post_id)

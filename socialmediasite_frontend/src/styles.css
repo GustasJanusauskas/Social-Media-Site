@@ -39,7 +39,7 @@ h2 {
 	margin-right: auto;
 }
 
-input:focus {
+input:focus, textarea:focus {
 	outline-style: solid;
 	outline-color: #6f617e;
 	outline-width: 1px;
@@ -50,7 +50,8 @@ input:focus {
 	margin-bottom: 0.5em;
 }
 
-input {
+input, textarea {
+	font-size: medium;
 	font-family: 'Montserrat', sans-serif;
 	background-color: azure;
 
@@ -60,20 +61,31 @@ input {
 	border-radius: 0.75em;
 }
 
-#EmailInput, #UserInput, #PassInput {
+textarea {
+	resize: none;
+}
+
+#EmailInput, #UserInput, #PassInput, #PostTitleInput {
 	height: 2em;
 	width: 16em;
 	padding-left: 0.5em;
 	margin-bottom: 0.75em;
 }
 
-#Login, #Register {
+#PostBodyInput {
+	height: 16em;
+	width: 16em;
+	padding-left: 0.5em;
+	margin-bottom: 0.75em;
+}
+
+#Login, #Register, #AddPost {
 	text-align: center;
 }
 
 #LogLabel {
 	display: inline-block;
-	width: 8em;
+	width: 9em;
 }
 
 .MainbarButton {

@@ -3,7 +3,7 @@
 	<head>
 		<title> Main UI </title>
 	</head>
-	<body>
+	<body (onload)="updateUI()">
 		<div class="Main">
 			<div id="Top">
 				<div id="Topbar" class="BackgroundElement">
@@ -16,6 +16,7 @@
 				<div id="SidebarMain" class="BackgroundElement">
 					<h2>Navigation</h2>
 					<button class="SidebarButton" id="FirstButton">Feed</button>
+					<button class="SidebarButton" (click)="setMain($event,'post')">Add Post</button>
 					<button class="SidebarButton">Your profile ( {{loggedInAs}} )</button>
 					<button class="SidebarButton">Settings</button>
 				</div>
@@ -39,6 +40,20 @@
 						<label id="LogLabel">Password:</label> <input type="password" placeholder="Enter password" id="PassInput" [(ngModel)]="password" autocomplete="off">
 						<br>
 						<button class="MainbarButton" id="RegisterMainButton" (click)="register($event)">Register</button>
+						<br>
+						<b>{{formError}}</b>
+					</div>
+					<div *ngIf="bodyHTML=='post'" id="AddPost">
+						<h2>Add a new post</h2>
+						<h3>Title</h3>
+						<input type="text" placeholder="Enter your post title" id="PostTitleInput" [(ngModel)]="postTitle" autocomplete="off">
+						<br>
+						<h3>Body</h3>
+						<textarea placeholder="Enter your post content" id="PostBodyInput" [(ngModel)]="postBody" (keypress)="updateCharCounter($event)" autocomplete="off"> </textarea>
+						<br>
+						Characters left: {{postCharLeft}}
+						<br>
+						<button class="MainbarButton" id="PostMainButton" (click)="addPost($event)">Post</button>
 						<br>
 						<b>{{formError}}</b>
 					</div>
