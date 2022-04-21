@@ -152,7 +152,7 @@ textarea {
 	border-radius: 0.75em;
 }
 
-#LoginButton, #RegisterButton {
+#LoginButton, #RegisterButton, #LogoffButton {
 	font-size: 16px;
 	padding: 0.25em;
 }

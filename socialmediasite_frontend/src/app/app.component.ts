@@ -37,10 +37,17 @@ export class AppComponent {
 
   constructor(private userdataService: UserdataService) {this.updateUI();}
 
-  //Updates friends list, 'logged in as' labels
+  //Gets userinfo, updates friends list, 'logged in as' labels
   updateUI() {
     var session = this.getCookie('session');
-    if (!session || session.length < 64 ) return;
+    if (!session || session.length < 64 ) {
+      //Clear user data if session was deleted/expired
+      this.loggedInAs= 'Not logged in';
+      this.userinfo = {session:''};
+      this.friendList = [];
+
+      return;
+    }
 
     this.userdataService.getUserInfo(session).subscribe(data => {
       if (!data.success) {
@@ -135,6 +142,11 @@ export class AppComponent {
         this.formError = '' + data.session;
       }
     });
+  }
+
+  logoff(event: Event) {
+    this.deleteCookie('session');
+    this.updateUI();
   }
 
   register(event: Event) {
