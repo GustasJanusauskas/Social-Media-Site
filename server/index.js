@@ -1,6 +1,7 @@
 'use strict';
 
 const UserInfo = require('./userinfo');
+const PostInfo = require('./postinfo');
 
 const fs = require('fs');
 const ws = require('ws');
@@ -58,6 +59,12 @@ app.get("/testLog", (req, res) => {
 });
 
 //API
+app.put("/userposts", (req, res) => { //TODO Test
+  GetUserPosts(req.body.authorID,(success,inf) => {
+    res.json(inf);
+  });
+});
+
 app.put("/publicuserinfo", (req, res) => {
   GetPublicUserInfo(req.body.ID,(success,inf) => {
     res.json(inf);
@@ -120,7 +127,7 @@ function AddPost(session,title,body,callback) {
 
     //Add post info
     var userID = res.rows[0].usr_id;
-    var innerQuery = 'INSERT INTO posts(usr_id,ptitle,pbody) VALUES($1,$2,$3) RETURNING post_id;';
+    var innerQuery = 'INSERT INTO posts(usr_id,ptitle,pbody,pdate) VALUES($1,$2,$3,now()) RETURNING post_id;';
     var innerData = [userID,title,body];
 
     dbclient.query(innerQuery,innerData, (err, res) => {
@@ -144,6 +151,33 @@ function AddPost(session,title,body,callback) {
         callback(true,'Post registered successfully.');
       });
     });
+  });
+}
+
+function GetUserPosts(ID,callback) {
+  var innerQuery = 'SELECT posts.ptitle, posts.pbody, posts.pdate FROM posts WHERE posts.usr_id = $1;';
+  var innerData = [ID];
+
+  var result = [];
+  dbclient.query(innerQuery,innerData, (err, res) => {
+    if (err || res.rows.length == 0) {
+      if (err) console.log("DB ERROR GetUserInfo: \n" + err);
+      result.error = 'Failed to get user info.';
+      callback(false,result);
+      return;
+    }
+
+    for (var x = 0; x < res.rowCount; x++) {
+      var temp = new PostInfo(ID);
+
+      temp.title = res.rows[x].ptitle;
+      temp.body = res.rows[x].pbody;
+      temp.date = res.rows[x].pdate;
+
+      result.push(temp);
+    }
+
+    callback(true,result);
   });
 }
 

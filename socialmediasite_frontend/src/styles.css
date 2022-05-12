@@ -65,6 +65,25 @@ textarea {
 	resize: none;
 }
 
+#FeedPost {
+	padding: 1.5em;
+	background-color: azure;
+	white-space: pre-line;
+
+	border-style: solid;
+	border-color: #414d61;
+	border-width: 1px;
+	border-radius: 0.75em;
+}
+
+#Feed {
+	text-align:center;
+}
+
+#PostBody {
+	text-align:justify;
+}
+
 #EmailInput, #UserInput, #PassInput {
 	height: 2em;
 	width: 16em;

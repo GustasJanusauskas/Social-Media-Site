@@ -32,6 +32,7 @@ CREATE TABLE posts(
 	usr_id bigint NOT NULL,
 	ptitle varchar(256),
 	pbody varchar(4096),
+	pdate timestamp DEFAULT '2022-01-01 08:00:00',
 	PRIMARY KEY(post_id)
 );
 

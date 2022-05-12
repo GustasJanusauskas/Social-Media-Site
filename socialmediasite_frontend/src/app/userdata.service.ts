@@ -6,6 +6,7 @@ import { catchError, retry } from 'rxjs/operators';
 import {LoginResponse} from './loginresponse';
 import {UserInfo} from './userinfo';
 import {PostInfo} from './postinfo';
+import { Post } from './post';
 
 const httpOptions = {
   headers: new HttpHeaders({
@@ -19,6 +20,11 @@ const httpOptions = {
 export class UserdataService {
 
   constructor(private http: HttpClient) {}
+
+  getUserPosts(userID: number): Observable<Post[]> {
+    var data: Post = {authorID:userID};
+    return this.http.put<Post[]>('/userposts',data,httpOptions);
+  }
 
   getPublicUserInfo(userID: number): Observable<UserInfo> {
     var data: UserInfo = {session:'',ID:userID};
