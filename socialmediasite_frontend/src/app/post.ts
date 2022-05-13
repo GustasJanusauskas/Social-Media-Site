@@ -1,6 +1,7 @@
 export class Post {
     title?: string;
     body?: string;
+    date?: string;
 
     author?: string;
     authorID: number = 0;

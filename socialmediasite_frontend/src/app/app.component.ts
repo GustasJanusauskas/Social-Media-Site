@@ -39,13 +39,12 @@ export class AppComponent {
 
   constructor(private userdataService: UserdataService) {
     this.updateUI();
-    this.getUserPosts(8,function () {});
   }
 
   //Gets userinfo, updates friends list, 'logged in as' labels
   updateUI() {
     var session = this.getCookie('session');
-    if (!session || session.length < 64 ) {
+    if (session == null || session.length < 64 ) {
       //Clear user data if session was deleted/expired
       this.loggedInAs= 'Not logged in';
       this.userinfo = {session:''};
@@ -84,22 +83,17 @@ export class AppComponent {
     });
   }
 
-  /*getOwnPosts() {
-    var session = this.getCookie('session');
-    if (!session || session.length < 64 ) {
-      return;
-    }
-    this.getUserPosts(this.userinfo.ID,d => {
-      d.
+  getFriendPosts(userID: number,callback: Function) {
+    this.userdataService.getFriendPosts(userID).subscribe(data => {
+      callback(data);
+      return data;
     });
+    return null;
+  }
 
-  }*/
-
-  getUserPosts(userID: number,callback: Function) { //TODO Finish
+  getUserPosts(userID: number,callback: Function) {
     this.userdataService.getUserPosts(userID).subscribe(data => {
-      console.log('a');
-      console.log(data);
-      //callback(data);
+      callback(data);
       return data;
     });
     return null;
@@ -120,7 +114,7 @@ export class AppComponent {
     }
 
     var session = this.getCookie('session');
-    if (!session || session.length < 64 ) {
+    if (session == null || session.length < 64 ) {
       this.formError = 'Must be logged in to make a post.';
       return;
     }
@@ -139,6 +133,28 @@ export class AppComponent {
   setMain(event: Event,text: string) {
     this.formError = '';
     this.bodyHTML = text;
+
+    switch (text) {
+      case 'feed':
+        var session = this.getCookie('session');
+        //Not logged in - show new public posts (-1 gets all new posts)
+        if (session == null || session.length < 64 ) {
+          this.getUserPosts(-1,(data:Post[]) => {
+            this.postList = data;
+            console.log(data);
+          });
+        }
+        //Logged in - show friend posts
+        else {
+          if (this.userinfo.friends != null && this.userinfo.ID) {
+            this.getFriendPosts(this.userinfo.ID,(data:Post[]) => {
+              this.postList = data;
+              console.log(data);
+            });
+          }
+        }
+        break;
+    }
   }
 
   login(event: Event) {
@@ -199,6 +215,12 @@ export class AppComponent {
       else {
         this.formError = '' + data.session;
       }
+    });
+  }
+
+  convertPostDates(posts:Post[]) {
+    posts.forEach(post => {
+      post.date = '';
     });
   }
 

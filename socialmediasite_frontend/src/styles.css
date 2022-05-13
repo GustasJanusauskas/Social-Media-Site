@@ -74,6 +74,8 @@ textarea {
 	border-color: #414d61;
 	border-width: 1px;
 	border-radius: 0.75em;
+
+	margin-bottom: 2em;
 }
 
 #Feed {
@@ -82,6 +84,11 @@ textarea {
 
 #PostBody {
 	text-align:justify;
+}
+
+#PostedDateText {
+	color: #6f617e;
+	font-size: small;
 }
 
 #EmailInput, #UserInput, #PassInput {

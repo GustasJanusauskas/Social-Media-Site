@@ -21,6 +21,11 @@ export class UserdataService {
 
   constructor(private http: HttpClient) {}
 
+  getFriendPosts(userID: number): Observable<Post[]> {
+    var data: Post = {authorID:userID};
+    return this.http.put<Post[]>('/friendposts',data,httpOptions);
+  }
+
   getUserPosts(userID: number): Observable<Post[]> {
     var data: Post = {authorID:userID};
     return this.http.put<Post[]>('/userposts',data,httpOptions);
@@ -36,6 +41,7 @@ export class UserdataService {
     return this.http.put<UserInfo>('/userinfo',data,httpOptions);
   }
 
+  //
   loginUser(user: string, pass: string): Observable<LoginResponse> {
     var data: LoginResponse = {username: user, password: pass};
     return this.http.put<LoginResponse>('/login',data,httpOptions);

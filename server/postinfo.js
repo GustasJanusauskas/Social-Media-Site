@@ -6,6 +6,7 @@ class PostInfo {
     title = "";
     body = "";
     date = "";
+    author = "";
     authorID = 0;
 
     constructor(a) { this.authorID = a}

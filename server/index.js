@@ -59,7 +59,13 @@ app.get("/testLog", (req, res) => {
 });
 
 //API
-app.put("/userposts", (req, res) => { //TODO Test
+app.put("/friendposts", (req, res) => {
+  GetFriendPosts(req.body.authorID,(success,inf) => {
+    res.json(inf);
+  });
+});
+
+app.put("/userposts", (req, res) => {
   GetUserPosts(req.body.authorID,(success,inf) => {
     res.json(inf);
   });
@@ -154,25 +160,64 @@ function AddPost(session,title,body,callback) {
   });
 }
 
-function GetUserPosts(ID,callback) {
-  var innerQuery = 'SELECT posts.ptitle, posts.pbody, posts.pdate FROM posts WHERE posts.usr_id = $1;';
-  var innerData = [ID];
+function GetFriendPosts(friends,callback) {
+  var innerQuery = "SELECT posts.ptitle, posts.pbody, to_char(posts.pdate, 'YYYY-MM-DD at HH12:MIam') AS pdate, posts.usr_id, CONCAT(profiles.firstname,' ',profiles.lastname) AS author FROM posts, profiles WHERE posts.usr_id = ANY (array(SELECT friends FROM profiles WHERE usr_id = $1 )) ORDER BY posts.pdate DESC LIMIT 50;";
+  var innerData = [friends];
 
   var result = [];
   dbclient.query(innerQuery,innerData, (err, res) => {
     if (err || res.rows.length == 0) {
-      if (err) console.log("DB ERROR GetUserInfo: \n" + err);
-      result.error = 'Failed to get user info.';
+      if (err) console.log("DB ERROR GetFriendPosts: \n" + err);
+      result.error = 'Failed to get friend post info.';
       callback(false,result);
       return;
     }
 
     for (var x = 0; x < res.rowCount; x++) {
-      var temp = new PostInfo(ID);
+      var temp = new PostInfo(res.rows[x].usr_id);
 
       temp.title = res.rows[x].ptitle;
       temp.body = res.rows[x].pbody;
       temp.date = res.rows[x].pdate;
+      temp.author = res.rows[x].author;
+
+      result.push(temp);
+    }
+
+    callback(true,result);
+  });
+}
+
+function GetUserPosts(ID,callback) {
+  var innerQuery;
+  var innerData;
+
+  //ID of -1 gets newest posts, regardless of user
+  if (ID == -1) {
+    innerQuery = "SELECT posts.ptitle, posts.pbody, to_char(posts.pdate, 'YYYY-MM-DD at HH12:MIam') AS pdate, posts.usr_id, CONCAT(profiles.firstname,' ',profiles.lastname) AS author FROM posts,profiles WHERE profiles.usr_id = posts.usr_id ORDER BY posts.pdate DESC LIMIT 50;";
+    innerData = [];
+  }
+  else {
+    innerQuery = "SELECT posts.ptitle, posts.pbody, to_char(posts.pdate, 'YYYY-MM-DD at HH12:MIam') AS pdate, posts.usr_id, CONCAT(profiles.firstname,' ',profiles.lastname) AS author FROM posts, profiles WHERE posts.usr_id = $1 AND posts.usr_id = profiles.usr_id ORDER BY posts.pdate DESC;";
+    innerData = [ID];
+  }
+
+  var result = [];
+  dbclient.query(innerQuery,innerData, (err, res) => {
+    if (err || res.rows.length == 0) {
+      if (err) console.log("DB ERROR GetUserPosts: \n" + err);
+      result.error = 'Failed to get user posts.';
+      callback(false,result);
+      return;
+    }
+
+    for (var x = 0; x < res.rowCount; x++) {
+      var temp = new PostInfo(res.rows[x].usr_id);
+
+      temp.title = res.rows[x].ptitle;
+      temp.body = res.rows[x].pbody;
+      temp.date = res.rows[x].pdate;
+      temp.author = res.rows[x].author;
 
       result.push(temp);
     }
@@ -189,8 +234,8 @@ function GetPublicUserInfo(ID,callback) {
   var result = new UserInfo();
   dbclient.query(innerQuery,innerData, (err, res) => {
     if (err || res.rows.length == 0) {
-      if (err) console.log("DB ERROR GetUserInfo: \n" + err);
-      result.error = 'Failed to get user info.';
+      if (err) console.log("DB ERROR GetPublicUserInfo: \n" + err);
+      result.error = 'Failed to get public user info.';
       callback(false,result);
       return;
     }
