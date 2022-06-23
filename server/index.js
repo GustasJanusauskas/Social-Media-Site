@@ -251,6 +251,8 @@ function GetPublicUserInfo(ID,callback) {
     result.friends = res.rows[0].friends;
     result.posts = res.rows[0].posts;
 
+    result.ID = userID;
+
     result.success = true;
 
     callback(true,result);
@@ -293,6 +295,8 @@ function GetUserInfo(session,callback) {
 
       result.friends = res.rows[0].friends;
       result.posts = res.rows[0].posts;
+
+      result.ID = userID;
 
       result.success = true;
 
@@ -412,7 +416,7 @@ function RegisterUser(user,passw,email,callback) {
     });
 
     //Create user profile row
-    innerQuery = 'INSERT INTO profiles(usr_id) VALUES($1);';
+    innerQuery = "INSERT INTO profiles(usr_id,friends) VALUES($1,'{$1}');";
     dbclient.query(innerQuery,innerData, (err, res) => {
       if (err) {
           console.log("DB ERROR RegProfile: \n" + err);

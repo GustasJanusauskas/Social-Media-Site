@@ -35,14 +35,14 @@ export class AppComponent {
 
   //Main Body
   bodyHTML: string = '';
-  postList: Post[] = [new Post('TestT',' Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec interdum gravida risus sed fringilla. Donec viverra, orci sed tempor accumsan, sapien diam placerat leo, in porttitor nunc quam ut magna. Donec dictum enim in nisl venenatis, vitae pretium eros volutpat. In tempus tristique ipsum nec egestas. Etiam imperdiet enim vitae mollis varius. Pellentesque finibus porttitor mi, sodales auctor leo. Aenean vulputate in dui sed vehicula. Maecenas nunc leo, dapibus feugiat suscipit non, vestibulum et sapien. Aenean malesuada nunc dolor, ac cursus odio mattis vitae. Suspendisse vitae tempor dui. Vivamus vestibulum, ex non maximus viverra, nisl ante luctus elit, in sagittis purus urna quis felis. In fringilla, nisl ac placerat condimentum, est diam pharetra libero, at gravida leo mauris id tellus. Quisque odio mauris, tincidunt eu eros vel, dignissim aliquam magna. Aenean finibus luctus nibh a aliquam. Quisque eu velit consequat, suscipit lorem eget, pretium ligula.\n\nNulla dapibus nec neque id efficitur. Nulla sodales, diam sed sollicitudin elementum, urna risus accumsan dui, vel lobortis sem lacus a tortor. Nullam sed eros a metus dapibus cursus id et nunc. Proin rhoncus nisl nec congue egestas. Aliquam lectus lacus, aliquam eget convallis at, faucibus at justo. Quisque posuere enim at sapien porta, lobortis ornare arcu malesuada. Integer mattis, dolor id porttitor dictum, odio orci accumsan velit, id mollis orci lacus quis massa. Fusce venenatis rhoncus finibus. Suspendisse porttitor consequat fermentum.\n\nCras rutrum sem quis justo tincidunt, sed pellentesque velit auctor. Aenean malesuada massa ligula, quis condimentum enim porta eu. Morbi luctus nulla dolor, non scelerisque odio consequat sit amet. Phasellus dapibus magna turpis, et facilisis dui ultrices eget. Nam tincidunt odio ultrices felis congue, cursus vestibulum urna aliquam. Donec tempus odio a est viverra gravida. Etiam sed augue id justo interdum ullamcorper. Fusce iaculis odio in justo maximus elementum. Etiam ac ante dui. Vestibulum molestie ornare dui, nec dignissim tellus pharetra vitae. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Duis iaculis fermentum tempus.','TestAuth',0)];
+  postList: Post[] = [];
 
   constructor(private userdataService: UserdataService) {
     this.updateUI();
   }
 
   //Gets userinfo, updates friends list, 'logged in as' labels
-  updateUI() {
+  updateUI(callback?: Function) {
     var session = this.getCookie('session');
     if (session == null || session.length < 64 ) {
       //Clear user data if session was deleted/expired
@@ -71,6 +71,8 @@ export class AppComponent {
             console.log('Error for friend with user ID ' + value + ': ' + data.error);
             return;
           }
+          //Don't add self to friends list.
+          if (data.ID == this.userinfo.ID) return;
           
           if ( (data.firstName == undefined || data.firstName?.length <= 0) && (data.lastName == undefined || data.lastName?.length <= 0) ) {
             this.friendList.push('' + data.username);
@@ -80,6 +82,8 @@ export class AppComponent {
           }
         });
       });
+
+      if (callback) callback();
     });
   }
 
@@ -133,28 +137,28 @@ export class AppComponent {
   setMain(event: Event,text: string) {
     this.formError = '';
     this.bodyHTML = text;
-
-    switch (text) {
-      case 'feed':
-        var session = this.getCookie('session');
-        //Not logged in - show new public posts (-1 gets all new posts)
-        if (session == null || session.length < 64 ) {
-          this.getUserPosts(-1,(data:Post[]) => {
-            this.postList = data;
-            console.log(data);
-          });
-        }
-        //Logged in - show friend posts
-        else {
-          if (this.userinfo.friends != null && this.userinfo.ID) {
-            this.getFriendPosts(this.userinfo.ID,(data:Post[]) => {
+    this.updateUI(() => {
+      switch (text) {
+        case 'feed':
+          var session = this.getCookie('session');
+          //Not logged in - show new public posts (-1 gets all new posts)
+          if (session == null || session.length < 64 ) {
+            this.getUserPosts(-1,(data:Post[]) => {
               this.postList = data;
               console.log(data);
             });
           }
-        }
-        break;
-    }
+          //Logged in - show friend posts
+          else {
+            if (this.userinfo.friends != undefined && this.userinfo.ID != undefined) {
+              this.getFriendPosts(this.userinfo.ID,(data:Post[]) => {
+                this.postList = data;
+              });
+            }
+          }
+          break;
+      }
+    });
   }
 
   login(event: Event) {
