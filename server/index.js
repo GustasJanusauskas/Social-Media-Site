@@ -390,7 +390,7 @@ function RegisterUser(user,passw,email,callback) {
   var finalPass = crypto.createHash('BLAKE2b512').update(passSalt + passw + passPepper).digest('hex');
 
   //Create user row
-  var query = 'INSERT INTO users(username,password,email,created,salt,pepper) VALUES($1,$2,$3,NOW(),$4,$5) RETURNING usr_id;';
+  var query = 'INSERT INTO users(username,password,email,created,salt,pepper) VALUES($1,$2,$3,NOW(),$4,$5) RETURNING usr_id, username;';
   var data = [user,finalPass,email,passSalt,passPepper];
 
   var DBErr = false;
@@ -416,7 +416,9 @@ function RegisterUser(user,passw,email,callback) {
     });
 
     //Create user profile row
-    innerQuery = "INSERT INTO profiles(usr_id,friends) VALUES($1,'{$1}');";
+    innerQuery = "INSERT INTO profiles(usr_id,firstname,friends) VALUES($1,$2,ARRAY[CAST($3 AS BIGINT)]);";
+    innerData = [res.rows[0].usr_id,res.rows[0].username,res.rows[0].usr_id];
+  
     dbclient.query(innerQuery,innerData, (err, res) => {
       if (err) {
           console.log("DB ERROR RegProfile: \n" + err);
