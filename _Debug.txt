@@ -1,9 +1,0 @@
-Test account 1:
-	fsfsgsg@gdgd.com
-	aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-	aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa4681
-
-DB debugging commands:
-UPDATE profiles SET friends = array_append(friends,15) WHERE usr_id = 8;
-UPDATE profiles SET firstname = 'fName' where usr_id = 8;
-UPDATE profiles SET lastname = 'lName' where usr_id = 8;
