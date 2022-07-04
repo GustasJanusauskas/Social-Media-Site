@@ -91,7 +91,7 @@ textarea {
 	font-size: small;
 }
 
-#EmailInput, #UserInput, #PassInput {
+#EmailInput, #UserInput, #PassInput, #ProfileInput {
 	height: 2em;
 	width: 16em;
 	padding-left: 0.5em;
@@ -109,7 +109,7 @@ textarea {
 	height: 2em;
 }
 
-#Login, #Register, #AddPost {
+#Login, #Register, #AddPost, #Profile {
 	text-align: center;
 }
 

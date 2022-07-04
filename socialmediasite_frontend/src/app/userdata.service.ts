@@ -41,7 +41,6 @@ export class UserdataService {
     return this.http.put<UserInfo>('/userinfo',data,httpOptions);
   }
 
-  //
   loginUser(user: string, pass: string): Observable<LoginResponse> {
     var data: LoginResponse = {username: user, password: pass};
     return this.http.put<LoginResponse>('/login',data,httpOptions);
@@ -55,5 +54,12 @@ export class UserdataService {
   addPost(session: string, postTitle: string, postBody: string) {
     var data: PostInfo = {session:session,title:postTitle,body:postBody};
     return this.http.put<PostInfo>('/addPost',data,httpOptions);
+  }
+
+  updateProfile(session: string, userinfo: UserInfo) {
+    var data: UserInfo = userinfo;
+    data.session = session;
+
+    return this.http.put<UserInfo>('/updateProfile',data,httpOptions);
   }
 }

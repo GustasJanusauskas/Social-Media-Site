@@ -27,6 +27,7 @@ export class AppComponent {
   loggedInAs: string = 'Not logged in';
   userinfo: UserInfo = {session:''};
   friendList: string[] = [];
+  profileDescCharLeft : number = 1024;
 
   //Add Post
   postTitle: string = '';
@@ -74,10 +75,12 @@ export class AppComponent {
           //Don't add self to friends list.
           if (data.ID == this.userinfo.ID) return;
           
-          if ( (data.firstName == undefined || data.firstName?.length <= 0) && (data.lastName == undefined || data.lastName?.length <= 0) ) {
+          if ( (data.firstName == null || data.firstName?.length <= 0) && (data.lastName == null || data.lastName?.length <= 0) ) {
             this.friendList.push('' + data.username);
           }
           else {
+            if (data.lastName == null) data.lastName = '';
+
             this.friendList.push(data.firstName + ' ' + data.lastName);
           }
         });
@@ -101,6 +104,29 @@ export class AppComponent {
       return data;
     });
     return null;
+  }
+
+  updateProfile(event: Event) {
+    if (!this.userinfo.firstName || !this.userinfo.lastName || this.userinfo.firstName?.length <= 0 || this.userinfo.lastName?.length <= 0) {
+      this.formError = 'Profile must have both a first and last name set.';
+      return;
+    }
+
+    var session = this.getCookie('session');
+    if (session == null || session.length < 64 ) {
+      this.formError = 'Must be logged in to update profile.';
+      return;
+    }
+
+    this.formError = 'Updating profile..';
+    this.userdataService.updateProfile(session,this.userinfo).subscribe(data => {
+      if (data.success) {
+        this.formError = 'Profile updated!';
+      }
+      else {
+        this.formError = 'Failed to update profile, please try again later.';
+      }
+    });
   }
 
   addPost(event: Event) {
@@ -228,8 +254,15 @@ export class AppComponent {
     });
   }
 
-  updateCharCounter(event: Event) {
-    this.postCharLeft = 4096 - this.postBody.length;
+  updateCharCounter(event: Event,counterID: string = 'post') {
+    switch (counterID) {
+      case 'post':
+        this.postCharLeft = 4096 - this.postBody.length;
+        break;
+      case 'profile':
+        if (this.userinfo.profileDesc) this.profileDescCharLeft = 1024 - this.userinfo.profileDesc?.length;
+        break;
+    }
   }
 
   setCookie(cname: string, cvalue: string, exdays: number) {

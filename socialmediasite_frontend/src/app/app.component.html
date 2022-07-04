@@ -21,7 +21,7 @@
 					<h2>Navigation</h2>
 					<button class="SidebarButton" id="FirstButton" (click)="setMain($event,'feed')">Feed</button>
 					<button *ngIf="userinfo.session != ''" class="SidebarButton" (click)="setMain($event,'post')">Add Post</button>
-					<button *ngIf="userinfo.session != ''" class="SidebarButton" (click)="setMain($event,'ownprofile')">Your profile</button>
+					<button *ngIf="userinfo.session != ''" class="SidebarButton" (click)="setMain($event,'ownprofile')">Edit profile</button>
 					<button class="SidebarButton">Settings</button>
 				</div>
 				<div id="BodyMain" class="BackgroundElement">
@@ -53,7 +53,7 @@
 						<input type="text" placeholder="Enter your post title" id="PostTitleInput" [(ngModel)]="postTitle" autocomplete="off">
 						<br>
 						<h3>Body</h3>
-						<textarea placeholder="Enter your post content" id="PostBodyInput" [(ngModel)]="postBody" (keypress)="updateCharCounter($event)" autocomplete="off"> </textarea>
+						<textarea placeholder="Enter your post content" id="PostBodyInput" [(ngModel)]="postBody" (ngModelChange)="updateCharCounter($event)" autocomplete="off"> </textarea>
 						<br>
 						Characters left: {{postCharLeft}}
 						<br>
@@ -62,7 +62,21 @@
 						<b>{{formError}}</b>
 					</div>
 					<div *ngIf="bodyHTML=='ownprofile'" id="Profile">
-						<h2>Name</h2>
+						<h2>Edit profile</h2>
+						<h3>Change profile image</h3>
+
+						<h3>Personal info</h3>
+						<label id="LogLabel">First name:</label> <input type="text" placeholder="Edit your first name" id="ProfileInput" [(ngModel)]="userinfo.firstName" autocomplete="off">
+						<br>
+						<label id="LogLabel">Last name:</label> <input type="text" placeholder="Edit your last name" id="ProfileInput" [(ngModel)]="userinfo.lastName" autocomplete="off">
+						<h3>Profile description</h3>
+						<textarea placeholder="Enter your profile description" id="PostBodyInput" [(ngModel)]="userinfo.profileDesc" (ngModelChange)="updateCharCounter($event,'profile')" autocomplete="off"> </textarea>
+						<br>
+						Characters left: {{profileDescCharLeft}}
+						<br>
+						<button class="MainbarButton" id="PostMainButton" (click)="updateProfile($event)">Update profile</button>
+						<br>
+						<b>{{formError}}</b>
 					</div>
 					<div *ngIf="bodyHTML=='feed'" id="Feed">
 						<h2>Your Feed</h2>
