@@ -10,7 +10,7 @@
 					<button *ngIf="userinfo.session == ''" class="TopbarButton" id="LoginButton" (click)="setMain($event,'login')">Login</button>
 					<button *ngIf="userinfo.session == ''" class="TopbarButton" id="RegisterButton" (click)="setMain($event,'register')">Register</button>
 
-					<b *ngIf="userinfo.session != ''">Logged in as {{loggedInAs}}</b>
+					<b *ngIf="userinfo.session != ''">Logged in as {{loggedInAs}} </b>
 					<button *ngIf="userinfo.session != ''" class="TopbarButton" id="LogoffButton" (click)="logoff($event)">Log off</button>
 
 					<input type="text" placeholder="Search" id="SearchInput" autocomplete="off">
@@ -63,12 +63,16 @@
 					</div>
 					<div *ngIf="bodyHTML=='ownprofile'" id="Profile">
 						<h2>Edit profile</h2>
+
 						<h3>Change profile image</h3>
+						<input class="FileUpload" type="file" (change)="onAvatarChange($event)">
+						<button class="MainbarButton">Upload image</button>
 
 						<h3>Personal info</h3>
 						<label id="LogLabel">First name:</label> <input type="text" placeholder="Edit your first name" id="ProfileInput" [(ngModel)]="userinfo.firstName" autocomplete="off">
 						<br>
 						<label id="LogLabel">Last name:</label> <input type="text" placeholder="Edit your last name" id="ProfileInput" [(ngModel)]="userinfo.lastName" autocomplete="off">
+
 						<h3>Profile description</h3>
 						<textarea placeholder="Enter your profile description" id="PostBodyInput" [(ngModel)]="userinfo.profileDesc" (ngModelChange)="updateCharCounter($event,'profile')" autocomplete="off"> </textarea>
 						<br>

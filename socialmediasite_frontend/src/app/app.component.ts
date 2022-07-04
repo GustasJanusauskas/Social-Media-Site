@@ -28,6 +28,7 @@ export class AppComponent {
   userinfo: UserInfo = {session:''};
   friendList: string[] = [];
   profileDescCharLeft : number = 1024;
+  profilePic: File = File.prototype;
 
   //Add Post
   postTitle: string = '';
@@ -252,6 +253,15 @@ export class AppComponent {
     posts.forEach(post => {
       post.date = '';
     });
+  }
+
+  onAvatarChange(event: Event) {
+    const target = event.target as HTMLInputElement;
+
+    if (target.files) {
+      this.profilePic = target.files[0];
+      this.userinfo.avatar = this.profilePic;
+    }
   }
 
   updateCharCounter(event: Event,counterID: string = 'post') {
