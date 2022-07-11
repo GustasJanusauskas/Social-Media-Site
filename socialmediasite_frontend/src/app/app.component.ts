@@ -29,6 +29,7 @@ export class AppComponent {
   friendList: string[] = [];
   profileDescCharLeft : number = 1024;
   profilePic: File = File.prototype;
+  updateProfileEnabled: boolean = true;
 
   //Add Post
   postTitle: string = '';
@@ -52,6 +53,7 @@ export class AppComponent {
       this.userinfo = {session:''};
       this.friendList = [];
 
+      if (callback) callback();
       return;
     }
 
@@ -113,6 +115,11 @@ export class AppComponent {
       return;
     }
 
+    if (this.profilePic && this.profilePic.size > 8.192 * 1000 * 1000) {
+      this.formError = 'Profile picture size must be under 8 megabytes.';
+      return;
+    }
+
     var session = this.getCookie('session');
     if (session == null || session.length < 64 ) {
       this.formError = 'Must be logged in to update profile.';
@@ -126,6 +133,7 @@ export class AppComponent {
       }
       else {
         this.formError = 'Failed to update profile, please try again later.';
+        console.log(data.session);
       }
     });
   }
@@ -172,7 +180,6 @@ export class AppComponent {
           if (session == null || session.length < 64 ) {
             this.getUserPosts(-1,(data:Post[]) => {
               this.postList = data;
-              console.log(data);
             });
           }
           //Logged in - show friend posts
@@ -260,7 +267,16 @@ export class AppComponent {
 
     if (target.files) {
       this.profilePic = target.files[0];
-      this.userinfo.avatar = this.profilePic;
+      this.updateProfileEnabled = false;
+
+      const reader = new FileReader();
+      reader.readAsDataURL(this.profilePic);
+      reader.onload = () => {
+        this.userinfo.avatar = reader.result?.toString().substring(reader.result?.toString().indexOf(',') + 1);
+        this.userinfo.avatarPath = this.profilePic.name;
+
+        this.updateProfileEnabled = true;
+      }
     }
   }
 
@@ -279,7 +295,7 @@ export class AppComponent {
     const d = new Date();
     d.setTime(d.getTime() + (exdays*24*60*60*1000));
     let expires = "expires="+ d.toUTCString();
-    document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/;SameSite=Strict";
+    document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/;SameSite=Strict;";
   }
 
   getCookie(name: string) {
@@ -294,6 +310,6 @@ export class AppComponent {
   }
 
   deleteCookie( name: string ) {
-      document.cookie = name + '=; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+      document.cookie = name + '=; expires=Thu, 01 Jan 1970 00:00:01 GMT;SameSite=Strict;';
   }
 }

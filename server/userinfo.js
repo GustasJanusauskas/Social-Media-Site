@@ -12,6 +12,7 @@ class UserInfo {
     lastName = "";
     profileDesc = "";
     avatarPath = "";
+    avatar = "";
     friends = [0,0];
     posts = [""];
 

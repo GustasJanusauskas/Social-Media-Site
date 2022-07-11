@@ -27,7 +27,7 @@ const dbclient = new Client({
   port: 5432
 }); dbclient.connect();
 
-app.use(express.json())
+app.use(express.json({limit: '16mb'}));
 
 //FILES
 app.use(express.static(path.join(__dirname,'..',String.raw`socialmediasite_frontend\dist\socialmediasite_frontend`)));
@@ -80,6 +80,15 @@ app.put("/publicuserinfo", (req, res) => {
 app.put("/userinfo", (req, res) => {
   GetUserInfo(req.body.session,(success,inf) => {
     res.json(inf);
+  });
+});
+
+app.put("/updateProfile", (req, res) => {
+  UpdateProfile( req.body,(success,msg) => {
+    res.json({
+      success: success,
+      session: msg
+    });
   });
 });
 
@@ -305,6 +314,65 @@ function GetUserInfo(session,callback) {
   });
 }
 
+function UpdateProfile(userinfo,callback) {
+  //Check data
+  if (userinfo.firstName.length <= 0 || userinfo.lastName.length <= 0) {
+    callback(false,"First and last name must be filled.");
+    return;
+  }
+
+  //Get user ID from session
+  var query = 'SELECT * FROM sessions WHERE sessionid = $1';
+  var data = [userinfo.session];
+
+  dbclient.query(query,data, (err, res) => {
+    if (err || res.rows.length == 0) {
+      if (err) console.log("DB ERROR UpdateProfileGetUserID: \n" + err);
+      callback(false,'Failed to get user ID from session.');
+      return;
+    }
+    var userID = res.rows[0].usr_id;
+
+    if (userinfo.avatar) {
+      var avPath = `avatar${userID}.${GetFilenameExtension(userinfo.avatarPath)}`;
+
+      //if avatar directory doesn't exist create one
+      if (!fs.existsSync(`avatars`)) fs.mkdirSync(`avatars`);
+
+      //Delete old image
+      GetPublicUserInfo(userID, (success,result) => {
+        if(success && result.avatarPath) fs.rmSync(`avatars\\${result.avatarPath}`);
+
+        //Save new image and save path
+        fs.writeFileSync(`avatars\\${avPath}`,Buffer.from(userinfo.avatar, 'base64'));
+        userinfo.avatarPath = avPath;
+
+        UpdateProfileText(userID,userinfo, (success,msg) => {
+          callback(success,msg);
+        });
+      });
+    }
+    else UpdateProfileText(userID,userinfo, (success,msg) => {
+      callback(success,msg);
+    });
+  });
+}
+
+function UpdateProfileText(userID,userinfo,callback) {
+  var innerQuery = 'UPDATE profiles SET firstname = $2, lastname = $3, description = $4, picture = $5 WHERE usr_id = $1;';
+  var innerData = [userID,userinfo.firstName,userinfo.lastName,userinfo.profileDesc,userinfo.avatarPath];
+
+  dbclient.query(innerQuery,innerData, (err, res) => {
+    if (err) {
+      console.log("DB ERROR UpdateProfileText: \n" + err);
+      callback(false,'Failed to update user profile text.');
+      return;
+    }
+
+    callback(true,'Updated user profile successfully.');
+  });
+}
+
 function LoginUser (user,passw,ip,callback) {
   //Check data
   if (!user || !passw) {
@@ -437,6 +505,7 @@ function RegisterUser(user,passw,email,callback) {
   });
 }
 
+//HELPER FUNCTIONS
 function RandomString(length) {
   var pool = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
   var result = "";
@@ -444,4 +513,9 @@ function RandomString(length) {
     result += pool.charAt(Math.random() * pool.length - 1);
   }
   return result;
+}
+
+function GetFilenameExtension(filename) {
+  if (filename.lastIndexOf('.') == -1) return '';
+  return filename.substring(filename.lastIndexOf('.')+1, filename.length) || '';
 }
