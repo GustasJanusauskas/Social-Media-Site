@@ -133,7 +133,6 @@ export class AppComponent {
       }
       else {
         this.formError = 'Failed to update profile, please try again later.';
-        console.log(data.session);
       }
     });
   }
@@ -227,6 +226,7 @@ export class AppComponent {
   logoff(event: Event) {
     this.deleteCookie('session');
     this.updateUI();
+    this.setMain(event,'feed');
   }
 
   register(event: Event) {
