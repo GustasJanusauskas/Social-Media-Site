@@ -353,7 +353,6 @@ function FindUsers(search,callback) {
     for (var x = 0; x < res.rowCount; x++) {
       promises.push(GetPublicUserInfoPromise(res.rows[x].usr_id,(success,res,resolve) => {
         result.push(res);
-        console.log(result);
         resolve();
       }));
     }
@@ -386,7 +385,17 @@ function UpdateProfile(userinfo,callback) {
     var userID = res.rows[0].usr_id;
 
     if (userinfo.avatar) {
-      var avPath = `avatar${userID}.${GetFilenameExtension(userinfo.avatarPath)}`;
+      var fileext = GetFilenameExtension(userinfo.avatarPath);
+      //Reject files that are not images, verify by extension then by binary signature
+      if (!['png','jpg','jpeg','bmp','gif','tiff','tif'].includes(fileext) || !VerifyImageBase64(userinfo.avatar)) {
+        userinfo.avatarPath = '';
+        UpdateProfileText(userID,userinfo, (success,msg) => {
+          callback(success,msg);
+        });
+        return;
+      }
+
+      var avPath = `avatar${userID}.${fileext}`;
 
       //if avatar directory doesn't exist create one
       if (!fs.existsSync(`avatars`)) fs.mkdirSync(`avatars`);
@@ -411,8 +420,17 @@ function UpdateProfile(userinfo,callback) {
 }
 
 function UpdateProfileText(userID,userinfo,callback) {
-  var innerQuery = 'UPDATE profiles SET firstname = $2, lastname = $3, description = $4, picture = $5 WHERE usr_id = $1;';
-  var innerData = [userID,userinfo.firstName,userinfo.lastName,userinfo.profileDesc,userinfo.avatarPath];
+  var innerQuery;
+  var innerData;
+  if (userinfo.avatarPath == '') {
+    //New profile image rejected, do not update path
+    innerQuery = 'UPDATE profiles SET firstname = $2, lastname = $3, description = $4 WHERE usr_id = $1;';
+    innerData = [userID,userinfo.firstName,userinfo.lastName,userinfo.profileDesc];
+  }
+  else {
+    innerQuery = 'UPDATE profiles SET firstname = $2, lastname = $3, description = $4, picture = $5 WHERE usr_id = $1;';
+    innerData = [userID,userinfo.firstName,userinfo.lastName,userinfo.profileDesc,userinfo.avatarPath];
+  }
 
   dbclient.query(innerQuery,innerData, (err, res) => {
     if (err) {
@@ -558,6 +576,23 @@ function RegisterUser(user,passw,email,callback) {
 }
 
 //HELPER FUNCTIONS
+function VerifyImageBase64(bufferString) {
+  var result = false;
+
+  //png,jpeg,bmp,gif87a,gif89a,tiff LE,tiff BE
+  var allowedFormats = ['89504E470D0A1A0A','FFD8FF','424D','474946383761','474946383961','49492A00','4D4D002A'];
+
+  for (var x = 0; x < allowedFormats.length; x++) {
+
+    if (Buffer.from(bufferString,'base64').subarray(0,allowedFormats[x].length / 2).toString('hex').toUpperCase() == allowedFormats[x]) {
+      result = true;
+      break;
+    }
+  }
+
+  return result;
+}
+
 function RandomString(length) {
   var pool = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
   var result = "";

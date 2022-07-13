@@ -115,7 +115,7 @@ export class AppComponent {
       return;
     }
 
-    if (this.profilePic && this.profilePic.size > 8.192 * 1000 * 1000) {
+    if (this.profilePic != File.prototype && this.profilePic.size > 8.192 * 1000 * 1000) {
       this.formError = 'Profile picture size must be under 8 megabytes.';
       return;
     }

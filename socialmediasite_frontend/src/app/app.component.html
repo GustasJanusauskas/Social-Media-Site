@@ -65,7 +65,7 @@
 						<h2>Edit profile</h2>
 
 						<h3>Change profile image</h3>
-						<input class="FileUpload" type="file" (change)="onAvatarChange($event)">
+						<input class="FileUpload" type="file" accept=".png, .jpg, .jpeg, .bmp, .gif, .tiff, .tif" (change)="onAvatarChange($event)">
 
 						<h3>Personal info</h3>
 						<label id="LogLabel">First name:</label> <input type="text" placeholder="Edit your first name" id="ProfileInput" [(ngModel)]="userinfo.firstName" (keypress)="lettersOnly($event)" autocomplete="off">
@@ -77,7 +77,7 @@
 						<br>
 						Characters left: {{profileDescCharLeft}}
 						<br>
-						<button class="MainbarButton" id="PostMainButton" [disabled]="!updateProfileEnabled" (click)="updateProfile($event)">{{updateProfileEnabled ? "Update profile" : "Uploading image.." }}</button>
+						<button class="MainbarButton" id="PostMainButton" [disabled]="!updateProfileEnabled" (click)="updateProfile($event)">{{updateProfileEnabled ? "Update profile" : "Reading image.." }}</button>
 						<br>
 						<b>{{formError}}</b>
 					</div>
