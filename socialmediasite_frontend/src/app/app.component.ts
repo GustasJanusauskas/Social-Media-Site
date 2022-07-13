@@ -262,6 +262,11 @@ export class AppComponent {
     });
   }
 
+  lettersOnly(event: KeyboardEvent, extended: boolean = false) {
+    if (extended) return `abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ,.;"'()`.includes(event.key);
+    return 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'.includes(event.key);
+  }
+
   onAvatarChange(event: Event) {
     const target = event.target as HTMLInputElement;
 

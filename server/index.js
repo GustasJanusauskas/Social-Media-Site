@@ -38,6 +38,12 @@ app.get("/", (req, res) => {
 });
 
 //TESTS
+app.get("/testFindusers", (req, res) => {
+  FindUsers('tes',(success,inf) => {
+    res.json(inf);
+  });
+});
+
 app.get("/testReg", (req, res) => {
   RegisterUser('TestUser','TestPassword','TestEmail@email.com',(success,msg) => {
     res.json({
@@ -79,6 +85,12 @@ app.put("/publicuserinfo", (req, res) => {
 
 app.put("/userinfo", (req, res) => {
   GetUserInfo(req.body.session,(success,inf) => {
+    res.json(inf);
+  });
+});
+
+app.put("/findusers", (req, res) => {
+  FindUsers(req.body.search,(success,inf) => {
     res.json(inf);
   });
 });
@@ -235,7 +247,7 @@ function GetUserPosts(ID,callback) {
   });
 }
 
-function GetPublicUserInfo(ID,callback) {
+function GetPublicUserInfo(ID,callback,resolve = null) {
   var userID = ID;
   var innerQuery = 'SELECT username, created, firstname, lastname, description, picture, friends, posts FROM users, profiles WHERE profiles.usr_id = users.usr_id AND users.usr_id = $1;';
   var innerData = [userID];
@@ -264,7 +276,14 @@ function GetPublicUserInfo(ID,callback) {
 
     result.success = true;
 
-    callback(true,result);
+    if (resolve) callback(true,result,resolve);
+    else callback(true,result);
+  });
+}
+
+function GetPublicUserInfoPromise(ID,callback) {
+  return new Promise((resolve,reject) => {
+    GetPublicUserInfo(ID,callback,resolve);
   });
 }
 
@@ -313,6 +332,39 @@ function GetUserInfo(session,callback) {
     });
   });
 }
+
+function FindUsers(search,callback) {
+  //Prepare search term 
+  search = search.replace('%','');
+  search += '%';
+
+  var query = 'SELECT users.usr_id FROM users,profiles WHERE (profiles.firstname LIKE $1 OR profiles.lastname LIKE $1 OR users.username LIKE $1) AND users.usr_id = profiles.usr_id;';
+  var data = [search];
+
+  var result = [];
+  var promises = [];
+  dbclient.query(query,data, (err, res) => {
+    if (err || res.rows.length == 0) {
+      if (err) console.log("DB ERROR FindUsers: \n" + err);
+      callback(false,result);
+      return;
+    }
+
+    for (var x = 0; x < res.rowCount; x++) {
+      promises.push(GetPublicUserInfoPromise(res.rows[x].usr_id,(success,res,resolve) => {
+        result.push(res);
+        console.log(result);
+        resolve();
+      }));
+    }
+    
+    //When all API calls are finished, return the result
+    Promise.allSettled(promises).then(() => {
+      callback(true,result);
+    });
+  });
+}
+
 
 function UpdateProfile(userinfo,callback) {
   //Check data
