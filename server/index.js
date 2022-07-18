@@ -338,7 +338,7 @@ function FindUsers(search,callback) {
   search = search.replace('%','');
   search += '%';
 
-  var query = 'SELECT users.usr_id FROM users,profiles WHERE (profiles.firstname LIKE $1 OR profiles.lastname LIKE $1 OR users.username LIKE $1) AND users.usr_id = profiles.usr_id;';
+  var query = "SELECT users.usr_id FROM users,profiles WHERE (LOWER(CONCAT(profiles.firstname,' ',profiles.lastname)) LIKE $1 OR LOWER(profiles.firstname) LIKE $1 OR LOWER(profiles.lastname) LIKE $1 OR LOWER(users.username) LIKE $1) AND users.usr_id = profiles.usr_id LIMIT 50;";
   var data = [search];
 
   var result = [];

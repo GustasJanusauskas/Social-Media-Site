@@ -46,15 +46,18 @@ export class AppComponent {
   lastSearchCharacterInput: number = Number.NaN;
   searchInterval;
 
+  selectedProfile: UserInfo = {session:''};
+
   constructor(private userdataService: UserdataService) {
     this.updateUI();
     this.searchInterval = setInterval(() => {
-      if (this.lastSearchCharacterInput + 500 < Date.now()) {
-        this.userdataService.findUsers(this.search).subscribe(data => {
+      if (this.lastSearchCharacterInput + 250 < Date.now() && this.search != '') {
+        this.userdataService.findUsers(this.search.toLowerCase()).subscribe(data => {
           this.results = data;
         });
+        this.lastSearchCharacterInput = Number.NaN;
       }
-    },250);
+    },125);
   }
 
   //Gets userinfo, updates friends list, 'logged in as' labels
@@ -267,6 +270,13 @@ export class AppComponent {
         this.formError = '' + data.session;
       }
     });
+  }
+
+  selectProfile(event: Event) {
+    this.selectedProfile = this.results.find((res) => {
+      return res.username == this.search;
+    }) || {session:''};
+    this.setMain(event,'profile');
   }
 
   convertPostDates(posts:Post[]) {

@@ -25,7 +25,6 @@ button {
 	background-color: transparent;
 	border-color: transparent;
 	border-radius: 0.75em;
-	transition: 0.25s;
 }
 
 button:hover {
@@ -141,6 +140,16 @@ textarea {
 	
 	
 	margin-left: 2em;
+}
+
+#ProfilePic {
+	text-align: center;
+}
+
+::ng-deep .mat-autocomplete-panel {
+	background-color: azure;
+	border-color: transparent;
+	border-radius: 0.75em;
 }
 
 #Bottom {
