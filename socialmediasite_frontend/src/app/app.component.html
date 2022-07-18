@@ -13,7 +13,7 @@
 					<b *ngIf="userinfo.session != ''">Logged in as {{loggedInAs}} </b>
 					<button *ngIf="userinfo.session != ''" class="TopbarButton" id="LogoffButton" (click)="logoff($event)">Log off</button>
 
-					<input type="text" placeholder="Search" id="SearchInput" autocomplete="off">
+					<input type="text" placeholder="Search" id="SearchInput" [(ngModel)]="search" (ngModelChange)="searchUpdate($event)" autocomplete="off">
 				</div>
 			</div>
 			<div id="Bottom">

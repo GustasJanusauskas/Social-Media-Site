@@ -3,6 +3,7 @@
 class UserInfo {
     session = "";
     success = false;
+    search = "";
 
     email = "";
     username = "";

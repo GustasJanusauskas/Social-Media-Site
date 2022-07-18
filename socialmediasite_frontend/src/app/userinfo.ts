@@ -2,6 +2,7 @@ export interface UserInfo {
     session: string;
     success?: boolean;
     error?: string;
+    search?: string;
 
     email?: string;
     username?: string;

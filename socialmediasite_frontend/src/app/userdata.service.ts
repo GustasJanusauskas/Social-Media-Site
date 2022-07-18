@@ -21,6 +21,11 @@ export class UserdataService {
 
   constructor(private http: HttpClient) {}
 
+  findUsers(searchStr: string) {
+    var data: UserInfo = {session:'',search:searchStr};
+    return this.http.put<UserInfo[]>('/findusers',data,httpOptions);
+  }
+
   getFriendPosts(userID: number): Observable<Post[]> {
     var data: Post = {authorID:userID};
     return this.http.put<Post[]>('/friendposts',data,httpOptions);
@@ -53,13 +58,13 @@ export class UserdataService {
 
   addPost(session: string, postTitle: string, postBody: string) {
     var data: PostInfo = {session:session,title:postTitle,body:postBody};
-    return this.http.put<PostInfo>('/addPost',data,httpOptions);
+    return this.http.put<PostInfo>('/addpost',data,httpOptions);
   }
 
   updateProfile(session: string, userinfo: UserInfo) {
     var data: UserInfo = userinfo;
     data.session = session;
 
-    return this.http.put<UserInfo>('/updateProfile',data,httpOptions);
+    return this.http.put<UserInfo>('/updateprofile',data,httpOptions);
   }
 }

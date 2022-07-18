@@ -95,7 +95,7 @@ app.put("/findusers", (req, res) => {
   });
 });
 
-app.put("/updateProfile", (req, res) => {
+app.put("/updateprofile", (req, res) => {
   UpdateProfile( req.body,(success,msg) => {
     res.json({
       success: success,
@@ -126,7 +126,7 @@ app.put("/register", (req, res) => {
   });
 });
 
-app.put("/addPost", (req, res) => {
+app.put("/addpost", (req, res) => {
   AddPost( req.body.session, sanitizeHtml( req.body.title ), sanitizeHtml( req.body.body ), (success,msg) => {
     if (!success) console.log(msg);
     res.json({

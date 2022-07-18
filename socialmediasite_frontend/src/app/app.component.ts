@@ -40,8 +40,21 @@ export class AppComponent {
   bodyHTML: string = '';
   postList: Post[] = [];
 
+  //Search
+  search: string = '';
+  results: UserInfo[] = [];
+  lastSearchCharacterInput: number = Number.NaN;
+  searchInterval;
+
   constructor(private userdataService: UserdataService) {
     this.updateUI();
+    this.searchInterval = setInterval(() => {
+      if (this.lastSearchCharacterInput + 500 < Date.now()) {
+        this.userdataService.findUsers(this.search).subscribe(data => {
+          this.results = data;
+        });
+      }
+    },250);
   }
 
   //Gets userinfo, updates friends list, 'logged in as' labels
@@ -265,6 +278,10 @@ export class AppComponent {
   lettersOnly(event: KeyboardEvent, extended: boolean = false) {
     if (extended) return `abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ,.;"'()`.includes(event.key);
     return 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'.includes(event.key);
+  }
+
+  searchUpdate(event: Event) {
+    this.lastSearchCharacterInput = Date.now();
   }
 
   onAvatarChange(event: Event) {
