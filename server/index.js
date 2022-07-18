@@ -31,6 +31,7 @@ app.use(express.json({limit: '16mb'}));
 
 //FILES
 app.use(express.static(path.join(__dirname,'..',String.raw`socialmediasite_frontend\dist\socialmediasite_frontend`)));
+app.use(express.static(path.join(__dirname,'..',String.raw`avatars`)));
 
 //HTTP
 app.get("/", (req, res) => {

@@ -1,6 +1,5 @@
 import { Component, Input, NgModule } from '@angular/core';
-import { FormsModule } from '@angular/forms';
-import { BrowserModule } from '@angular/platform-browser';
+import {PageEvent} from '@angular/material/paginator';
 import { UserdataService } from './userdata.service';
 
 import {LoginResponse} from './loginresponse';
@@ -46,7 +45,9 @@ export class AppComponent {
   lastSearchCharacterInput: number = Number.NaN;
   searchInterval;
 
-  selectedProfile: UserInfo = {session:''};
+  //Profiles
+  selectedProfile!: UserInfo;
+  pageEvent: PageEvent = {pageIndex:0,pageSize:1,length:1};
 
   constructor(private userdataService: UserdataService) {
     this.updateUI();
@@ -276,7 +277,18 @@ export class AppComponent {
     this.selectedProfile = this.results.find((res) => {
       return res.username == this.search;
     }) || {session:''};
-    this.setMain(event,'profile');
+
+    //Get user's posts
+    if (this.selectedProfile.ID) {
+      this.getUserPosts(this.selectedProfile.ID,(data:Post[]) => {
+        this.postList = data;
+        this.setMain(event,'profile');
+      });
+    }
+    else {
+      this.postList = [];
+      this.setMain(event,'profile');
+    }
   }
 
   convertPostDates(posts:Post[]) {
@@ -323,6 +335,23 @@ export class AppComponent {
     }
   }
 
+  createFakeArray(l:number) {
+    var res = new Array(l);
+    for (let x = 0; x < l; x++) {
+      res[x] = x;
+    }
+    return res;
+  }
+
+  toTitleCase(str: String) {
+    return str.replace(
+      /\w\S*/g,
+      function(txt) {
+        return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+      }
+    );
+  }
+
   setCookie(cname: string, cvalue: string, exdays: number) {
     const d = new Date();
     d.setTime(d.getTime() + (exdays*24*60*60*1000));
@@ -344,4 +373,5 @@ export class AppComponent {
   deleteCookie( name: string ) {
       document.cookie = name + '=; expires=Thu, 01 Jan 1970 00:00:01 GMT;SameSite=Strict;';
   }
+
 }

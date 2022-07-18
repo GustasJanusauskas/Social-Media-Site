@@ -86,6 +86,25 @@
 						<br>
 						<b>{{formError}}</b>
 					</div>
+					<div *ngIf="bodyHTML=='profile'" id="Profile">
+						<img [src]="selectedProfile.avatarPath" id="ProfilePic">
+						<h2>{{toTitleCase(selectedProfile.firstName + " " + selectedProfile.lastName)}}</h2>
+						<p>{{selectedProfile.profileDesc}}</p>
+						<br>
+						<h2>Posts</h2>
+						<mat-paginator [length]="postList.length" [pageSize]="1" [pageSizeOptions]="[1,5,10,25]" (page)="pageEvent = $event" aria-label="Select page">
+						</mat-paginator>
+						<br>
+						<div *ngIf="pageEvent">
+							<div *ngFor="let ind of createFakeArray(pageEvent.pageSize)">
+								<div *ngIf="ind < postList.length" id="FeedPost">
+									<h3 id="PostTitle">{{postList[pageEvent.pageIndex * pageEvent.pageSize + ind].title}} by {{postList[pageEvent.pageIndex * pageEvent.pageSize + ind].author}}</h3>
+									<p id="PostBody">{{postList[pageEvent.pageIndex * pageEvent.pageSize + ind].body}}</p>
+									<div id="PostedDateText">Posted {{postList[pageEvent.pageIndex * pageEvent.pageSize + ind].date}}</div>
+								</div>
+							</div>
+						</div>
+					</div>
 					<div *ngIf="bodyHTML=='feed'" id="Feed">
 						<h2>Your Feed</h2>
 						<div id="FeedPost" *ngFor="let post of postList;">
