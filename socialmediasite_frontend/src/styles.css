@@ -151,10 +151,17 @@ textarea {
 	border-radius: 50%;
 }
 
-::ng-deep .mat-autocomplete-panel {
-	background-color: azure;
+:host ::ng-deep .mat-autocomplete-panel {
+	background: azure;
+	font-family: 'Montserrat', sans-serif;
+
 	border-color: transparent;
 	border-radius: 0.75em;
+}
+
+:host ::ng-deep .mat-option-text {
+	font-family: 'Montserrat', sans-serif;
+	color: #414d61;
 }
 
 #Bottom {

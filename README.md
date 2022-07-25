@@ -14,7 +14,7 @@ Features include:
 - PostgreSQL
 - NodeJS
 - Angular
-- Angular Material (Custom theme)
+- Angular Material
 
 ### Steps
 
