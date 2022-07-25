@@ -87,7 +87,7 @@
 						<b>{{formError}}</b>
 					</div>
 					<div *ngIf="bodyHTML=='profile'" id="Profile">
-						<img [src]="selectedProfile.avatarPath" id="ProfilePic">
+						<img [src]="selectedProfile.avatarPath || 'assets/defaultProfile.png'" id="ProfilePic">
 						<h2>{{toTitleCase(selectedProfile.firstName + " " + selectedProfile.lastName)}}</h2>
 						<p>{{selectedProfile.profileDesc}}</p>
 						<br>
