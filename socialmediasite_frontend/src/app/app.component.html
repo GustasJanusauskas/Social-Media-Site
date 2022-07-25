@@ -25,8 +25,9 @@
 				<div id="SidebarMain" class="BackgroundElement">
 					<h2>Navigation</h2>
 					<button class="SidebarButton" id="FirstButton" (click)="setMain($event,'feed')">Feed</button>
-					<button *ngIf="userinfo.session != ''" class="SidebarButton" (click)="setMain($event,'post')">Add Post</button>
-					<button *ngIf="userinfo.session != ''" class="SidebarButton" (click)="setMain($event,'ownprofile')">Edit profile</button>
+					<button *ngIf="userinfo.session != ''" class="SidebarButton" (click)="setMain($event,'post');">Add Post</button>
+					<button *ngIf="userinfo.session != ''" class="SidebarButton" (click)="selectProfile($event,userinfo);">My profile</button>
+					<button *ngIf="userinfo.session != ''" class="SidebarButton" (click)="setMain($event,'ownprofile');">Edit profile</button>
 					<button class="SidebarButton">Settings</button>
 				</div>
 				<div id="BodyMain" class="BackgroundElement">
