@@ -267,20 +267,22 @@ export class AppComponent {
   }
 
   selectProfile(event: Event, profile: UserInfo = {session:''}) {
+    var tempProfile: UserInfo;
     //If profile not provided, search results array, assume search bar used
     if (!profile.ID) {
-      this.selectedProfile = this.results.find((res) => {
+      tempProfile = this.results.find((res) => {
         return res.username == this.search;
       }) || {session:''};
     }
     else {
-      this.selectedProfile = profile;
+      tempProfile = profile;
     }
 
     //Get user's posts
-    if (this.selectedProfile.ID) {
-      this.getUserPosts(this.selectedProfile.ID,(data:Post[]) => {
+    if (tempProfile.ID) {
+      this.getUserPosts(tempProfile.ID,(data:Post[]) => {
         this.postList = data;
+        this.selectedProfile = tempProfile;
         this.setMain(event,'profile');
       });
     }
