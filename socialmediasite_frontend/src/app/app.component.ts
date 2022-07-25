@@ -25,7 +25,7 @@ export class AppComponent {
   //UserData
   loggedInAs: string = 'Not logged in';
   userinfo: UserInfo = {session:''};
-  friendList: string[] = [];
+  friendList: UserInfo[] = [];
   profileDescCharLeft : number = 1024;
   profilePic: File = File.prototype;
   updateProfileEnabled: boolean = true;
@@ -95,14 +95,7 @@ export class AppComponent {
           //Don't add self to friends list.
           if (data.ID == this.userinfo.ID) return;
           
-          if ( (data.firstName == null || data.firstName?.length <= 0) && (data.lastName == null || data.lastName?.length <= 0) ) {
-            this.friendList.push('' + data.username);
-          }
-          else {
-            if (data.lastName == null) data.lastName = '';
-
-            this.friendList.push(data.firstName + ' ' + data.lastName);
-          }
+          this.friendList.push(data);
         });
       });
 
@@ -273,10 +266,16 @@ export class AppComponent {
     });
   }
 
-  selectProfile(event: Event) {
-    this.selectedProfile = this.results.find((res) => {
-      return res.username == this.search;
-    }) || {session:''};
+  selectProfile(event: Event, profile: UserInfo = {session:''}) {
+    //If profile not provided, search results array, assume search bar used
+    if (!profile.ID) {
+      this.selectedProfile = this.results.find((res) => {
+        return res.username == this.search;
+      }) || {session:''};
+    }
+    else {
+      this.selectedProfile = profile;
+    }
 
     //Get user's posts
     if (this.selectedProfile.ID) {
@@ -284,10 +283,6 @@ export class AppComponent {
         this.postList = data;
         this.setMain(event,'profile');
       });
-    }
-    else {
-      this.postList = [];
-      this.setMain(event,'profile');
     }
   }
 

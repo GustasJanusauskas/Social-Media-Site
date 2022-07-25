@@ -118,7 +118,7 @@
 				<div id="FriendbarMain" class="BackgroundElement">
 					<h2>Friends</h2>
 					<div id="FriendbarInner">
-						<li *ngFor="let friend of friendList;">{{friend}}</li> 
+						<button class="FriendButton" *ngFor="let friend of friendList;" (click)="selectProfile($event,friend);">{{friend.firstName && friend.lastName ? friend.firstName + ' ' + friend.lastName : friend.username}}</button> 
 					</div>
 				</div>
 			</div>
