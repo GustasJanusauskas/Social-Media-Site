@@ -61,6 +61,11 @@ export class UserdataService {
     return this.http.put<PostInfo>('/addpost',data,httpOptions);
   }
 
+  removePost(session: string, postID: number) {
+    var data = {session:session,postID: postID};
+    return this.http.put('/removepost',data,httpOptions);
+  }
+
   updateProfile(session: string, userinfo: UserInfo) {
     var data: UserInfo = userinfo;
     data.session = session;

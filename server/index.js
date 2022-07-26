@@ -136,6 +136,15 @@ app.put("/addpost", (req, res) => {
   });
 });
 
+app.put("/removepost", (req, res) => {
+  RemovePost( req.body.session, req.body.postID, (success,msg) => {
+    if (!success) console.log(msg);
+    res.json({
+      success:success
+    });
+  });
+});
+
 app.put("/changefriendstatus", (req,res) => {
   ChangeFriend(req.body.session,req.body.friendID,req.body.status, (success,msg) => {
     if (!success) console.log(msg);
@@ -184,6 +193,34 @@ function ChangeFriend(session,friendID,status,callback) {
       }
 
       callback(true,'Friend status changed successfully!');
+    });
+  });
+}
+
+function RemovePost(session,postID,callback) {
+  //Getting UserID from session
+  var query = 'SELECT * FROM sessions WHERE sessionid = $1';
+  var data = [session];
+
+  dbclient.query(query,data, (err, res) => {
+    if (err || res.rows.length == 0) {
+      if (err) console.log("DB ERROR GetUserID: \n" + err);
+      callback(false,'Failed to get user ID from session.');
+      return;
+    }
+
+    var userID = res.rows[0].usr_id;
+    var innerQuery = 'UPDATE profiles SET posts = array_remove(posts,$1) WHERE usr_id = $2; DELETE FROM posts WHERE post_ID = $1 AND usr_id = $2;';
+    var innerData = [postID,userID];
+
+    dbclient.query(innerQuery,innerData, (err, res) => {
+      if (err) {
+        if (err) console.log("DB ERROR RemovePost: \n" + err);
+        callback(false,'Failed to remove post.');
+        return;
+      }
+
+      callback(true,'Post removed successfully.');
     });
   });
 }
