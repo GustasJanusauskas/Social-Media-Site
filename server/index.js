@@ -136,11 +136,58 @@ app.put("/addpost", (req, res) => {
   });
 });
 
+app.put("/changefriendstatus", (req,res) => {
+  ChangeFriend(req.body.session,req.body.friendID,req.body.status, (success,msg) => {
+    if (!success) console.log(msg);
+    res.json({
+      success:success
+    });
+  });
+});
+
 app.listen(PORT, () => {
   console.log(`Server listening on ${PORT}`);
 });
 
 //FUNCTIONS
+function ChangeFriend(session,friendID,status,callback) {
+  //Getting UserID from session
+  var query = 'SELECT * FROM sessions WHERE sessionid = $1';
+  var data = [session];
+
+  dbclient.query(query,data, (err, res) => {
+    if (err || res.rows.length == 0) {
+      if (err) console.log("DB ERROR GetUserID: \n" + err);
+      callback(false,'Failed to get user ID from session.');
+      return;
+    }
+
+    var userID = res.rows[0].usr_id;
+    var innerQuery;
+    var innerData;
+    //Add friend
+    if (status) {
+      innerQuery = 'UPDATE profiles SET friends = ( CASE WHEN $1 = ANY(friends) THEN friends ELSE array_append(friends,$1) END ) WHERE usr_id = $2;';
+      innerData = [friendID,userID];
+    }
+    //Remove friend
+    else {
+      innerQuery = 'UPDATE profiles SET friends = array_remove(friends,$1) WHERE usr_id = $2;';
+      innerData = [friendID,userID];
+    }
+
+    dbclient.query(innerQuery,innerData, (err, res) => {
+      if (err || res.rows.length == 0) {
+        if (err) console.log("DB ERROR ChangeFriend: \n" + err);
+        callback(false,'Failed to change friend status.');
+        return;
+      }
+
+      callback(true,'Friend status changed successfully!');
+    });
+  });
+}
+
 function AddPost(session,title,body,callback) {
   //Getting UserID from session
   var query = 'SELECT * FROM sessions WHERE sessionid = $1';
