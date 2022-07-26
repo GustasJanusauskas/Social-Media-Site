@@ -396,7 +396,8 @@ function UpdateProfile(userinfo,callback) {
         return;
       }
 
-      var avPath = `avatar${userID}.${fileext}`;
+      //Avatar - User ID - Salt (for security) . File extension
+      var avPath = `avatar-${userID}-${RandomString(8)}.${fileext}`;
 
       //if avatar directory doesn't exist create one
       if (!fs.existsSync(`avatars`)) fs.mkdirSync(`avatars`);
