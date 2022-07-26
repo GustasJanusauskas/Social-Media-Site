@@ -230,7 +230,7 @@ function AddPost(session,title,body,callback) {
 }
 
 function GetFriendPosts(friends,callback) {
-  var innerQuery = "SELECT posts.ptitle, posts.pbody, to_char(posts.pdate, 'YYYY-MM-DD at HH12:MIam') AS pdate, posts.usr_id, CONCAT(profiles.firstname,' ',profiles.lastname) AS author FROM posts, profiles WHERE posts.usr_id = ANY (array(SELECT friends FROM profiles WHERE usr_id = $1 )) AND posts.usr_id = profiles.usr_id ORDER BY posts.pdate DESC LIMIT 50;";
+  var innerQuery = "SELECT posts.ptitle, posts.pbody, to_char(posts.pdate, 'YYYY-MM-DD at HH12:MIam') AS pdate, posts.usr_id, posts.post_id, CONCAT(profiles.firstname,' ',profiles.lastname) AS author FROM posts, profiles WHERE posts.usr_id = ANY (array(SELECT friends FROM profiles WHERE usr_id = $1 )) AND posts.usr_id = profiles.usr_id ORDER BY posts.pdate DESC LIMIT 50;";
   var innerData = [friends];
 
   var result = [];
@@ -249,6 +249,7 @@ function GetFriendPosts(friends,callback) {
       temp.body = res.rows[x].pbody;
       temp.date = res.rows[x].pdate;
       temp.author = res.rows[x].author;
+      temp.postID = res.rows[x].post_id;
 
       result.push(temp);
     }
@@ -263,11 +264,11 @@ function GetUserPosts(ID,callback) {
 
   //ID of -1 gets newest posts, regardless of user
   if (ID == -1) {
-    innerQuery = "SELECT posts.ptitle, posts.pbody, to_char(posts.pdate, 'YYYY-MM-DD at HH12:MIam') AS pdate, posts.usr_id, CONCAT(profiles.firstname,' ',profiles.lastname) AS author FROM posts,profiles WHERE profiles.usr_id = posts.usr_id ORDER BY posts.pdate DESC LIMIT 50;";
+    innerQuery = "SELECT posts.ptitle, posts.pbody, to_char(posts.pdate, 'YYYY-MM-DD at HH12:MIam') AS pdate, posts.usr_id, posts.post_id, CONCAT(profiles.firstname,' ',profiles.lastname) AS author FROM posts,profiles WHERE profiles.usr_id = posts.usr_id ORDER BY posts.pdate DESC LIMIT 50;";
     innerData = [];
   }
   else {
-    innerQuery = "SELECT posts.ptitle, posts.pbody, to_char(posts.pdate, 'YYYY-MM-DD at HH12:MIam') AS pdate, posts.usr_id, CONCAT(profiles.firstname,' ',profiles.lastname) AS author FROM posts, profiles WHERE posts.usr_id = $1 AND posts.usr_id = profiles.usr_id ORDER BY posts.pdate DESC;";
+    innerQuery = "SELECT posts.ptitle, posts.pbody, to_char(posts.pdate, 'YYYY-MM-DD at HH12:MIam') AS pdate, posts.usr_id, posts.post_id, CONCAT(profiles.firstname,' ',profiles.lastname) AS author FROM posts, profiles WHERE posts.usr_id = $1 AND posts.usr_id = profiles.usr_id ORDER BY posts.pdate DESC;";
     innerData = [ID];
   }
 
@@ -287,6 +288,7 @@ function GetUserPosts(ID,callback) {
       temp.body = res.rows[x].pbody;
       temp.date = res.rows[x].pdate;
       temp.author = res.rows[x].author;
+      temp.postID = res.rows[x].post_id;
 
       result.push(temp);
     }
