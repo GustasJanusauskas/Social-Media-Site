@@ -117,6 +117,10 @@ textarea {
 	width: 9em;
 }
 
+.PrivateMessageCard {
+	margin-top: 0.75em;
+}
+
 .MainbarButton {
 	font-size: 18px;
 	background-color: azure;
@@ -130,6 +134,7 @@ textarea {
 }
 
 .FriendButton {
+	width: 100%;
 	font-size: 16px;
 
 	border-style: solid;
@@ -139,6 +144,8 @@ textarea {
 	padding: 0.33em;
 	padding-left: 1em;
 	padding-right: 1em;
+
+	margin-top: 0.75em;
 }
 
 #SearchInput {

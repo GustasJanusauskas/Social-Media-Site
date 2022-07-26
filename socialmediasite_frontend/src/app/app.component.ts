@@ -1,10 +1,10 @@
 import { Component, Input, NgModule } from '@angular/core';
-import {PageEvent} from '@angular/material/paginator';
+import { PageEvent } from '@angular/material/paginator';
 import { UserdataService } from './userdata.service';
 
-import {LoginResponse} from './loginresponse';
-import {UserInfo} from './userinfo';
-import {Post} from './post';
+import { UserInfo } from './userinfo';
+import { Post } from './post';
+import { Chat } from './chat';
 
 @Component({
   selector: 'app-root',
@@ -48,6 +48,9 @@ export class AppComponent {
   //Profiles
   selectedProfile!: UserInfo;
   pageEvent: PageEvent = {pageIndex:0,pageSize:1,length:1};
+
+  //Private messages
+  chatList: Chat[] = [];
 
   constructor(private userdataService: UserdataService) {
     this.updateUI();
@@ -97,6 +100,14 @@ export class AppComponent {
           
           this.friendList.push(data);
         });
+      });
+
+      //Sort alphabetically
+      this.friendList.sort((a,b) => {
+        if (!a.firstName) return -1;
+        else if (!b.firstName) return 1;
+
+        return (a.firstName.toLowerCase() < b.firstName.toLowerCase()) ? -1 : (a.firstName.toLowerCase() > b.firstName.toLowerCase()) ? 1 : 0;
       });
 
       if (callback) callback();
@@ -264,6 +275,18 @@ export class AppComponent {
         this.formError = '' + data.session;
       }
     });
+  }
+
+  openChat(event: Event, profile: UserInfo) {
+    var bypass: boolean = false;
+
+    this.chatList.forEach(chat => {
+      if (chat.recipient.ID == profile.ID) {
+        bypass = true;
+        return;
+      }
+    });
+    if (!bypass) this.chatList.push({recipient:profile, sender: this.userinfo, messages:[{author:profile,body:'Test Message',date:'2022-07-26'}]});
   }
 
   selectProfile(event: Event, profile: UserInfo = {session:''}) {
