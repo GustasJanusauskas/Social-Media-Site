@@ -38,11 +38,9 @@ CREATE TABLE posts(
 
 CREATE TABLE messages(
 	msg_id bigserial UNIQUE NOT NULL,
-	usr_id bigint UNIQUE NOT NULL,
-	msg varchar(300) NOT NULL,
+	sender bigint NOT NULL,
 	recipient bigint NOT NULL,
+	msg varchar(512) NOT NULL,
 	date timestamp,
-	ip varchar(45),
-	file varchar(256),
 	PRIMARY KEY(msg_id)
 );
