@@ -1,7 +1,7 @@
 'use strict';
 
-const UserInfo = require('./userinfo');
-const PostInfo = require('./postinfo');
+const UserInfo = require('./classes/userinfo');
+const PostInfo = require('./classes/postinfo');
 
 const fs = require('fs');
 const ws = require('ws');

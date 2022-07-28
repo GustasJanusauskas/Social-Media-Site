@@ -3,10 +3,10 @@ import { HttpClient, HttpHandler, HttpHeaders } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError, retry } from 'rxjs/operators';
 
-import {LoginResponse} from './loginresponse';
-import {UserInfo} from './userinfo';
-import {PostInfo} from './postinfo';
-import { Post } from './post';
+import {LoginResponse} from '../interfaces/loginresponse';
+import {UserInfo} from '../interfaces/userinfo';
+import {PostInfo} from '../interfaces/postinfo';
+import { Post } from '../interfaces/post';
 
 const httpOptions = {
   headers: new HttpHeaders({

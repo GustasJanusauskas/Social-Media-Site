@@ -1,10 +1,10 @@
 import { Component, Input, NgModule } from '@angular/core';
 import { PageEvent } from '@angular/material/paginator';
-import { UserdataService } from './userdata.service';
+import { UserdataService } from './services/userdata.service';
 
-import { UserInfo } from './userinfo';
-import { Post } from './post';
-import { Chat } from './chat';
+import { UserInfo } from './interfaces/userinfo';
+import { Post } from './interfaces/post';
+import { Chat } from './interfaces/chat';
 
 @Component({
   selector: 'app-root',
