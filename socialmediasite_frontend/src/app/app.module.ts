@@ -11,6 +11,7 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatCardModule } from '@angular/material/card';
 import { MatDividerModule } from '@angular/material/divider';
+import { MatInputModule } from '@angular/material/input';
 
 @NgModule({
   declarations: [
@@ -26,7 +27,8 @@ import { MatDividerModule } from '@angular/material/divider';
     MatTabsModule,
     MatMenuModule,
     MatCardModule,
-    MatDividerModule
+    MatDividerModule,
+    MatInputModule
   ],
   providers: [],
   bootstrap: [AppComponent]

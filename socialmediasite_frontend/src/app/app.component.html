@@ -118,27 +118,42 @@
 				<div id="FriendbarMain" class="BackgroundElement">
 					<mat-tab-group mat-stretch-tabs md-no-pagination *ngIf="userinfo.session != ''">
 						<mat-tab label="Friends"> 
+
 							<div id="FriendbarInner">
 								<div id="FriendOption" *ngFor="let friend of friendList;">
+
 									<button mat-button [matMenuTriggerFor]="matFriendMenu" class="FriendButton">{{friend.firstName && friend.lastName ? friend.firstName + ' ' + friend.lastName : friend.username}}</button> 
 									<mat-menu #matFriendMenu="matMenu">
 										<button (click)="selectProfile($event,friend);" mat-menu-item>Show Profile</button>
 										<button (click)="openChat($event,friend);" mat-menu-item>Message</button>
 										<button mat-menu-item>Remove Friend</button>
 									</mat-menu>
+
 								</div>
 							</div>
+
 						</mat-tab>
-						<mat-tab *ngFor="let chat of chatList" [label]="'Chat: ' + chat.recipient.username "> 
-							<mat-card *ngFor="let msg of chat.messages" class="PrivateMessageCard">
-								<mat-card-subtitle>{{msg.author.firstName}}</mat-card-subtitle>
-								<mat-card-content>
-									<p>
-										{{msg.body}}
-									</p>
-								</mat-card-content>
-								<mat-card-subtitle>Sent {{msg.date}}</mat-card-subtitle>
-							</mat-card>
+						<mat-tab *ngFor="let chat of chatList" [label]="'Chat: ' + chat.recipient.firstName ">
+							<button class="CloseChatButton" (click)="chatList.splice(chatList.indexOf(chat,0),1);"></button>
+							<div id="ChatTab">
+								<mat-card *ngFor="let msg of chat.messages" class="PrivateMessageCard">
+									<mat-card-subtitle>{{msg.author.firstName && msg.author.lastName ? msg.author.firstName + ' ' + msg.author.lastName : msg.author.firstName}}</mat-card-subtitle>
+									<mat-card-content>
+										<p>
+											{{msg.body}}
+										</p>
+									</mat-card-content>
+									<mat-card-subtitle>Sent {{msg.date}}</mat-card-subtitle>
+								</mat-card>
+							</div>
+
+							<mat-form-field class="MessageInputField" appearance="fill">
+								<mat-label>Type your message.</mat-label>
+								<textarea matInput class="MessageInputTextArea" placeholder="Message here."></textarea>
+							</mat-form-field>
+
+							<button class="FriendButton">Send message</button>
+
 						</mat-tab>
 					</mat-tab-group>
 				</div>

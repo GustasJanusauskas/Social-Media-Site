@@ -157,8 +157,12 @@ textarea {
 	background-size: 1.5em;
 	padding-left: 2em;
 	
-	
 	margin-left: 2em;
+
+	border-style: solid;
+	border-color: #414d61;
+	border-width: 1px;
+	border-radius: 0.75em;
 }
 
 #ProfilePic {
@@ -218,4 +222,32 @@ textarea {
 	font-size: 24px;
 	padding: 0.5em;
 	margin-top: 0.75em;
+}
+
+#ChatTab {
+	overflow-y: scroll;
+	overflow-x: hidden;
+
+	height: 25em;
+}
+
+.MessageInputTextArea:focus {
+	outline: none;
+}
+
+.MessageInputField {
+	margin-top: 0.75em;
+	width: 100%;
+}
+
+.CloseChatButton {
+	background: url('images/Close.png') no-repeat;
+	background-color: #e2eaf3;
+
+	width: 2em;
+	height: 2em;
+
+	position: absolute;
+	right: 0;
+	z-index: 10;
 }

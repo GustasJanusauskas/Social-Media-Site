@@ -287,6 +287,8 @@ export class AppComponent {
       }
     });
     if (!bypass) this.chatList.push({recipient:profile, sender: this.userinfo, messages:[{author:profile,body:'Test Message',date:'2022-07-26'}]});
+
+    for (var x = 0; x < 10 ; x++) this.chatList[this.chatList.length - 1].messages.push({author:profile,body:'Test Message ' + x,date:'2022-07-26'});
   }
 
   selectProfile(event: Event, profile: UserInfo = {session:''}) {
