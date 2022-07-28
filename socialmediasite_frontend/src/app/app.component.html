@@ -116,7 +116,7 @@
 					</div>
 				</div>
 				<div id="FriendbarMain" class="BackgroundElement">
-					<mat-tab-group mat-stretch-tabs md-no-pagination *ngIf="userinfo.session != ''">
+					<mat-tab-group mat-stretch-tabs md-no-pagination *ngIf="userinfo.session != ''" (selectedTabChange)="onTabChange($event);">
 						<mat-tab label="Friends"> 
 
 							<div id="FriendbarInner">
@@ -137,11 +137,9 @@
 							<button class="CloseChatButton" (click)="chatList.splice(chatList.indexOf(chat,0),1);"></button>
 							<div id="ChatTab">
 								<mat-card *ngFor="let msg of chat.messages" class="PrivateMessageCard">
-									<mat-card-subtitle>{{msg.author.firstName && msg.author.lastName ? msg.author.firstName + ' ' + msg.author.lastName : msg.author.firstName}}</mat-card-subtitle>
+									<mat-card-subtitle>{{msg.author.firstName && msg.author.lastName ? msg.author.firstName + ' ' + msg.author.lastName + ' (' + msg.author.username + ')' : msg.author.username}}</mat-card-subtitle>
 									<mat-card-content>
-										<p>
-											{{msg.body}}
-										</p>
+										<p>{{msg.body}}</p>
 									</mat-card-content>
 									<mat-card-subtitle>Sent {{msg.date}}</mat-card-subtitle>
 								</mat-card>
@@ -149,10 +147,10 @@
 
 							<mat-form-field class="MessageInputField" appearance="fill">
 								<mat-label>Type your message.</mat-label>
-								<textarea matInput class="MessageInputTextArea" placeholder="Message here."></textarea>
+								<textarea matInput class="MessageInputTextArea" placeholder="Message here." [(ngModel)]="chatMsgField"></textarea>
 							</mat-form-field>
 
-							<button class="FriendButton">Send message</button>
+							<button class="FriendButton" (click)="sendMsg();">Send message</button>
 
 						</mat-tab>
 					</mat-tab-group>

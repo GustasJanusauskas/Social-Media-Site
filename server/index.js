@@ -11,12 +11,17 @@ const crypto = require('crypto');
 const express = require("express");
 const path = require('path');
 
+const wss = new ws.Server({ port: 4001 });
+
+const PORT = process.env.PORT || 3001;
+const app = express();
+
 const linkRegex = new RegExp(String.raw`[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)$`);
 const base64Regex = new RegExp(String.raw`^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=|[A-Za-z0-9+/]{4})$`);
 const emailRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 
-const PORT = process.env.PORT || 3001;
-const app = express();
+//Enables extra debug messages
+const VERBOSE_DEBUG = true;
 
 //CONFIG
 const dbclient = new Client({
@@ -28,6 +33,38 @@ const dbclient = new Client({
 }); dbclient.connect();
 
 app.use(express.json({limit: '16mb'}));
+
+//WEBSOCKETS
+var wsUsers = [];
+
+wss.on('connection', (ws,req) => {
+  ws.on('message', function(message) {
+    var conip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+    var jsonMessage = JSON.parse(message);
+    if (VERBOSE_DEBUG) console.log(`Received message from ${conip} => ${message}`);
+
+    //If handshake
+    if (jsonMessage.handshake == true) {
+      RegisterNewWebsocket(ws,conip,jsonMessage);
+    }
+    //If message
+    else {
+      var sender = wsUsers.find((user => {return user.session == jsonMessage.session;}));
+      var receiver = wsUsers.find((user => {return user.id == jsonMessage.recipientID;}));
+      if (sender && receiver) {
+        //Replace sender session with ID before sending message to receiver.
+        jsonMessage.senderID = sender.id;
+        jsonMessage.session = '';
+        receiver.ws.send(JSON.stringify(jsonMessage));
+      }
+      //If receiver cannot be found, send an error message back to sender.
+      else if (sender) {
+        if (VERBOSE_DEBUG) console.log(`Couldn't send ${sender.id}'s message to ${jsonMessage.recipientID}.`);
+        sender.ws.send(JSON.stringify({recipientID:jsonMessage.recipientID,error:'Recipient could not receive message, please try again later.'}));
+      }
+    }
+  });
+});
 
 //FILES
 app.use(express.static(path.join(__dirname,'..',String.raw`socialmediasite_frontend\dist\socialmediasite_frontend`)));
@@ -159,6 +196,25 @@ app.listen(PORT, () => {
 });
 
 //FUNCTIONS
+function RegisterNewWebsocket(ws,conip,jsonMessage) {
+  var tempUser = wsUsers.find((user => {return user.ip == conip;}));
+  //Update existing connection
+  if (tempUser) {
+    GetIDFromSession(jsonMessage.session,(id) => {
+      tempUser.ip = conip;
+      tempUser.session = jsonMessage.session;
+      tempUser.id = id;
+      tempUser.ws = ws;
+    });
+  }
+  //New connection, get user ID from session and associate with IP
+  else {
+    GetIDFromSession(jsonMessage.session,(id) => {
+      wsUsers.push({ip:conip,session:jsonMessage.session,id,ws});
+    });
+  }
+}
+
 function ChangeFriend(session,friendID,status,callback) {
   //Getting UserID from session
   var query = 'SELECT * FROM sessions WHERE sessionid = $1';
@@ -371,6 +427,21 @@ function GetPublicUserInfo(ID,callback,resolve = null) {
 function GetPublicUserInfoPromise(ID,callback) {
   return new Promise((resolve,reject) => {
     GetPublicUserInfo(ID,callback,resolve);
+  });
+}
+
+function GetIDFromSession(session,callback) {
+  var query = 'SELECT * FROM sessions WHERE sessionid = $1';
+  var data = [session];
+
+  dbclient.query(query,data, (err, res) => {
+    if (err || res.rows.length == 0) {
+      if (err) console.log("DB ERROR GetUserIDFromSession: \n" + err);
+      callback(-1);
+      return;
+    }
+
+    callback(res.rows[0].usr_id);
   });
 }
 
@@ -607,6 +678,11 @@ function RegisterUser(user,passw,email,callback) {
 
   if(!emailRegex.test(email.toLowerCase())) {
     callback(false,"Email is invalid.");
+    return;
+  }
+  //Reserved usernames
+  if (['server','host','owner','system'].indexOf(user.toLowerCase()) != -1) {
+    callback(false,"Username reserved. Pick another username.");
     return;
   }
 

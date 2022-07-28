@@ -1,10 +1,16 @@
 import { Component, Input, NgModule } from '@angular/core';
 import { PageEvent } from '@angular/material/paginator';
+
 import { UserdataService } from './services/userdata.service';
+import { MessagingService } from "./services/messaging.service";
 
 import { UserInfo } from './interfaces/userinfo';
 import { Post } from './interfaces/post';
 import { Chat } from './interfaces/chat';
+import { Message, MessageSend } from './interfaces/message';
+
+//Enables extra debug messages
+export const VERBOSE_DEBUG = true;
 
 @Component({
   selector: 'app-root',
@@ -51,9 +57,49 @@ export class AppComponent {
 
   //Private messages
   chatList: Chat[] = [];
+  currentChat!: Chat;
+  chatMsgField: string = "";
 
-  constructor(private userdataService: UserdataService) {
-    this.updateUI();
+  constructor(private userdataService: UserdataService, private messagingService: MessagingService) {
+    //On websocket message: find correct chat and add message
+    messagingService.messages.subscribe(msg => {
+      //If error message, find chat to add it to and set author to reserved 'SERVER' username
+      if (msg.error) {
+        var chat = this.chatList.find(chat => {
+          if (!chat || !chat.recipient) return false;
+          return chat.recipient.ID == msg.recipientID;
+        });
+
+        chat?.messages.push({body:msg.error,author:{session:'',username:'SYSTEM'},date:new Date(Date.now()).toLocaleString()});
+        return;
+      }
+
+      var chat = this.chatList.find(chat => {
+        if (!chat || !chat.recipient || !msg.senderID) return false;
+        return chat.recipient.ID == msg.senderID;
+      });
+      
+      var localMessage: Message = {body:msg.body,date:msg.date,author:this.userinfo};
+      //Get author data from memory, if ID isn't user's assume it's the sender's
+      if (chat) {
+        if (msg.senderID == this.userinfo.ID) {
+          localMessage.author = chat.sender;
+        }
+        else {
+          localMessage.author = chat.recipient;
+        }
+        //Convert date to readable format
+        localMessage.date = new Date(msg.date).toLocaleString();
+  
+        chat.messages.push(localMessage);
+      }
+
+      if (VERBOSE_DEBUG) console.log("Response from websocket: " + msg);
+    });
+
+    this.updateUI(() => {
+      this.connectMsg();
+    });
     this.searchInterval = setInterval(() => {
       if (this.lastSearchCharacterInput + 250 < Date.now() && this.search != '') {
         this.userdataService.findUsers(this.search.toLowerCase()).subscribe(data => {
@@ -234,6 +280,7 @@ export class AppComponent {
         this.formError = 'Logged in succesfully.';
         this.setCookie('session','' + data.session,30);
         this.updateUI();
+        this.connectMsg();
 
         this.username = '';
         this.password = '';
@@ -291,6 +338,34 @@ export class AppComponent {
     for (var x = 0; x < 10 ; x++) this.chatList[this.chatList.length - 1].messages.push({author:profile,body:'Test Message ' + x,date:'2022-07-26'});
   }
 
+  connectMsg() {
+    //Sends session over separate handshake port
+    var session = this.getCookie('session');
+    if (session == null || session.length < 64 ) return;
+
+    var request: MessageSend = {body:'',recipientID:-1,date:'',session,handshake:true};
+    this.messagingService.messages.next(request);
+  }
+
+  sendMsg() {
+    var session = this.getCookie('session');
+    if (session == null || session.length < 64 ) return;
+    if (!this.currentChat || !this.currentChat.recipient.ID) return;
+
+    //Create 2 versions of message: a local one with all of the info, and a smaller, more secure sendable version.
+    //An identical local message will be generated on receiver's computer.
+    var timestamp = Date.now();
+    var msg: MessageSend = {body:this.chatMsgField,session,recipientID:this.currentChat.recipient.ID,date: timestamp};
+    var localmsg: Message = {body:this.chatMsgField,author:this.userinfo,date: timestamp};
+
+    //Convert local date to readable format
+    localmsg.date = new Date(timestamp).toLocaleString();
+
+    //Send and store messages;
+    this.currentChat.messages.push(localmsg);
+    this.messagingService.messages.next(msg);
+  }
+
   selectProfile(event: Event, profile: UserInfo = {session:''}) {
     var tempProfile: UserInfo;
     //If profile not provided, search results array, assume search bar used
@@ -343,6 +418,12 @@ export class AppComponent {
 
         this.updateProfileEnabled = true;
       }
+    }
+  }
+
+  onTabChange(event: any) {
+    if (event.index != 0) {
+      this.currentChat = this.chatList[event.index - 1];
     }
   }
 

@@ -6,3 +6,14 @@ export interface Message {
 
     date: any;
 }
+
+export interface MessageSend {
+    body: string;
+    session?: string;
+    recipientID: number;
+    senderID?: number;
+
+    date: any;
+    error?: string;
+    handshake?: boolean;
+}
