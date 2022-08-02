@@ -14,17 +14,20 @@ Features include:
 - PostgreSQL
 - NodeJS
 - Angular
-- Angular Material
 
 ### Steps
 
 1. Install prerequisites.
-2. To setup the database, run the commands included in '_DB Setup.sql' via postgreSQL.
-3. Navigate to the project folder in the terminal and run:
+2. Navigate to both the root and socialmediasite_frontend folders and run:
+```
+npm install
+```
+3. To setup the database, run the commands included in '_DB Setup.sql' via postgreSQL.
+4. Navigate to the project folder in the terminal and run:
 ```
 npm run test
 ```
-4. Webapp can now be reached at:
+5. Webapp can now be reached at:
 ```
 localhost:3001
 ```
