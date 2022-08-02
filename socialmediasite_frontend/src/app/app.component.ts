@@ -1,4 +1,4 @@
-import { Component, Input, NgModule } from '@angular/core';
+import { Component, QueryList, Directive, ViewChildren } from '@angular/core';
 import { PageEvent } from '@angular/material/paginator';
 
 import { UserdataService } from './services/userdata.service';
@@ -60,9 +60,17 @@ export class AppComponent {
   currentChat!: Chat;
   chatMsgField: string = "";
 
+  @ViewChildren('chatDiv') chatDiv!: QueryList<any>;
+
   constructor(private userdataService: UserdataService, private messagingService: MessagingService) {
     //On websocket message: find correct chat and add message
     messagingService.messages.subscribe(msg => {
+      //Check whether autoscroll is required on each chat
+      var scrollChat: boolean[] = new Array<boolean>(this.chatDiv.length);
+      this.chatDiv.forEach( (item, index, arr) => {
+        scrollChat[index] = item.nativeElement.scrollTop + item.nativeElement.clientHeight == item.nativeElement.scrollHeight;
+      });
+
       //If error message, find chat to add it to and set author to reserved 'SERVER' username
       if (msg.error) {
         var chat = this.chatList.find(chat => {
@@ -71,6 +79,9 @@ export class AppComponent {
         });
 
         chat?.messages.push({body:msg.error,author:{session:'',username:'SYSTEM'},date:new Date(Date.now()).toLocaleString()});
+
+        //Apply autoscroll on each chat if needed
+        this.scrollDivs(scrollChat);
         return;
       }
 
@@ -90,16 +101,21 @@ export class AppComponent {
         }
         //Convert date to readable format
         localMessage.date = new Date(msg.date).toLocaleString();
-  
+        
         chat.messages.push(localMessage);
       }
+
+      //Apply autoscroll on each chat if needed
+      this.scrollDivs(scrollChat);
 
       if (VERBOSE_DEBUG) console.log("Response from websocket: " + msg);
     });
 
+    //Connect messaging websock
     this.updateUI(() => {
       this.connectMsg();
     });
+    //Setup search input checking
     this.searchInterval = setInterval(() => {
       if (this.lastSearchCharacterInput + 250 < Date.now() && this.search != '') {
         this.userdataService.findUsers(this.search.toLowerCase()).subscribe(data => {
@@ -351,7 +367,13 @@ export class AppComponent {
     var session = this.getCookie('session');
     if (session == null || session.length < 64 ) return;
     if (!this.currentChat || !this.currentChat.recipient.ID) return;
-    if (this.chatMsgField.length > 350) return;
+    if (this.chatMsgField.length > 350 || !this.chatMsgField) return;
+
+    //Check whether autoscroll is required on each chat
+    var scrollChat: boolean[] = new Array<boolean>(this.chatDiv.length);
+    this.chatDiv.forEach( (item, index, arr) => {
+      scrollChat[index] = item.nativeElement.scrollTop + item.nativeElement.clientHeight == item.nativeElement.scrollHeight;
+    });
 
     //Create 2 versions of message: a local one with all of the info, and a smaller, more secure sendable version.
     //An identical local message will be generated on receiver's computer.
@@ -362,9 +384,12 @@ export class AppComponent {
     //Convert local date to readable format
     localmsg.date = new Date(timestamp).toLocaleString();
 
-    //Send and store messages;
+    //Send and store messages
     this.currentChat.messages.push(localmsg);
     this.messagingService.messages.next(msg);
+
+    //Apply autoscroll if needed
+    this.scrollDivs(scrollChat);
   }
 
   selectProfile(event: Event, profile: UserInfo = {session:''}) {
@@ -387,6 +412,12 @@ export class AppComponent {
         this.setMain(event,'profile');
       });
     }
+  }
+
+  scrollDivs(scrollAllowList?: boolean[]) {
+    this.chatDiv.forEach( (item, index, arr) => {
+      if ( ( scrollAllowList && scrollAllowList[index] ) || !scrollAllowList) setTimeout( () => {item.nativeElement.scrollTop = item.nativeElement.scrollHeight}, 10);
+    });
   }
 
   convertPostDates(posts:Post[]) {
@@ -426,6 +457,8 @@ export class AppComponent {
     if (event.index != 0) {
       this.currentChat = this.chatList[event.index - 1];
     }
+
+    this.scrollDivs();
   }
 
   updateCharCounter(event: Event,counterID: string = 'post') {

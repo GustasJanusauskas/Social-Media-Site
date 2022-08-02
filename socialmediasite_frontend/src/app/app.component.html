@@ -28,14 +28,14 @@
 					<button *ngIf="userinfo.session != ''" class="SidebarButton" (click)="setMain($event,'post');">Add Post</button>
 					<button *ngIf="userinfo.session != ''" class="SidebarButton" (click)="selectProfile($event,userinfo);">My profile</button>
 					<button *ngIf="userinfo.session != ''" class="SidebarButton" (click)="setMain($event,'ownprofile');">Edit profile</button>
-					<button class="SidebarButton">Settings</button>
+					<!--<button class="SidebarButton" (click)="setMain($event,'settings');">Settings</button> -->
 				</div>
 				<div id="BodyMain" class="BackgroundElement">
 					<div *ngIf="bodyHTML=='login'" id="Login">
 						<h2>Log in</h2>
-						<label id="LogLabel">Username/Email:</label> <input type="text" placeholder="Enter your username or email" id="UserInput" [(ngModel)]="username" autocomplete="off">
+						<label class="LogLabel">Username/Email:</label> <input type="text" placeholder="Enter your username or email" id="UserInput" [(ngModel)]="username" autocomplete="off">
 						<br>
-						<label id="LogLabel">Password:</label> <input type="password" placeholder="Enter your password" id="PassInput" [(ngModel)]="password" autocomplete="off">
+						<label class="LogLabel">Password:</label> <input type="password" placeholder="Enter your password" id="PassInput" [(ngModel)]="password" autocomplete="off">
 						<br>
 						<button class="MainbarButton" id="LoginMainButton" (click)="login($event)">Login</button>
 						<br>
@@ -43,11 +43,11 @@
 					</div>
 					<div *ngIf="bodyHTML=='register'" id="Register">
 						<h2>Create a new account</h2>
-						<label id="LogLabel">Email:</label> <input type="text" placeholder="Enter your email adress" id="EmailInput" [(ngModel)]="email" autocomplete="off">
+						<label class="LogLabel">Email:</label> <input type="text" placeholder="Enter your email adress" id="EmailInput" [(ngModel)]="email" autocomplete="off">
 						<br>
-						<label id="LogLabel">Username:</label> <input type="text" placeholder="Enter username" id="UserInput" [(ngModel)]="username" autocomplete="off">
+						<label class="LogLabel">Username:</label> <input type="text" placeholder="Enter username" id="UserInput" [(ngModel)]="username" autocomplete="off">
 						<br>
-						<label id="LogLabel">Password:</label> <input type="password" placeholder="Enter password" id="PassInput" [(ngModel)]="password" autocomplete="off">
+						<label class="LogLabel">Password:</label> <input type="password" placeholder="Enter password" id="PassInput" [(ngModel)]="password" autocomplete="off">
 						<br>
 						<button class="MainbarButton" id="RegisterMainButton" (click)="register($event)">Register</button>
 						<br>
@@ -74,9 +74,9 @@
 						<input class="FileUpload" type="file" accept=".png, .jpg, .jpeg, .bmp, .gif, .tiff, .tif" (change)="onAvatarChange($event)">
 
 						<h3>Personal info</h3>
-						<label id="LogLabel">First name:</label> <input type="text" placeholder="Edit your first name" id="ProfileInput" [(ngModel)]="userinfo.firstName" (keypress)="lettersOnly($event)" autocomplete="off">
+						<label class="LogLabel">First name:</label> <input type="text" placeholder="Edit your first name" id="ProfileInput" [(ngModel)]="userinfo.firstName" (keypress)="lettersOnly($event)" autocomplete="off">
 						<br>
-						<label id="LogLabel">Last name:</label> <input type="text" placeholder="Edit your last name" id="ProfileInput" [(ngModel)]="userinfo.lastName" (keypress)="lettersOnly($event)" autocomplete="off">
+						<label class="LogLabel">Last name:</label> <input type="text" placeholder="Edit your last name" id="ProfileInput" [(ngModel)]="userinfo.lastName" (keypress)="lettersOnly($event)" autocomplete="off">
 
 						<h3>Profile description</h3>
 						<textarea placeholder="Enter your profile description" id="PostBodyInput" [(ngModel)]="userinfo.profileDesc" (ngModelChange)="updateCharCounter($event,'profile')" autocomplete="off"> </textarea>
@@ -114,6 +114,11 @@
 							<div id="PostedDateText">Posted {{post.date}}</div>
 						</div> 
 					</div>
+					<div *ngIf="bodyHTML=='settings'" id="Settings">
+						<h2>Settings</h2>
+						<label class="SettingsLabel">Setting 1: </label>
+						<mat-checkbox class="SettingsCheckbox">Enable</mat-checkbox>
+					</div>
 				</div>
 				<div id="FriendbarMain" class="BackgroundElement">
 					<mat-tab-group mat-stretch-tabs md-no-pagination *ngIf="userinfo.session != ''" (selectedTabChange)="onTabChange($event);">
@@ -135,7 +140,7 @@
 						</mat-tab>
 						<mat-tab *ngFor="let chat of chatList" [label]="'Chat: ' + chat.recipient.firstName ">
 							<button class="CloseChatButton" (click)="chatList.splice(chatList.indexOf(chat,0),1);"></button>
-							<div id="ChatTab">
+							<div class="ChatTab" #chatDiv>
 								<mat-card *ngFor="let msg of chat.messages" class="PrivateMessageCard">
 									<mat-card-subtitle>{{msg.author.firstName && msg.author.lastName ? msg.author.firstName + ' ' + msg.author.lastName + ' (' + msg.author.username + ')' : msg.author.username}}</mat-card-subtitle>
 									<mat-card-content>

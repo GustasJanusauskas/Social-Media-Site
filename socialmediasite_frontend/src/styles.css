@@ -33,6 +33,10 @@ button:hover {
 	transition: 0.25s;
 }
 
+p {
+	word-break: break-all;
+}
+
 h2 {
 	margin-left: auto;
 	margin-right: auto;
@@ -108,13 +112,18 @@ textarea {
 	height: 2em;
 }
 
-#Login, #Register, #AddPost, #Profile {
+#Login, #Register, #AddPost, #Profile, #Settings {
 	text-align: center;
 }
 
-#LogLabel {
+.LogLabel {
 	display: inline-block;
 	width: 9em;
+}
+
+.SettingsLabel {
+	display: inline-block;
+	width: 28em;
 }
 
 .PrivateMessageCard {
@@ -224,7 +233,7 @@ textarea {
 	margin-top: 0.75em;
 }
 
-#ChatTab {
+.ChatTab {
 	overflow-y: scroll;
 	overflow-x: hidden;
 
