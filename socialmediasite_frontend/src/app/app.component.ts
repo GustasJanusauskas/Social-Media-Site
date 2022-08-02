@@ -351,6 +351,7 @@ export class AppComponent {
     var session = this.getCookie('session');
     if (session == null || session.length < 64 ) return;
     if (!this.currentChat || !this.currentChat.recipient.ID) return;
+    if (this.chatMsgField.length > 350) return;
 
     //Create 2 versions of message: a local one with all of the info, and a smaller, more secure sendable version.
     //An identical local message will be generated on receiver's computer.

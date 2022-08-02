@@ -145,9 +145,10 @@
 								</mat-card>
 							</div>
 
-							<mat-form-field class="MessageInputField" appearance="fill">
+							<mat-form-field class="MessageInputField" hintLabel="Max 350 characters" appearance="fill">
 								<mat-label>Type your message.</mat-label>
-								<textarea matInput class="MessageInputTextArea" placeholder="Message here." [(ngModel)]="chatMsgField"></textarea>
+								<textarea matInput #input maxlength="350" class="MessageInputTextArea" placeholder="Message here." [(ngModel)]="chatMsgField"></textarea>
+								<mat-hint align="end">{{chatMsgField.length}}/350</mat-hint>
 							</mat-form-field>
 
 							<button class="FriendButton" (click)="sendMsg();">Send message</button>
