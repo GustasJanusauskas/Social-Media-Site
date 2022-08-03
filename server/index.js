@@ -39,13 +39,13 @@ var wsUsers = [];
 
 wss.on('connection', (ws,req) => {
   ws.on('message', function(message) {
-    var conip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+    var connip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
     var jsonMessage = JSON.parse(message);
-    if (VERBOSE_DEBUG) console.log(`Received message from ${conip} => ${message}`);
+    if (VERBOSE_DEBUG) console.log(`Received message from ${connip} => ${message}`);
 
     //If handshake
     if (jsonMessage.handshake == true) {
-      RegisterNewWebsocket(ws,conip,jsonMessage);
+      RegisterNewWebsocket(ws,connip,jsonMessage);
     }
     //If message
     else {
@@ -55,6 +55,7 @@ wss.on('connection', (ws,req) => {
         //Replace sender session with ID before sending message to receiver.
         jsonMessage.senderID = sender.id;
         jsonMessage.session = '';
+        jsonMessage.body = jsonMessage.body.replace('{','').replace('}','').replace('"','') ;
         receiver.ws.send(JSON.stringify(jsonMessage));
       }
       //If receiver cannot be found, send an error message back to sender.
@@ -65,6 +66,8 @@ wss.on('connection', (ws,req) => {
     }
   });
 });
+
+
 
 //FILES
 app.use(express.static(path.join(__dirname,'..',String.raw`socialmediasite_frontend\dist\socialmediasite_frontend`)));
@@ -196,12 +199,12 @@ app.listen(PORT, () => {
 });
 
 //FUNCTIONS
-function RegisterNewWebsocket(ws,conip,jsonMessage) {
-  var tempUser = wsUsers.find((user => {return user.ip == conip;}));
+function RegisterNewWebsocket(ws,connip,jsonMessage) {
+  var tempUser = wsUsers.find((user => {return user.ip == connip;}));
   //Update existing connection
   if (tempUser) {
     GetIDFromSession(jsonMessage.session,(id) => {
-      tempUser.ip = conip;
+      tempUser.ip = connip;
       tempUser.session = jsonMessage.session;
       tempUser.id = id;
       tempUser.ws = ws;
@@ -210,7 +213,7 @@ function RegisterNewWebsocket(ws,conip,jsonMessage) {
   //New connection, get user ID from session and associate with IP
   else {
     GetIDFromSession(jsonMessage.session,(id) => {
-      wsUsers.push({ip:conip,session:jsonMessage.session,id,ws});
+      wsUsers.push({ip:connip,session:jsonMessage.session,id,ws});
     });
   }
 }

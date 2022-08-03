@@ -431,6 +431,10 @@ export class AppComponent {
     return 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'.includes(event.key);
   }
 
+  noJsonSymbols(event: KeyboardEvent) {
+    return !`"{}`.includes(event.key);
+  }
+
   searchUpdate(event: Event) {
     this.lastSearchCharacterInput = Date.now();
   }

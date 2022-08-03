@@ -56,10 +56,10 @@
 					<div *ngIf="bodyHTML=='post'" id="AddPost">
 						<h2>Add a new post</h2>
 						<h3>Title</h3>
-						<input type="text" placeholder="Enter your post title" id="PostTitleInput" [(ngModel)]="postTitle" autocomplete="off">
+						<input type="text" placeholder="Enter your post title" id="PostTitleInput" (keypress)="noJsonSymbols($event)" [(ngModel)]="postTitle" autocomplete="off">
 						<br>
 						<h3>Body</h3>
-						<textarea placeholder="Enter your post content" id="PostBodyInput" [(ngModel)]="postBody" (ngModelChange)="updateCharCounter($event)" autocomplete="off"> </textarea>
+						<textarea placeholder="Enter your post content" id="PostBodyInput" (keypress)="noJsonSymbols($event)" [(ngModel)]="postBody" (ngModelChange)="updateCharCounter($event)" autocomplete="off"> </textarea>
 						<br>
 						Characters left: {{postCharLeft}}
 						<br>
@@ -152,7 +152,7 @@
 
 							<mat-form-field class="MessageInputField" hintLabel="Max 350 characters" appearance="fill">
 								<mat-label>Type your message.</mat-label>
-								<textarea matInput #input maxlength="350" class="MessageInputTextArea" placeholder="Message here." [(ngModel)]="chatMsgField"></textarea>
+								<textarea matInput #input maxlength="350" class="MessageInputTextArea" placeholder="Message here." (keypress)="noJsonSymbols($event)" [(ngModel)]="chatMsgField"></textarea>
 								<mat-hint align="end">{{chatMsgField.length}}/350</mat-hint>
 							</mat-form-field>
 
