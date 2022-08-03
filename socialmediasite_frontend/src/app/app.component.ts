@@ -52,12 +52,12 @@ export class AppComponent {
   searchInterval;
 
   //Profiles
-  selectedProfile!: UserInfo;
+  selectedProfile?: UserInfo;
   pageEvent: PageEvent = {pageIndex:0,pageSize:1,length:1};
 
   //Private messages
   chatList: Chat[] = [];
-  currentChat!: Chat;
+  currentChat?: Chat;
   chatMsgField: string = "";
 
   @ViewChildren('chatDiv') chatDiv!: QueryList<any>;
@@ -247,6 +247,8 @@ export class AppComponent {
     this.formError = 'Posting..';
     this.userdataService.addPost(session,this.postTitle,this.postBody).subscribe(data => {
       if (data.success) {
+        this.postTitle = '';
+        this.postBody = '';
         this.formError = 'Post added to wall!';
       }
       else {
@@ -327,9 +329,18 @@ export class AppComponent {
 
   logoff(event: Event) {
     this.deleteCookie('session');
+    this.connectMsg(true);
+
     this.updateUI();
     this.setMain(event,'feed');
-    this.connectMsg(true);
+
+    //Clear previous user's data
+    this.chatList = [];
+    this.chatMsgField = '';
+    this.currentChat = undefined;
+    this.selectedProfile = undefined;
+    this.postTitle = '';
+    this.postBody = '';
   }
 
   register(event: Event) {
@@ -351,6 +362,7 @@ export class AppComponent {
     //Send data to backend
     this.userdataService.registerUser(this.username,this.password,this.email).subscribe(data => {
       if (data.success) {
+        this.email = '';
         this.formError = 'User registered! You can now log in.';
       }
       else {
@@ -384,9 +396,9 @@ export class AppComponent {
         return;
       }
     });
-    if (!bypass) this.chatList.push({recipient:profile, sender: this.userinfo, messages:[{author:profile,body:'Test Message',date:'2022-07-26'}]});
+    if (!bypass) this.chatList.push({recipient:profile, sender: this.userinfo, messages:[]});
 
-    for (var x = 0; x < 10 ; x++) this.chatList[this.chatList.length - 1].messages.push({author:profile,body:'Test Message ' + x,date:'2022-07-26'});
+    //for (var x = 0; x < 10 ; x++) this.chatList[this.chatList.length - 1].messages.push({author:profile,body:'Test Message ' + x,date:'2022-07-26'});
   }
 
   connectMsg(disconnect:boolean = false) {

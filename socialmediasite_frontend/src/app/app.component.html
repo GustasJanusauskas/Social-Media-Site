@@ -38,7 +38,7 @@
 						<label class="LogLabel">Password:</label> <input type="password" placeholder="Enter your password" id="PassInput" [(ngModel)]="password" autocomplete="off">
 						<br>
 						<button class="MainbarButton" id="LoginMainButton" (click)="login($event)">Login</button>
-						<br>
+						<br><br>
 						<b>{{formError}}</b>
 					</div>
 					<div *ngIf="bodyHTML=='register'" id="Register">
