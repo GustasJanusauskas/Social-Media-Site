@@ -63,7 +63,7 @@ export class UserdataService {
 
   removePost(session: string, postID: number) {
     var data = {session:session,postID: postID};
-    return this.http.put('/removepost',data,httpOptions);
+    return this.http.put<any>('/removepost',data,httpOptions);
   }
 
   updateProfile(session: string, userinfo: UserInfo) {

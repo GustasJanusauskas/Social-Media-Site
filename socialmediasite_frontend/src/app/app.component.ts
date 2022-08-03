@@ -255,6 +255,18 @@ export class AppComponent {
     });
   }
 
+  removePost(event: Event,postID: number, showProfile: boolean = false) {
+    var session = this.getCookie('session');
+    if (session == null || session.length < 64 ) return;
+
+    this.userdataService.removePost(session,postID).subscribe(data => {
+      if (data.success) {
+        if (showProfile) this.selectProfile(event,this.userinfo);
+        else this.setMain(event,'feed');
+      }
+    });
+  }
+
   setMain(event: Event,text: string) {
     this.formError = '';
     this.bodyHTML = text;

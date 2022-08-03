@@ -261,17 +261,27 @@ function ChangeFriend(session,friendID,status,callback) {
 
 function RemovePost(session,postID,callback) {
   GetIDFromSession(session, (userID) => {
-    var innerQuery = 'UPDATE profiles SET posts = array_remove(posts,$1) WHERE usr_id = $2; DELETE FROM posts WHERE post_ID = $1 AND usr_id = $2;';
+    var innerQuery = 'UPDATE profiles SET posts = array_remove(posts,$1) WHERE usr_id = $2;';
     var innerData = [postID,userID];
 
     dbclient.query(innerQuery,innerData, (err, res) => {
       if (err) {
-        if (err) console.log("DB ERROR RemovePost: \n" + err);
-        callback(false,'Failed to remove post.');
+        console.log("DB ERROR RemovePostUpdateProfile: \n" + err);
+        callback(false,'Failed to remove post ID from profile.');
         return;
       }
 
-      callback(true,'Post removed successfully.');
+      var innerInQuery = 'DELETE FROM posts WHERE post_ID = $1 AND usr_id = $2;';
+      dbclient.query(innerInQuery,innerData, (err, res) => {
+        if (err) {
+          console.log("DB ERROR RemovePost: \n" + err);
+          callback(false,'Failed to remove post.');
+          return;
+        }
+
+        if (VERBOSE_DEBUG) console.log('User ' + userID + ' deleted post ' + postID);
+        callback(true,'Post removed successfully.');
+      });
     });
   });
 }
@@ -325,6 +335,7 @@ function GetFriendPosts(friends,callback) {
       temp.body = res.rows[x].pbody;
       temp.date = res.rows[x].pdate;
       temp.author = res.rows[x].author;
+      temp.authorID = res.rows[x].usr_id;
       temp.postID = res.rows[x].post_id;
 
       result.push(temp);
@@ -364,6 +375,7 @@ function GetUserPosts(ID,callback) {
       temp.body = res.rows[x].pbody;
       temp.date = res.rows[x].pdate;
       temp.author = res.rows[x].author;
+      temp.authorID = res.rows[x].usr_id;
       temp.postID = res.rows[x].post_id;
 
       result.push(temp);
