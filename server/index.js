@@ -242,9 +242,14 @@ function ChangeFriend(session,friendID,status,callback) {
       innerData = [friendID,userID];
     }
 
+    if (VERBOSE_DEBUG) {
+      console.log('Friend status change:');
+      console.log({fID:friendID,uID:userID,status});
+    }
+
     dbclient.query(innerQuery,innerData, (err, res) => {
-      if (err || res.rows.length == 0) {
-        if (err) console.log("DB ERROR ChangeFriend: \n" + err);
+      if (err) {
+        console.log("DB ERROR ChangeFriend: \n" + err);
         callback(false,'Failed to change friend status.');
         return;
       }

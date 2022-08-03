@@ -345,6 +345,22 @@ export class AppComponent {
     });
   }
 
+  changeFriendStatus(event: Event, profile: UserInfo, friend: boolean) {
+    var session = this.getCookie('session');
+    if (session == null || session.length < 64 ) return;
+
+    this.userdataService.changeFriendStatus(session,profile.ID || -1,friend).subscribe(data => {
+      if (data.success) {
+        this.updateUI();
+
+        if (VERBOSE_DEBUG) console.log('Friend removed.');
+      }
+      else {
+        if (VERBOSE_DEBUG) console.log('Error, removing friend failed.');
+      }
+    });
+  }
+
   openChat(event: Event, profile: UserInfo) {
     var bypass: boolean = false;
 

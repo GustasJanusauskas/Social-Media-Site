@@ -76,6 +76,6 @@ export class UserdataService {
   changeFriendStatus(session: string, userID: number, status: boolean) {
     var data = {session:session,friendID:userID,status:status};
 
-    return this.http.put('/changefriendstatus',data,httpOptions);
+    return this.http.put<any>('/changefriendstatus',data,httpOptions);
   }
 }
