@@ -65,9 +65,17 @@ wss.on('connection', (ws,req) => {
       }
     }
   });
+  ws.on('close', function() {
+    var connip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+    
+    //Find and remove closed websockets from list
+    var tempUser = wsUsers.find((user => {return user.ip == connip;}));
+    if (tempUser) {
+      if (VERBOSE_DEBUG) console.log(`User ${connip} disconnected from ws.`);
+      wsUsers.splice(wsUsers.indexOf(tempUser),1);
+    }
+  });
 });
-
-
 
 //FILES
 app.use(express.static(path.join(__dirname,'..',String.raw`socialmediasite_frontend\dist\socialmediasite_frontend`)));

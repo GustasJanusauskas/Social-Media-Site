@@ -126,6 +126,10 @@ export class AppComponent {
     },125);
   }
 
+  async ngOnDestroy() {
+    this.messagingService.disconnect();
+  }
+
   //Gets userinfo, updates friends list, 'logged in as' labels
   updateUI(callback?: Function) {
     var session = this.getCookie('session');
@@ -311,6 +315,7 @@ export class AppComponent {
     this.deleteCookie('session');
     this.updateUI();
     this.setMain(event,'feed');
+    this.messagingService.disconnect();
   }
 
   register(event: Event) {

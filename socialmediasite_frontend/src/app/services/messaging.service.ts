@@ -14,6 +14,7 @@ const MSG_URL = "ws://localhost:4001";
   providedIn: 'root'
 })
 export class MessagingService {
+  private websock!: WebSocket;
   private subject!: AnonymousSubject<MessageEvent>;
   public messages: Subject<MessageSend>;
 
@@ -37,6 +38,13 @@ export class MessagingService {
       return this.subject;
   }
 
+  public disconnect() {
+    if (this.subject && this.websock) {
+        this.websock.close();
+        if (VERBOSE_DEBUG) console.log("Disconnected websocket");
+    }
+  }
+
   private create(url: string): AnonymousSubject<MessageEvent> {
     let ws = new WebSocket(url);
     let observable = new Observable((obs: Observer<MessageEvent>) => {
@@ -55,6 +63,7 @@ export class MessagingService {
             }
         }
     };
+    this.websock = ws;
     return new AnonymousSubject<MessageEvent>(observer, observable);
-}
+  }
 }
