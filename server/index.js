@@ -60,10 +60,17 @@ wss.on('connection', (ws,req) => {
         jsonMessage.senderID = sender.id;
         jsonMessage.session = '';
         jsonMessage.body = jsonMessage.body.replace('{','').replace('}','').replace('"','') ;
+
+        //Save message to DB
+        AddMessage(sender.id,jsonMessage.recipientID,jsonMessage.body);
+        //Send
         receiver.ws.send(JSON.stringify(jsonMessage));
       }
       //If receiver cannot be found, send an error message back to sender.
       else if (sender) {
+        //Save message to DB
+        AddMessage(sender.id,jsonMessage.recipientID,jsonMessage.body);
+
         if (VERBOSE_DEBUG) console.log(`Couldn't send ${sender.id}'s message to ${jsonMessage.recipientID}.`);
         sender.ws.send(JSON.stringify({recipientID:jsonMessage.recipientID,error:'Recipient could not receive message, please try again later.'}));
       }
@@ -232,6 +239,19 @@ function ClearWebsocket(connip) {
     if (VERBOSE_DEBUG) console.log(`User ${connip} disconnected from ws.`);
     wsUsers.splice(wsUsers.indexOf(tempUser),1);
   }
+}
+
+function AddMessage(senderID,recipientID,message) {
+  var innerQuery = 'INSERT INTO messages(sender,recipient,msg,date) VALUES($1,$2,$3,now());';
+  var innerData = [senderID,recipientID,message];
+
+  dbclient.query(innerQuery,innerData, (err, res) => {
+    if (err) {
+      console.log("DB ERROR AddMessage: \n" + err);
+      return;
+    }
+
+  });
 }
 
 function ChangeFriend(session,friendID,status,callback) {
