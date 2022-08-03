@@ -41,7 +41,7 @@ wss.on('connection', (ws,req) => {
   ws.on('message', function(message) {
     var connip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
     var jsonMessage = JSON.parse(message);
-    if (VERBOSE_DEBUG) console.log(`Received message from ${connip} => ${message}`);
+    if (VERBOSE_DEBUG) console.log(`Received ${jsonMessage.handshake ? 'handshake' : 'message'} from ${connip}${!jsonMessage.handshake ? ': ' + jsonMessage.body : '.'}`);
 
     //If handshake
     if (jsonMessage.handshake == true) {
