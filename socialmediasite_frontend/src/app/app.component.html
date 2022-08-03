@@ -98,7 +98,7 @@
 						<br>
 						<div *ngIf="pageEvent">
 							<div *ngFor="let ind of createFakeArray(pageEvent.pageSize)">
-								<div *ngIf="ind < postList.length" id="FeedPost">
+								<div *ngIf="ind < postList.length" class="FeedPost">
 									<h3 id="PostTitle">{{postList[pageEvent.pageIndex * pageEvent.pageSize + ind].title}} by {{postList[pageEvent.pageIndex * pageEvent.pageSize + ind].author}}</h3>
 									<p id="PostBody">{{postList[pageEvent.pageIndex * pageEvent.pageSize + ind].body}}</p>
 									<div id="PostedDateText">Posted {{postList[pageEvent.pageIndex * pageEvent.pageSize + ind].date}}</div>
@@ -108,11 +108,13 @@
 					</div>
 					<div *ngIf="bodyHTML=='feed'" id="Feed">
 						<h2>Your Feed</h2>
-						<div id="FeedPost" *ngFor="let post of postList;">
-							<h3 id="PostTitle">{{post.title}} by {{post.author}}</h3>
-							<p id="PostBody">{{post.body}}</p>
-							<div id="PostedDateText">Posted {{post.date}}</div>
-						</div> 
+						<div id="FeedInner">
+							<div class="FeedPost" *ngFor="let post of postList;">
+								<h3 id="PostTitle">{{post.title}} by {{post.author}}</h3>
+								<p id="PostBody">{{post.body}}</p>
+								<div id="PostedDateText">Posted {{post.date}}</div>
+							</div> 
+						</div>
 					</div>
 					<div *ngIf="bodyHTML=='settings'" id="Settings">
 						<h2>Settings</h2>

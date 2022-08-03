@@ -68,7 +68,7 @@ textarea {
 	resize: none;
 }
 
-#FeedPost {
+.FeedPost {
 	padding: 1.5em;
 	background-color: azure;
 	white-space: pre-line;
@@ -79,6 +79,15 @@ textarea {
 	border-radius: 0.75em;
 
 	margin-bottom: 2em;
+}
+
+#FeedInner {
+	height: 40em;
+	overflow-y: scroll;
+
+	padding: 0.5em;
+	border: solid #414d61 1px;
+	border-radius: 0.75em;
 }
 
 #Feed {
