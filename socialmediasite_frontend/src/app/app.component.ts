@@ -311,8 +311,10 @@ export class AppComponent {
         //Set session string, update UI, clear form
         this.formError = 'Logged in succesfully.';
         this.setCookie('session','' + data.session,30);
-        this.updateUI();
-        this.connectMsg();
+        this.updateUI(() => {
+          //Connect messaging websock
+          this.connectMsg();
+        });
 
         this.username = '';
         this.password = '';
@@ -327,7 +329,7 @@ export class AppComponent {
     this.deleteCookie('session');
     this.updateUI();
     this.setMain(event,'feed');
-    this.messagingService.disconnect();
+    this.connectMsg(true);
   }
 
   register(event: Event) {
@@ -387,12 +389,14 @@ export class AppComponent {
     for (var x = 0; x < 10 ; x++) this.chatList[this.chatList.length - 1].messages.push({author:profile,body:'Test Message ' + x,date:'2022-07-26'});
   }
 
-  connectMsg() {
-    //Sends session over separate handshake port
-    var session = this.getCookie('session');
-    if (session == null || session.length < 64 ) return;
+  connectMsg(disconnect:boolean = false) {
+    var session;
+    if (!disconnect) {
+      session = this.getCookie('session');
+      if (session ==null || session.length < 64 ) return;
+    }
 
-    var request: MessageSend = {body:'',recipientID:-1,date:'',session,handshake:true};
+    var request: MessageSend = {body:'',recipientID:-1,date:'',session,handshake: (disconnect ? 'disconnect' : 'handshake')};
     this.messagingService.messages.next(request);
   }
 

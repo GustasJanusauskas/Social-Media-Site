@@ -15,5 +15,5 @@ export interface MessageSend {
 
     date: any;
     error?: string;
-    handshake?: boolean;
+    handshake?: string;
 }

@@ -41,13 +41,17 @@ wss.on('connection', (ws,req) => {
   ws.on('message', function(message) {
     var connip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
     var jsonMessage = JSON.parse(message);
-    if (VERBOSE_DEBUG) console.log(`Received ${jsonMessage.handshake ? 'handshake' : 'message'} from ${connip}${!jsonMessage.handshake ? ': ' + jsonMessage.body : '.'}`);
+    if (VERBOSE_DEBUG) console.log(`Received ${jsonMessage.handshake ? jsonMessage.handshake : 'message'} from ${connip}${jsonMessage.handshake == 'message' ? ': ' + jsonMessage.body : '.'}`);
 
-    //If handshake
-    if (jsonMessage.handshake == true) {
+    //Handshake
+    if (jsonMessage.handshake == 'handshake') {
       RegisterNewWebsocket(ws,connip,jsonMessage);
     }
-    //If message
+    //Disconnect
+    else if (jsonMessage.handshake == 'disconnect') {
+      ClearWebsocket(connip);
+    }
+    //Message
     else {
       var sender = wsUsers.find((user => {return user.session == jsonMessage.session;}));
       var receiver = wsUsers.find((user => {return user.id == jsonMessage.recipientID;}));
@@ -68,12 +72,7 @@ wss.on('connection', (ws,req) => {
   ws.on('close', function() {
     var connip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
     
-    //Find and remove closed websockets from list
-    var tempUser = wsUsers.find((user => {return user.ip == connip;}));
-    if (tempUser) {
-      if (VERBOSE_DEBUG) console.log(`User ${connip} disconnected from ws.`);
-      wsUsers.splice(wsUsers.indexOf(tempUser),1);
-    }
+    ClearWebsocket(connip);
   });
 });
 
@@ -223,6 +222,15 @@ function RegisterNewWebsocket(ws,connip,jsonMessage) {
     GetIDFromSession(jsonMessage.session,(id) => {
       wsUsers.push({ip:connip,session:jsonMessage.session,id,ws});
     });
+  }
+}
+
+function ClearWebsocket(connip) {
+  //Find and remove closed websocket from list
+  var tempUser = wsUsers.find((user => {return user.ip == connip;}));
+  if (tempUser) {
+    if (VERBOSE_DEBUG) console.log(`User ${connip} disconnected from ws.`);
+    wsUsers.splice(wsUsers.indexOf(tempUser),1);
   }
 }
 
