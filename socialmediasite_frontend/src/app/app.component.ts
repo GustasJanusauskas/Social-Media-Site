@@ -197,7 +197,7 @@ export class AppComponent {
   }
 
   updateProfile(event: Event) {
-    if (!this.userinfo.firstName || !this.userinfo.lastName || this.userinfo.firstName?.length <= 0 || this.userinfo.lastName?.length <= 0) {
+    if (!this.userinfo.firstName || !this.userinfo.lastName || this.userinfo.firstName?.trim().length == 0 || this.userinfo.lastName?.trim().length == 0) {
       this.formError = 'Profile must have both a first and last name set.';
       return;
     }
@@ -225,7 +225,7 @@ export class AppComponent {
   }
 
   addPost(event: Event) {
-    if (this.postTitle.length <= 0 || this.postBody.length <= 0) {
+    if (this.postTitle.trim().length == 0 || this.postBody.trim().length == 0) {
       this.formError = 'Post must have a title and body.';
       return;
     }
