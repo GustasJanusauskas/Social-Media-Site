@@ -217,17 +217,7 @@ function RegisterNewWebsocket(ws,conip,jsonMessage) {
 
 function ChangeFriend(session,friendID,status,callback) {
   //Getting UserID from session
-  var query = 'SELECT * FROM sessions WHERE sessionid = $1';
-  var data = [session];
-
-  dbclient.query(query,data, (err, res) => {
-    if (err || res.rows.length == 0) {
-      if (err) console.log("DB ERROR GetUserID: \n" + err);
-      callback(false,'Failed to get user ID from session.');
-      return;
-    }
-
-    var userID = res.rows[0].usr_id;
+  GetIDFromSession(session, (userID) => {
     var innerQuery;
     var innerData;
     //Add friend
@@ -254,18 +244,7 @@ function ChangeFriend(session,friendID,status,callback) {
 }
 
 function RemovePost(session,postID,callback) {
-  //Getting UserID from session
-  var query = 'SELECT * FROM sessions WHERE sessionid = $1';
-  var data = [session];
-
-  dbclient.query(query,data, (err, res) => {
-    if (err || res.rows.length == 0) {
-      if (err) console.log("DB ERROR GetUserID: \n" + err);
-      callback(false,'Failed to get user ID from session.');
-      return;
-    }
-
-    var userID = res.rows[0].usr_id;
+  GetIDFromSession(session, (userID) => {
     var innerQuery = 'UPDATE profiles SET posts = array_remove(posts,$1) WHERE usr_id = $2; DELETE FROM posts WHERE post_ID = $1 AND usr_id = $2;';
     var innerData = [postID,userID];
 
@@ -282,19 +261,7 @@ function RemovePost(session,postID,callback) {
 }
 
 function AddPost(session,title,body,callback) {
-  //Getting UserID from session
-  var query = 'SELECT * FROM sessions WHERE sessionid = $1';
-  var data = [session];
-
-  dbclient.query(query,data, (err, res) => {
-    if (err || res.rows.length == 0) {
-      if (err) console.log("DB ERROR GetUserID: \n" + err);
-      callback(false,'Failed to get user ID from session.');
-      return;
-    }
-
-    //Add post info
-    var userID = res.rows[0].usr_id;
+  GetIDFromSession(session, (userID) => {
     var innerQuery = 'INSERT INTO posts(usr_id,ptitle,pbody,pdate) VALUES($1,$2,$3,now()) RETURNING post_id;';
     var innerData = [userID,title,body];
 
@@ -445,22 +412,11 @@ function GetIDFromSession(session,callback) {
   });
 }
 
-function GetUserInfo(session,callback) {
-  var query = 'SELECT * FROM sessions WHERE sessionid = $1';
-  var data = [session];
-
-  var result = new UserInfo();
-  dbclient.query(query,data, (err, res) => {
-    if (err || res.rows.length == 0) {
-      if (err) console.log("DB ERROR GetUserID: \n" + err);
-      result.error = 'Failed to get user ID from session.';
-      callback(false,result);
-      return;
-    }
-
-    var userID = res.rows[0].usr_id;
+function GetUserInfo(session, callback) {
+  GetIDFromSession(session, (userID) => {
     var innerQuery = 'SELECT username, password, email, created, salt, pepper, firstname, lastname, description, picture, friends, posts FROM users, profiles WHERE profiles.usr_id = users.usr_id AND users.usr_id = $1;';
     var innerData = [userID];
+    var result = new UserInfo();
 
     dbclient.query(innerQuery,innerData, (err, res) => {
       if (err || res.rows.length == 0) {
@@ -531,17 +487,7 @@ function UpdateProfile(userinfo,callback) {
   }
 
   //Get user ID from session
-  var query = 'SELECT * FROM sessions WHERE sessionid = $1';
-  var data = [userinfo.session];
-
-  dbclient.query(query,data, (err, res) => {
-    if (err || res.rows.length == 0) {
-      if (err) console.log("DB ERROR UpdateProfileGetUserID: \n" + err);
-      callback(false,'Failed to get user ID from session.');
-      return;
-    }
-    var userID = res.rows[0].usr_id;
-
+  GetIDFromSession(userinfo.session, (userID) => {
     if (userinfo.avatar) {
       var fileext = GetFilenameExtension(userinfo.avatarPath);
       //Reject files that are not images, verify by extension then by binary signature
