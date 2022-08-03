@@ -233,7 +233,7 @@ export class AppComponent {
       this.formError = 'Post title too long must be under 256 characters.';
       return;
     }
-    if (this.postBody.length > 256) {
+    if (this.postBody.length > 4096) {
       this.formError = 'Post too long, must be under 4096 characters.';
       return;
     }
