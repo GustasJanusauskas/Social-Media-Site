@@ -7,20 +7,25 @@
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 
+:root {
+	--textClr: #414d61;
+	--backgroundClr: #e2eaf3;
+}
+
 body {
 	background-image: url('images/MountainBackground.jpg');
 	background-size: cover;
 	background-repeat: no-repeat;
 	background-attachment: fixed;
-	background-color: #e2eaf3;
+	background-color: var(--backgroundClr);
 	
 	font-family: 'Montserrat', sans-serif;
-	color: #414d61;
+	color: var(--textClr);
 }
 
 button {
 	font-family: 'Montserrat', sans-serif;
-	color: #414d61;
+	color: var(--textClr);
 	
 	background-color: transparent;
 	border-color: transparent;
@@ -59,7 +64,7 @@ input, textarea {
 	background-color: azure;
 
 	border-style: solid;
-	border-color: #414d61;
+	border-color: var(--textClr);
 	border-width: 1px;
 	border-radius: 0.75em;
 }
@@ -74,7 +79,7 @@ textarea {
 	white-space: pre-line;
 
 	border-style: solid;
-	border-color: #414d61;
+	border-color: var(--textClr);
 	border-width: 1px;
 	border-radius: 0.75em;
 
@@ -86,7 +91,7 @@ textarea {
 	overflow-y: scroll;
 
 	padding: 0.5em;
-	border: solid #414d61 1px;
+	border: solid var(--textClr) 1px;
 	border-radius: 0.75em;
 }
 
@@ -143,7 +148,7 @@ textarea {
 	font-size: 18px;
 	background-color: azure;
 	border-style: solid;
-	border-color: #414d61;
+	border-color: var(--textClr);
 	border-width: 1px;
 
 	padding: 0.33em;
@@ -156,7 +161,7 @@ textarea {
 	font-size: 16px;
 
 	border-style: solid;
-	border-color: #414d61;
+	border-color: var(--textClr);
 	border-width: 1px;
 
 	padding: 0.33em;
@@ -178,7 +183,7 @@ textarea {
 	margin-left: 2em;
 
 	border-style: solid;
-	border-color: #414d61;
+	border-color: var(--textClr);
 	border-width: 1px;
 	border-radius: 0.75em;
 }
@@ -220,9 +225,9 @@ textarea {
 
 .BackgroundElement {
 	padding: 0.5em;
-	background-color: #e2eaf3;
+	background-color: var(--backgroundClr);
 	border-style: solid;
-	border-color: #414d61;
+	border-color: var(--textClr);
 	border-width: 1px;
 	border-radius: 0.75em;
 }
@@ -260,7 +265,7 @@ textarea {
 
 .CloseChatButton {
 	background: url('images/Close.png') no-repeat;
-	background-color: #e2eaf3;
+	background-color: var(--backgroundClr);
 
 	width: 2em;
 	height: 2em;
