@@ -66,13 +66,14 @@ wss.on('connection', (ws,req) => {
         //Send
         receiver.ws.send(JSON.stringify(jsonMessage));
       }
-      //If receiver cannot be found, send an error message back to sender.
+      //If receiver isn't online, send an error message back to sender.
       else if (sender) {
         //Save message to DB
         AddMessage(sender.id,jsonMessage.recipientID,jsonMessage.body);
 
         if (VERBOSE_DEBUG) console.log(`Couldn't send ${sender.id}'s message to ${jsonMessage.recipientID}.`);
-        sender.ws.send(JSON.stringify({recipientID:jsonMessage.recipientID,error:'Recipient could not receive message, please try again later.'}));
+        //Error message no longer necessary
+        //sender.ws.send(JSON.stringify({recipientID:jsonMessage.recipientID,error:'Recipient could not receive message, please try again later.'}));
       }
     }
   });
@@ -208,6 +209,14 @@ app.put("/changefriendstatus", (req,res) => {
   });
 });
 
+app.put("/messagehistory", (req, res) => {
+  GetIDFromSession(req.body.session, (userID) => {
+    GetConversation(userID,req.body.recipientID,(success,inf) => {
+      res.json(inf);
+    });
+  });
+});
+
 app.listen(PORT, () => {
   console.log(`Server listening on ${PORT}`);
 });
@@ -251,6 +260,27 @@ function AddMessage(senderID,recipientID,message) {
       return;
     }
 
+  });
+}
+
+function GetConversation(usr1,usr2,callback) {
+  var result = [];
+
+  var innerQuery = String.raw`SELECT msg, recipient, sender, extract(epoch from date) * 1000 AS date FROM messages WHERE sender = ANY(ARRAY[CAST($1 AS BIGINT),CAST($2 AS BIGINT)]) AND recipient = ANY(ARRAY[CAST($1 AS BIGINT),CAST($2 AS BIGINT)]) ORDER BY date;`;
+  var innerData = [usr1,usr2];
+
+  dbclient.query(innerQuery,innerData, (err, res) => {
+    if (err || res.rows.length == 0) {
+      if (err) console.log("DB ERROR GetConvo: \n" + err);
+      callback(false,result);
+      return;
+    }
+
+    res.rows.forEach(row => {
+      result.push({body:row.msg,recipientID:row.recipient,senderID:row.sender,date:row.date});
+    });
+
+    callback(true,result);
   });
 }
 

@@ -52,7 +52,7 @@ export class AppComponent {
   searchInterval;
 
   //Profiles
-  selectedProfile?: UserInfo;
+  selectedProfile!: UserInfo;
   pageEvent: PageEvent = {pageIndex:0,pageSize:1,length:1};
 
   //Private messages
@@ -90,7 +90,7 @@ export class AppComponent {
         return chat.recipient.ID == msg.senderID;
       });
       
-      var localMessage: Message = {body:msg.body,date:msg.date,author:this.userinfo};
+      var localMessage: Message = {body:msg.body,date:new Date(msg.date).toLocaleString(),author:this.userinfo};
       //Get author data from memory, if ID isn't user's assume it's the sender's
       if (chat) {
         if (msg.senderID == this.userinfo.ID) {
@@ -338,7 +338,7 @@ export class AppComponent {
     this.chatList = [];
     this.chatMsgField = '';
     this.currentChat = undefined;
-    this.selectedProfile = undefined;
+    this.selectedProfile = {session:''};
     this.postTitle = '';
     this.postBody = '';
   }
@@ -388,8 +388,11 @@ export class AppComponent {
   }
 
   openChat(event: Event, profile: UserInfo) {
-    var bypass: boolean = false;
+    var session = this.getCookie('session');
+    if (session == null || session.length < 64 ) return;
 
+    //If chat isn't already open, add new tab
+    var bypass: boolean = false;
     this.chatList.forEach(chat => {
       if (chat.recipient.ID == profile.ID) {
         bypass = true;
@@ -398,7 +401,12 @@ export class AppComponent {
     });
     if (!bypass) this.chatList.push({recipient:profile, sender: this.userinfo, messages:[]});
 
-    //for (var x = 0; x < 10 ; x++) this.chatList[this.chatList.length - 1].messages.push({author:profile,body:'Test Message ' + x,date:'2022-07-26'});
+    //Request message history from server
+    this.userdataService.getMessageHistory(session,profile.ID || -1).subscribe( data => {
+      data.forEach(msg => {
+        this.chatList[this.chatList.length - 1].messages.push({body:msg.body,author:msg.senderID == this.userinfo.ID ? this.userinfo : profile,date:new Date(Math.trunc(msg.date)).toLocaleString()});
+      });
+    });
   }
 
   connectMsg(disconnect:boolean = false) {
@@ -408,7 +416,7 @@ export class AppComponent {
       if (session ==null || session.length < 64 ) return;
     }
 
-    var request: MessageSend = {body:'',recipientID:-1,date:'',session,handshake: (disconnect ? 'disconnect' : 'handshake')};
+    var request: MessageSend = {body:'',recipientID:-1,date:0,session,handshake: (disconnect ? 'disconnect' : 'handshake')};
     this.messagingService.messages.next(request);
   }
 

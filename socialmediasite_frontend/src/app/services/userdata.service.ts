@@ -7,6 +7,7 @@ import {LoginResponse} from '../interfaces/loginresponse';
 import {UserInfo} from '../interfaces/userinfo';
 import {PostInfo} from '../interfaces/postinfo';
 import { Post } from '../interfaces/post';
+import { MessageSend } from "../interfaces/message";
 
 const httpOptions = {
   headers: new HttpHeaders({
@@ -77,5 +78,11 @@ export class UserdataService {
     var data = {session:session,friendID:userID,status:status};
 
     return this.http.put<any>('/changefriendstatus',data,httpOptions);
+  }
+
+  getMessageHistory(session: string, recipientID: number) {
+    var data = {session,recipientID};
+
+    return this.http.put<MessageSend[]>('/messagehistory',data,httpOptions);
   }
 }

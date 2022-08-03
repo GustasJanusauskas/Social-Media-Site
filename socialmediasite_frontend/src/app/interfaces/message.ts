@@ -13,7 +13,7 @@ export interface MessageSend {
     recipientID: number;
     senderID?: number;
 
-    date: any;
+    date: number;
     error?: string;
     handshake?: string;
 }

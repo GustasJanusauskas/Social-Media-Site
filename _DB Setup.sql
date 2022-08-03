@@ -41,6 +41,6 @@ CREATE TABLE messages(
 	sender bigint NOT NULL,
 	recipient bigint NOT NULL,
 	msg varchar(512) NOT NULL,
-	date timestamp,
+	date timestamptz,
 	PRIMARY KEY(msg_id)
 );
