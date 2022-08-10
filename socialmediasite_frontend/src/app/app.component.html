@@ -22,15 +22,29 @@
 				</div>
 			</div>
 			<div id="Bottom">
-				<div id="SidebarMain" class="BackgroundElement" #backgroundDiv>
+				<div id="SidebarMain" class="BackgroundElement" style="height: 1000em;" #backgroundDiv>
 					<h2>Navigation</h2>
-					<button class="SidebarButton" id="FirstButton" (click)="animateBackground(45.75); setMain('feed');">Feed</button>
-					<button *ngIf="userinfo.session != ''" class="SidebarButton" (click)="animateBackground(35.5); setMain('post');">Add Post</button>
-					<button *ngIf="userinfo.session != ''" class="SidebarButton" (click)="animateBackground(61.25); selectProfile($event,userinfo);">My profile</button>
-					<button *ngIf="userinfo.session != ''" class="SidebarButton" (click)="animateBackground(42.65); setMain('ownprofile');">Edit profile</button>
+					<button class="SidebarButton" id="FirstButton" (click)="animateBackground(45.75); setMain('feed');">
+						<mat-icon class="SidebarIcon">home</mat-icon>
+						Feed
+					</button>
+
+					<button *ngIf="userinfo.session != ''" class="SidebarButton" (click)="animateBackground(35.5); setMain('post');">
+						<mat-icon class="SidebarIcon">post_add</mat-icon>
+						Add Post
+					</button>
+
+					<button *ngIf="userinfo.session != ''" class="SidebarButton" (click)="animateBackground(61.25); selectProfile($event,userinfo);">
+						<mat-icon class="SidebarIcon">account_circle</mat-icon>
+						My profile
+					</button>
+					<button *ngIf="userinfo.session != ''" class="SidebarButton" (click)="animateBackground(42.65); setMain('ownprofile');">
+						<mat-icon class="SidebarIcon">edit</mat-icon>
+						Edit profile
+					</button>
 					<!--<button class="SidebarButton" (click)="animateBackground(30); setMain('settings');">Settings</button> -->
 				</div>
-				<div id="BodyMain" class="BackgroundElement" #backgroundDiv>
+				<div id="BodyMain" class="BackgroundElement" style="height: 1000em;" #backgroundDiv>
 					<div *ngIf="bodyHTML=='login'" id="Login">
 						<h2>Log in</h2>
 						<label class="LogLabel">Username/Email:</label> <input type="text" placeholder="Enter your username or email" id="UserInput" [(ngModel)]="username" autocomplete="off">
@@ -92,7 +106,10 @@
 						<h2>{{toTitleCase(selectedProfile.firstName || "") + " " + toTitleCase(selectedProfile.lastName || "")}}</h2>
 						<p>{{selectedProfile.profileDesc || "No profile description."}}</p>
 						<br>
-						<button *ngIf="userinfo.friends && !userinfo.friends.includes(selectedProfile.ID || -1)" class="TopbarButton" (click)="changeFriendStatus($event,selectedProfile,true);" >Add to friend list</button>
+						<button *ngIf="userinfo.friends && !userinfo.friends.includes(selectedProfile.ID || -1)" class="TopbarButton" (click)="changeFriendStatus($event,selectedProfile,true);" >
+							<mat-icon class="BodyIcon">person_add</mat-icon>
+							Add to friend list
+						</button>
 						<h2>Posts</h2>
 						<mat-paginator [length]="postList.length" [pageSize]="1" [pageSizeOptions]="[1,5,10,25]" (page)="pageEvent = $event" aria-label="Select page">
 						</mat-paginator>
@@ -103,7 +120,10 @@
 									<h3 id="PostTitle">{{postList[pageEvent.pageIndex * pageEvent.pageSize + ind].title}} by {{postList[pageEvent.pageIndex * pageEvent.pageSize + ind].author}}</h3>
 									<p id="PostBody">{{postList[pageEvent.pageIndex * pageEvent.pageSize + ind].body}}</p>
 
-									<button *ngIf="postList[pageEvent.pageIndex * pageEvent.pageSize + ind].authorID && userinfo.ID && postList[pageEvent.pageIndex * pageEvent.pageSize + ind].authorID == userinfo.ID" class="TopbarButton" (click)="removePost($event,postList[pageEvent.pageIndex * pageEvent.pageSize + ind].postID || -1,true)">Remove post</button>
+									<button *ngIf="postList[pageEvent.pageIndex * pageEvent.pageSize + ind].authorID && userinfo.ID && postList[pageEvent.pageIndex * pageEvent.pageSize + ind].authorID == userinfo.ID" class="TopbarButton" (click)="removePost($event,postList[pageEvent.pageIndex * pageEvent.pageSize + ind].postID || -1,true)">
+										<mat-icon class="BodyIcon">delete</mat-icon>
+										Remove post
+									</button>
 
 									<div id="PostedDateText">Posted {{postList[pageEvent.pageIndex * pageEvent.pageSize + ind].date}}</div>
 								</div>
@@ -117,7 +137,10 @@
 								<h3 id="PostTitle">{{post.title}} by {{post.author}}</h3>
 								<p id="PostBody">{{post.body}}</p>
 
-								<button *ngIf="post.authorID && userinfo.ID && post.authorID == userinfo.ID" class="TopbarButton" (click)="removePost($event,post.postID || -1)">Remove post</button>
+								<button *ngIf="post.authorID && userinfo.ID && post.authorID == userinfo.ID" class="TopbarButton" (click)="removePost($event,post.postID || -1)">
+									<mat-icon class="BodyIcon">delete</mat-icon>
+									Remove post
+								</button>
 
 								<div id="PostedDateText">Posted {{post.date}}</div>
 							</div> 
@@ -129,18 +152,31 @@
 						<mat-checkbox class="SettingsCheckbox">Enable</mat-checkbox>
 					</div>
 				</div>
-				<div id="FriendbarMain" class="BackgroundElement" #backgroundDiv>
+				<div id="FriendbarMain" class="BackgroundElement" style="height: 1000em;" #backgroundDiv>
 					<mat-tab-group mat-stretch-tabs md-no-pagination *ngIf="userinfo.session != ''" (selectedTabChange)="onTabChange($event);">
-						<mat-tab label="Friends"> 
+						<mat-tab> 
+							<ng-template mat-tab-label>
+								<mat-icon class="ChatTabIcon">group</mat-icon>
+								Friends
+							</ng-template>
 
 							<div id="FriendbarInner">
 								<div id="FriendOption" *ngFor="let friend of friendList;">
 
 									<button mat-button [matMenuTriggerFor]="matFriendMenu" class="FriendButton">{{friend.firstName && friend.lastName ? friend.firstName + ' ' + friend.lastName : friend.username}}</button> 
 									<mat-menu #matFriendMenu="matMenu">
-										<button (click)="selectProfile($event,friend);" mat-menu-item>Show Profile</button>
-										<button (click)="openChat($event,friend);" mat-menu-item>Message</button>
-										<button (click)="changeFriendStatus($event,friend,false);" mat-menu-item>Remove Friend</button>
+										<button (click)="selectProfile($event,friend);" mat-menu-item>
+											<mat-icon class="BodyIcon">account_circle</mat-icon>
+											Show Profile
+										</button>
+										<button (click)="openChat($event,friend);" mat-menu-item>
+											<mat-icon class="BodyIcon">chat</mat-icon>
+											Message
+										</button>
+										<button (click)="changeFriendStatus($event,friend,false);" mat-menu-item>
+											<mat-icon class="BodyIcon">person_remove</mat-icon>
+											Remove Friend
+										</button>
 									</mat-menu>
 
 								</div>
@@ -170,7 +206,10 @@
 								<mat-hint align="end">{{chatMsgField.length}}/350</mat-hint>
 							</mat-form-field>
 
-							<button class="FriendButton" (click)="sendMsg();">Send message</button>
+							<button class="FriendButton" (click)="sendMsg();">
+								<mat-icon class="BodyIcon">send</mat-icon>
+								Send message
+							</button>
 
 						</mat-tab>
 					</mat-tab-group>
