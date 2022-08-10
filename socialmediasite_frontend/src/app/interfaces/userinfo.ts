@@ -16,5 +16,7 @@ export interface UserInfo {
     friends?: number[];
     posts?: string[];
 
+    online?: boolean;
+
     ID?: number;
 }

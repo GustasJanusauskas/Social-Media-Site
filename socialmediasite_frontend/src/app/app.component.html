@@ -147,7 +147,12 @@
 							</div>
 
 						</mat-tab>
-						<mat-tab *ngFor="let chat of chatList" [label]="'Chat: ' + chat.recipient.firstName ">
+						<mat-tab *ngFor="let chat of chatList">
+							<ng-template mat-tab-label>
+								<mat-icon class="ChatTabIcon">{{chat.recipient.online ? 'person' : 'person_off'}}</mat-icon>
+								{{'Chat: ' + chat.recipient.firstName}}
+							</ng-template>
+
 							<button class="CloseChatButton" (click)="chatList.splice(chatList.indexOf(chat,0),1);"></button>
 							<div class="ChatTab" #chatDiv>
 								<mat-card *ngFor="let msg of chat.messages" class="PrivateMessageCard">
