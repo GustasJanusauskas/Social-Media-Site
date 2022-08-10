@@ -199,13 +199,19 @@ textarea {
 	border-radius: 0.75em;
 }
 
-#ProfilePic {
+.ProfilePic {
 	text-align: center;
 
 	object-fit: cover;
 	width: 20em;
 	height: 20em;
 	border-radius: 50%;
+}
+
+.ProfilePic.Thumb {
+	width: 2em;
+	height: 2em;
+	vertical-align: middle;
 }
 
 #Bottom {

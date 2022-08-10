@@ -16,7 +16,8 @@
 					<input type="text" placeholder="Search" id="SearchInput" [(ngModel)]="search" (ngModelChange)="searchUpdate($event)" (keyup.enter)="animateBackground(61.25); selectProfile($event);" matInput [matAutocomplete]="auto">
 					<mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
 						<mat-option *ngFor="let option of results" [value]="option.username">
-						  {{option.firstName + ' ' + option.lastName + ' (' + option.username + ')'}}
+							<img class="ProfilePic Thumb" [src]="option.avatarPath || 'assets/defaultProfile.png'">
+							{{option.firstName + ' ' + option.lastName + ' (' + option.username + ')'}}
 						</mat-option>
 					</mat-autocomplete>
 				</div>
@@ -102,7 +103,7 @@
 						<b>{{formError}}</b>
 					</div>
 					<div *ngIf="bodyHTML=='profile'" id="Profile">
-						<img [src]="selectedProfile.avatarPath || 'assets/defaultProfile.png'" id="ProfilePic">
+						<img [src]="selectedProfile.avatarPath || 'assets/defaultProfile.png'" class="ProfilePic">
 						<h2>{{toTitleCase(selectedProfile.firstName || "") + " " + toTitleCase(selectedProfile.lastName || "")}}</h2>
 						<p>{{selectedProfile.profileDesc || "No profile description."}}</p>
 						<br>
