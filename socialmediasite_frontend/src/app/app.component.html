@@ -7,13 +7,13 @@
 		<div class="Main">
 			<div id="Top">
 				<div id="Topbar" class="BackgroundElement">
-					<button *ngIf="userinfo.session == ''" class="TopbarButton" id="LoginButton" (click)="setMain($event,'login')">Login</button>
-					<button *ngIf="userinfo.session == ''" class="TopbarButton" id="RegisterButton" (click)="setMain($event,'register')">Register</button>
+					<button *ngIf="userinfo.session == ''" class="TopbarButton" id="LoginButton" (click)="animateBackground(16.15); setMain('login');">Login</button>
+					<button *ngIf="userinfo.session == ''" class="TopbarButton" id="RegisterButton" (click)="animateBackground(17.85); setMain('register');">Register</button>
 
 					<b *ngIf="userinfo.session != ''">Logged in as {{loggedInAs}} </b>
-					<button *ngIf="userinfo.session != ''" class="TopbarButton" id="LogoffButton" (click)="logoff($event)">Log off</button>
+					<button *ngIf="userinfo.session != ''" class="TopbarButton" id="LogoffButton" (click)="animateBackground(35.5); logoff($event);">Log off</button>
 
-					<input type="text" placeholder="Search" id="SearchInput" [(ngModel)]="search" (ngModelChange)="searchUpdate($event)" (keyup.enter)="selectProfile($event);" matInput [matAutocomplete]="auto">
+					<input type="text" placeholder="Search" id="SearchInput" [(ngModel)]="search" (ngModelChange)="searchUpdate($event)" (keyup.enter)="animateBackground(61.25); selectProfile($event);" matInput [matAutocomplete]="auto">
 					<mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
 						<mat-option *ngFor="let option of results" [value]="option.username">
 						  {{option.firstName + ' ' + option.lastName + ' (' + option.username + ')'}}
@@ -22,15 +22,15 @@
 				</div>
 			</div>
 			<div id="Bottom">
-				<div id="SidebarMain" class="BackgroundElement">
+				<div id="SidebarMain" class="BackgroundElement" #backgroundDiv>
 					<h2>Navigation</h2>
-					<button class="SidebarButton" id="FirstButton" (click)="setMain($event,'feed')">Feed</button>
-					<button *ngIf="userinfo.session != ''" class="SidebarButton" (click)="setMain($event,'post');">Add Post</button>
-					<button *ngIf="userinfo.session != ''" class="SidebarButton" (click)="selectProfile($event,userinfo);">My profile</button>
-					<button *ngIf="userinfo.session != ''" class="SidebarButton" (click)="setMain($event,'ownprofile');">Edit profile</button>
-					<!--<button class="SidebarButton" (click)="setMain($event,'settings');">Settings</button> -->
+					<button class="SidebarButton" id="FirstButton" (click)="animateBackground(45.75); setMain('feed');">Feed</button>
+					<button *ngIf="userinfo.session != ''" class="SidebarButton" (click)="animateBackground(35.5); setMain('post');">Add Post</button>
+					<button *ngIf="userinfo.session != ''" class="SidebarButton" (click)="animateBackground(61.25); selectProfile($event,userinfo);">My profile</button>
+					<button *ngIf="userinfo.session != ''" class="SidebarButton" (click)="animateBackground(42.65); setMain('ownprofile');">Edit profile</button>
+					<!--<button class="SidebarButton" (click)="animateBackground(30); setMain('settings');">Settings</button> -->
 				</div>
-				<div id="BodyMain" class="BackgroundElement">
+				<div id="BodyMain" class="BackgroundElement" #backgroundDiv>
 					<div *ngIf="bodyHTML=='login'" id="Login">
 						<h2>Log in</h2>
 						<label class="LogLabel">Username/Email:</label> <input type="text" placeholder="Enter your username or email" id="UserInput" [(ngModel)]="username" autocomplete="off">
@@ -99,7 +99,7 @@
 						<br>
 						<div *ngIf="pageEvent">
 							<div *ngFor="let ind of createFakeArray(pageEvent.pageSize)">
-								<div *ngIf="ind < postList.length" class="FeedPost">
+								<div *ngIf="ind < postList.length" class="FeedPost Profile">
 									<h3 id="PostTitle">{{postList[pageEvent.pageIndex * pageEvent.pageSize + ind].title}} by {{postList[pageEvent.pageIndex * pageEvent.pageSize + ind].author}}</h3>
 									<p id="PostBody">{{postList[pageEvent.pageIndex * pageEvent.pageSize + ind].body}}</p>
 
@@ -111,7 +111,7 @@
 						</div>
 					</div>
 					<div *ngIf="bodyHTML=='feed'" id="Feed">
-						<h2>Your Feed</h2>
+						<h2>{{userinfo.session == '' ? 'Feed' : 'Your Feed'}}</h2>
 						<div id="FeedInner">
 							<div class="FeedPost" *ngFor="let post of postList;">
 								<h3 id="PostTitle">{{post.title}} by {{post.author}}</h3>
@@ -129,7 +129,7 @@
 						<mat-checkbox class="SettingsCheckbox">Enable</mat-checkbox>
 					</div>
 				</div>
-				<div id="FriendbarMain" class="BackgroundElement">
+				<div id="FriendbarMain" class="BackgroundElement" #backgroundDiv>
 					<mat-tab-group mat-stretch-tabs md-no-pagination *ngIf="userinfo.session != ''" (selectedTabChange)="onTabChange($event);">
 						<mat-tab label="Friends"> 
 

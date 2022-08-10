@@ -8,6 +8,7 @@ import { UserInfo } from './interfaces/userinfo';
 import { Post } from './interfaces/post';
 import { Chat } from './interfaces/chat';
 import { Message, MessageSend } from './interfaces/message';
+import { serializeNodes } from '@angular/compiler/src/i18n/digest';
 
 //Enables extra debug messages
 export const VERBOSE_DEBUG = true;
@@ -61,6 +62,7 @@ export class AppComponent {
   chatMsgField: string = "";
 
   @ViewChildren('chatDiv') chatDiv!: QueryList<any>;
+  @ViewChildren('backgroundDiv') backgroundDiv!: QueryList<any>;
 
   constructor(private userdataService: UserdataService, private messagingService: MessagingService) {
     //On websocket message: find correct chat and add message
@@ -115,6 +117,7 @@ export class AppComponent {
     this.updateUI(() => {
       this.connectMsg();
     });
+
     //Setup search input checking
     this.searchInterval = setInterval(() => {
       if (this.lastSearchCharacterInput + 250 < Date.now() && this.search != '') {
@@ -124,6 +127,8 @@ export class AppComponent {
         this.lastSearchCharacterInput = Number.NaN;
       }
     },125);
+
+    this.setMain('feed');
   }
 
   async ngOnDestroy() {
@@ -264,12 +269,12 @@ export class AppComponent {
     this.userdataService.removePost(session,postID).subscribe(data => {
       if (data.success) {
         if (showProfile) this.selectProfile(event,this.userinfo);
-        else this.setMain(event,'feed');
+        else this.setMain('feed');
       }
     });
   }
 
-  setMain(event: Event,text: string) {
+  setMain(text: string) {
     this.formError = '';
     this.bodyHTML = text;
     this.updateUI(() => {
@@ -310,7 +315,7 @@ export class AppComponent {
     //Send data to backend
     this.userdataService.loginUser(this.username,this.password).subscribe(data => {
       if (data.success) {
-        //Set session string, update UI, clear form
+        //Set session string, update UI
         this.formError = 'Logged in succesfully.';
         this.setCookie('session','' + data.session,30);
         this.updateUI(() => {
@@ -318,6 +323,10 @@ export class AppComponent {
           this.connectMsg();
         });
 
+        //Make background larger for expanded navigation/chat
+        this.animateBackground(40);
+
+        //Clear login form
         this.username = '';
         this.password = '';
       }
@@ -332,7 +341,7 @@ export class AppComponent {
     this.connectMsg(true);
 
     this.updateUI();
-    this.setMain(event,'feed');
+    this.setMain('feed');
 
     //Clear previous user's data
     this.chatList = [];
@@ -466,7 +475,7 @@ export class AppComponent {
       this.getUserPosts(tempProfile.ID,(data:Post[]) => {
         this.postList = data;
         this.selectedProfile = tempProfile;
-        this.setMain(event,'profile');
+        this.setMain('profile');
       });
     }
   }
@@ -514,6 +523,14 @@ export class AppComponent {
     }
   }
 
+  animateBackground(size: number = 40) { //size in em
+    if (this.userinfo.session != '' && size < 40) size = 40; //minimum size is 40em (for chat window and navigation when logged in)
+
+    this.backgroundDiv.forEach((item,index,arr) => {
+      item.nativeElement.style = `max-height: ${size}em; height: ${1000}em;`;
+    });
+  }
+
   onTabChange(event: any) {
     if (event.index != 0) {
       this.currentChat = this.chatList[event.index - 1];
@@ -553,12 +570,12 @@ export class AppComponent {
   setCookie(cname: string, cvalue: string, exdays: number) {
     const d = new Date();
     d.setTime(d.getTime() + (exdays*24*60*60*1000));
-    let expires = "expires="+ d.toUTCString();
-    document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/;SameSite=Strict;";
+    let expires = 'expires='+ d.toUTCString();
+    document.cookie = cname + '=' + cvalue + ';' + expires + ';path=/;SameSite=Strict;';
   }
 
   getCookie(name: string) {
-    var nameEQ = name + "=";
+    var nameEQ = name + '=';
     var ca = document.cookie.split(';');
     for(var i=0;i < ca.length;i++) {
         var c = ca[i];

@@ -75,6 +75,7 @@ textarea {
 
 .FeedPost {
 	padding: 1.5em;
+	margin-bottom: 2em;
 	background-color: azure;
 	white-space: pre-line;
 
@@ -83,12 +84,17 @@ textarea {
 	border-width: 1px;
 	border-radius: 0.75em;
 
-	margin-bottom: 2em;
+	max-height: 20em;
+	overflow-y: auto;
+}
+
+.FeedPost.Profile {
+	margin-bottom: 0;
 }
 
 #FeedInner {
 	height: 40em;
-	overflow-y: scroll;
+	overflow-y: auto;
 
 	padding: 0.5em;
 	border: solid var(--textClr) 1px;
@@ -208,6 +214,7 @@ textarea {
 	display: flex;
 	flex-direction: column;
 	justify-content: top;
+	overflow-y: auto;
 }
 
 #BodyMain {
@@ -226,10 +233,15 @@ textarea {
 .BackgroundElement {
 	padding: 0.5em;
 	background-color: var(--backgroundClr);
+
 	border-style: solid;
 	border-color: var(--textClr);
 	border-width: 1px;
 	border-radius: 0.75em;
+
+    max-height: 45.75em;
+	transition: max-height 0.5s ease-out;
+	overflow: hidden;
 }
 
 #LoginButton, #RegisterButton, #LogoffButton {
