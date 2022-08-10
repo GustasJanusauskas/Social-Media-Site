@@ -471,6 +471,8 @@ function GetPublicUserInfo(ID,callback,resolve = null) {
 
     result.ID = userID;
 
+    result.online = wsUsers.find((user => {return user.id == userID;})) != undefined;
+
     result.success = true;
 
     if (resolve) callback(true,result,resolve);
@@ -525,6 +527,8 @@ function GetUserInfo(session, callback) {
 
       result.friends = res.rows[0].friends;
       result.posts = res.rows[0].posts;
+
+      result.online = wsUsers.find((user => {return user.id == userID;})) != undefined;
 
       result.ID = userID;
 

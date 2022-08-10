@@ -3,12 +3,11 @@ import { Observable, Observer } from 'rxjs';
 import { AnonymousSubject } from 'rxjs/internal/Subject';
 import { Subject } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { Router } from '@angular/router';
 
 import { Chat } from '../interfaces/chat';
 import { MessageSend } from '../interfaces/message';
 import { VERBOSE_DEBUG } from '../app.component';
-
-const MSG_URL = "ws://localhost:4001";
 
 @Injectable({
   providedIn: 'root'
@@ -18,16 +17,19 @@ export class MessagingService {
   private subject!: AnonymousSubject<MessageEvent>;
   public messages: Subject<MessageSend>;
 
-  constructor() {
-      this.messages = <Subject<MessageSend>>this.connect(MSG_URL).pipe(
-          map(
-              (response: MessageEvent): MessageSend => {
-                if (VERBOSE_DEBUG) console.log(response.data);
-                  let data = JSON.parse(response.data)
-                  return data;
-              }
-          )
-      );
+  constructor(private router: Router) {
+    const baseUrl = window.location.href.replace(String.raw`https:`,``).replace(String.raw`http:`,``).replace(`:${window.location.port}`,``).replace(/\//g,'');
+    var msgUrl = `ws://${baseUrl}:4001`;
+
+    this.messages = <Subject<MessageSend>>this.connect(msgUrl).pipe(
+        map(
+            (response: MessageEvent): MessageSend => {
+              if (VERBOSE_DEBUG) console.log(response.data);
+                let data = JSON.parse(response.data)
+                return data;
+            }
+        )
+    );
   }
 
   public connect(url: string): AnonymousSubject<MessageEvent> {

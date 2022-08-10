@@ -18,6 +18,8 @@ class UserInfo {
     friends = [0,0];
     posts = [""];
 
+    online = false;
+
     ID = -1;
 
     constructor(a) { this.session = a}

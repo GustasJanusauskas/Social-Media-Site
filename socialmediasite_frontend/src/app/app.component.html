@@ -164,7 +164,10 @@
 							<div id="FriendbarInner">
 								<div id="FriendOption" *ngFor="let friend of friendList;">
 
-									<button mat-button [matMenuTriggerFor]="matFriendMenu" class="FriendButton">{{friend.firstName && friend.lastName ? friend.firstName + ' ' + friend.lastName : friend.username}}</button> 
+									<button mat-button [matMenuTriggerFor]="matFriendMenu" class="FriendButton">
+										<mat-icon class="BodyIcon" [style]="'color:' + (friend.online ? 'darkgreen' : 'darkred')">blur_circular</mat-icon>
+										{{friend.firstName && friend.lastName ? friend.firstName + ' ' + friend.lastName : friend.username}}
+									</button> 
 									<mat-menu #matFriendMenu="matMenu">
 										<button (click)="selectProfile($event,friend);" mat-menu-item>
 											<mat-icon class="BodyIcon">account_circle</mat-icon>
@@ -184,10 +187,10 @@
 							</div>
 
 						</mat-tab>
-						<mat-tab *ngFor="let chat of chatList">
+						<mat-tab *ngFor="let chat of chatList;" [title]="getLocalFriendFromID(chat).firstName + (getLocalFriendFromID(chat).online ? ' is online.' : 'is offline.')">
 							<ng-template mat-tab-label>
-								<mat-icon class="ChatTabIcon">{{chat.recipient.online ? 'person' : 'person_off'}}</mat-icon>
-								{{'Chat: ' + chat.recipient.firstName}}
+								<mat-icon class="ChatTabIcon" [style]="'color:' + (getLocalFriendFromID(chat).online ? 'darkgreen' : 'darkred')">{{getLocalFriendFromID(chat).online ? 'blur_circular' : 'blur_circular'}}</mat-icon>
+								{{'Chat: ' + getLocalFriendFromID(chat).firstName}}
 							</ng-template>
 
 							<button class="CloseChatButton" (click)="chatList.splice(chatList.indexOf(chat,0),1);"></button>

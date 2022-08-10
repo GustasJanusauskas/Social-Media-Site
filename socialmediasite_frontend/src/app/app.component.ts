@@ -76,8 +76,8 @@ export class AppComponent {
       //If error message, find chat to add it to and set author to reserved 'SERVER' username
       if (msg.error) {
         var chat = this.chatList.find(chat => {
-          if (!chat || !chat.recipient) return false;
-          return chat.recipient.ID == msg.recipientID;
+          if (!chat || !chat.recipientID) return false;
+          return chat.recipientID == msg.recipientID;
         });
 
         chat?.messages.push({body:msg.error,author:{session:'',username:'SYSTEM'},date:new Date(Date.now()).toLocaleString()});
@@ -88,8 +88,8 @@ export class AppComponent {
       }
 
       var chat = this.chatList.find(chat => {
-        if (!chat || !chat.recipient || !msg.senderID) return false;
-        return chat.recipient.ID == msg.senderID;
+        if (!chat || !chat.recipientID || !msg.senderID) return false;
+        return chat.recipientID == msg.senderID;
       });
       
       var localMessage: Message = {body:msg.body,date:new Date(msg.date).toLocaleString(),author:this.userinfo};
@@ -99,7 +99,7 @@ export class AppComponent {
           localMessage.author = chat.sender;
         }
         else {
-          localMessage.author = chat.recipient;
+          localMessage.author = this.friendList.find( (val) => {return val.ID == (chat!.recipientID);}) || {session:'',firstName:'Author not found.',username:'noauthor'};
         }
         //Convert date to readable format
         localMessage.date = new Date(msg.date).toLocaleString();
@@ -173,13 +173,15 @@ export class AppComponent {
         });
       });
 
-      //Sort alphabetically
+      //Sort alphabetically (doesn't work)
+      /*
       this.friendList.sort((a,b) => {
         if (!a.firstName) return -1;
         else if (!b.firstName) return 1;
 
         return (a.firstName.toLowerCase() < b.firstName.toLowerCase()) ? -1 : (a.firstName.toLowerCase() > b.firstName.toLowerCase()) ? 1 : 0;
       });
+      */
 
       if (callback) callback();
     });
@@ -403,12 +405,12 @@ export class AppComponent {
     //If chat isn't already open, add new tab
     var bypass: boolean = false;
     this.chatList.forEach(chat => {
-      if (chat.recipient.ID == profile.ID) {
+      if (chat.recipientID == profile.ID) {
         bypass = true;
         return;
       }
     });
-    if (!bypass) this.chatList.push({recipient:profile, sender: this.userinfo, messages:[]});
+    if (!bypass) this.chatList.push({recipientID:profile.ID || -1, sender: this.userinfo, messages:[]});
 
     //Request message history from server
     this.userdataService.getMessageHistory(session,profile.ID || -1).subscribe( data => {
@@ -432,7 +434,7 @@ export class AppComponent {
   sendMsg() {
     var session = this.getCookie('session');
     if (session == null || session.length < 64 ) return;
-    if (!this.currentChat || !this.currentChat.recipient.ID) return;
+    if (!this.currentChat || !this.currentChat.recipientID) return;
     if (this.chatMsgField.length > 350 || !this.chatMsgField) return;
 
     //Check whether autoscroll is required on each chat
@@ -444,7 +446,7 @@ export class AppComponent {
     //Create 2 versions of message: a local one with all of the info, and a smaller, more secure sendable version.
     //An identical local message will be generated on receiver's computer.
     var timestamp = Date.now();
-    var msg: MessageSend = {body:this.chatMsgField,session,recipientID:this.currentChat.recipient.ID,date: timestamp};
+    var msg: MessageSend = {body:this.chatMsgField,session,recipientID:this.currentChat.recipientID,date: timestamp};
     var localmsg: Message = {body:this.chatMsgField,author:this.userinfo,date: timestamp};
 
     //Convert local date to readable format
@@ -548,6 +550,10 @@ export class AppComponent {
         if (this.userinfo.profileDesc) this.profileDescCharLeft = 1024 - this.userinfo.profileDesc?.length;
         break;
     }
+  }
+
+  getLocalFriendFromID(chat: Chat) {
+    return this.friendList.find( (val) => {return val.ID == (chat.recipientID);}) || {session:''};
   }
 
   createFakeArray(l:number) {
