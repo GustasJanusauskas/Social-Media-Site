@@ -113,11 +113,6 @@ export class AppComponent {
       if (VERBOSE_DEBUG) console.log("Response from websocket: " + msg);
     });
 
-    //Connect messaging websock
-    this.updateUI(() => {
-      this.connectMsg();
-    });
-
     //Setup search input checking
     this.searchInterval = setInterval(() => {
       if (this.lastSearchCharacterInput + 250 < Date.now() && this.search != '') {
@@ -128,7 +123,10 @@ export class AppComponent {
       }
     },125);
 
-    this.setMain('feed');
+    //Connect messaging websock
+    this.setMain('feed',() => {
+      this.connectMsg();
+    });
   }
 
   async ngOnDestroy() {
@@ -276,7 +274,7 @@ export class AppComponent {
     });
   }
 
-  setMain(text: string) {
+  setMain(text: string, callback?: Function) {
     this.formError = '';
     this.bodyHTML = text;
     this.updateUI(() => {
@@ -299,6 +297,8 @@ export class AppComponent {
           }
           break;
       }
+
+      if (callback) callback();
     });
   }
 
