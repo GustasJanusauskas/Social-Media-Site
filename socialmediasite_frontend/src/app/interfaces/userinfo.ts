@@ -12,6 +12,7 @@ export interface UserInfo {
     lastName?: string;
     profileDesc?: string;
     avatarPath?: string;
+    thumbPath?: string;
     avatar?: string;
     friends?: number[];
     posts?: string[];

@@ -13,6 +13,7 @@ class UserInfo {
     lastName = "";
     profileDesc = "";
     avatarPath = "";
+    thumbPath = "";
     avatar = "";
     friends = [0,0];
     posts = [""];

@@ -16,7 +16,7 @@
 					<input type="text" placeholder="Search" id="SearchInput" [(ngModel)]="search" (ngModelChange)="searchUpdate($event)" (keyup.enter)="animateBackground(61.25); selectProfile($event);" matInput [matAutocomplete]="auto">
 					<mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
 						<mat-option *ngFor="let option of results" [value]="option.username">
-							<img class="ProfilePic Thumb" [src]="option.avatarPath || 'assets/defaultProfile.png'">
+							<img class="ProfilePic Thumb" [src]="option.thumbPath || 'assets/defaultProfile.png'">
 							{{option.firstName + ' ' + option.lastName + ' (' + option.username + ')'}}
 						</mat-option>
 					</mat-autocomplete>

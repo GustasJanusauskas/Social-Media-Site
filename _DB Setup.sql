@@ -23,6 +23,7 @@ CREATE TABLE profiles(
 	lastname varchar(128),
 	description varchar(1024),
 	picture varchar(256),
+	thumb varchar(256),
 	friends bigint[],
 	posts bigint[]
 );

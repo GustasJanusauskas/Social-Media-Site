@@ -10,6 +10,7 @@ const sanitizeHtml = require('sanitize-html');
 const crypto = require('crypto');
 const express = require("express");
 const path = require('path');
+const imageThumbnail = require('image-thumbnail');
 
 const wss = new ws.Server({ port: 4001 });
 
@@ -445,7 +446,7 @@ function GetUserPosts(ID,callback) {
 
 function GetPublicUserInfo(ID,callback,resolve = null) {
   var userID = ID;
-  var innerQuery = 'SELECT username, created, firstname, lastname, description, picture, friends, posts FROM users, profiles WHERE profiles.usr_id = users.usr_id AND users.usr_id = $1;';
+  var innerQuery = 'SELECT username, created, firstname, lastname, description, picture, thumb, friends, posts FROM users, profiles WHERE profiles.usr_id = users.usr_id AND users.usr_id = $1;';
   var innerData = [userID];
 
   var result = new UserInfo();
@@ -458,12 +459,12 @@ function GetPublicUserInfo(ID,callback,resolve = null) {
     }
 
     result.username = res.rows[0].username;
-    result.creationdate = res.rows[0].created;
 
     result.firstName = res.rows[0].firstname;
     result.lastName = res.rows[0].lastname;
     result.profileDesc = res.rows[0].description;
     result.avatarPath = res.rows[0].picture;
+    result.thumbPath = res.rows[0].thumb;
 
     result.friends = res.rows[0].friends;
     result.posts = res.rows[0].posts;
@@ -500,7 +501,7 @@ function GetIDFromSession(session,callback) {
 
 function GetUserInfo(session, callback) {
   GetIDFromSession(session, (userID) => {
-    var innerQuery = 'SELECT username, password, email, created, salt, pepper, firstname, lastname, description, picture, friends, posts FROM users, profiles WHERE profiles.usr_id = users.usr_id AND users.usr_id = $1;';
+    var innerQuery = 'SELECT username, password, email, created, salt, pepper, firstname, lastname, description, picture, thumb, friends, posts FROM users, profiles WHERE profiles.usr_id = users.usr_id AND users.usr_id = $1;';
     var innerData = [userID];
     var result = new UserInfo();
 
@@ -520,6 +521,7 @@ function GetUserInfo(session, callback) {
       result.lastName = res.rows[0].lastname;
       result.profileDesc = res.rows[0].description;
       result.avatarPath = res.rows[0].picture;
+      result.thumbPath = res.rows[0].thumb;
 
       result.friends = res.rows[0].friends;
       result.posts = res.rows[0].posts;
@@ -586,7 +588,9 @@ function UpdateProfile(userinfo,callback) {
       }
 
       //Avatar - User ID - Salt (for security) . File extension
-      var avPath = `avatar-${userID}-${RandomString(8)}.${fileext}`;
+      const salt = RandomString(8);
+      var avPath = `avatar-${userID}-${salt}.${fileext}`;
+      var thPath = `thumb-${userID}-${salt}.jpg`;
 
       //if avatar directory doesn't exist create one
       if (!fs.existsSync(`avatars`)) fs.mkdirSync(`avatars`);
@@ -595,12 +599,22 @@ function UpdateProfile(userinfo,callback) {
       GetPublicUserInfo(userID, (success,result) => {
         if(success && result.avatarPath) fs.rmSync(`avatars\\${result.avatarPath}`);
 
-        //Save new image and save path
-        fs.writeFileSync(`avatars\\${avPath}`,Buffer.from(userinfo.avatar, 'base64'));
-        userinfo.avatarPath = avPath;
-
-        UpdateProfileText(userID,userinfo, (success,msg) => {
-          callback(success,msg);
+        //Save new image
+        var img = Buffer.from(userinfo.avatar, 'base64');
+        fs.writeFile(`avatars\\${avPath}`,img,() => {
+          //Generate image thumbnail
+          imageThumbnail(img,{percentage: 20,responseType:'buffer',jpegOptions:{force:true,quality:80}}).then(thumbnail => {
+            //Save thumbnail
+            fs.writeFile(`avatars\\${thPath}`,thumbnail,() => {
+              //Set save paths
+              userinfo.avatarPath = avPath;
+              userinfo.thumbPath = thPath;
+              //Finally, update profile row
+              UpdateProfileText(userID,userinfo, (success,msg) => {
+                callback(success,msg);
+              });
+            });
+          });
         });
       });
     }
@@ -619,8 +633,8 @@ function UpdateProfileText(userID,userinfo,callback) {
     innerData = [userID,userinfo.firstName,userinfo.lastName,userinfo.profileDesc];
   }
   else {
-    innerQuery = 'UPDATE profiles SET firstname = $2, lastname = $3, description = $4, picture = $5 WHERE usr_id = $1;';
-    innerData = [userID,userinfo.firstName,userinfo.lastName,userinfo.profileDesc,userinfo.avatarPath];
+    innerQuery = 'UPDATE profiles SET firstname = $2, lastname = $3, description = $4, picture = $5, thumb = $6 WHERE usr_id = $1;';
+    innerData = [userID,userinfo.firstName,userinfo.lastName,userinfo.profileDesc,userinfo.avatarPath,userinfo.thumbPath];
   }
 
   dbclient.query(innerQuery,innerData, (err, res) => {
