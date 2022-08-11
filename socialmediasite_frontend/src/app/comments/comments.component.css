@@ -1,0 +1,16 @@
+#Comments {
+	text-align:center;
+}
+
+#CommentsFeed {
+    height: 20em;
+}
+
+.CommentCard {
+    margin-bottom: 0.75em;
+}
+
+.MessageInputTextArea {
+	resize: none;
+    height: 4em;
+}

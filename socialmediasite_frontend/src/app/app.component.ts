@@ -124,7 +124,7 @@ export class AppComponent {
     },125);
 
     //Connect messaging websock
-    this.setMain('feed',() => {
+    this.setMain('comments',() => {
       this.connectMsg();
     });
   }

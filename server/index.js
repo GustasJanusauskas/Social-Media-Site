@@ -94,33 +94,6 @@ app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname,'..',String.raw`socialmediasite_frontend\dist\socialmediasite_frontend\index.html`));
 });
 
-//TESTS
-app.get("/testFindusers", (req, res) => {
-  FindUsers('tes',(success,inf) => {
-    res.json(inf);
-  });
-});
-
-app.get("/testReg", (req, res) => {
-  RegisterUser('TestUser','TestPassword','TestEmail@email.com',(success,msg) => {
-    res.json({
-      success: success,
-      session: msg
-    });
-  });
-});
-
-app.get("/testLog", (req, res) => {
-  LoginUser('TestUser','TestPassword',req.headers.host,(success,msg) => {
-    res.json({
-      username: '',
-      password: '',
-      success: success,
-      session: msg
-    });
-  });
-});
-
 //API
 app.put("/friendposts", (req, res) => {
   GetFriendPosts(req.body.authorID,(success,inf) => {
@@ -198,6 +171,12 @@ app.put("/removepost", (req, res) => {
     res.json({
       success:success
     });
+  });
+});
+
+app.post("/addcomment", (req, res) => {
+  AddComment( req.body.session, sanitizeHtml( req.body.content ), req.body.postID , (success,msg) => {
+    if (!success) console.log(msg);
   });
 });
 
@@ -370,6 +349,23 @@ function AddPost(session,title,body,callback) {
 
         callback(true,'Post registered successfully.');
       });
+    });
+  });
+}
+
+function AddComment(session,content,postID,callback) {
+  GetIDFromSession(session, (userID) => {
+    var innerQuery = 'INSERT INTO comments(usr_id,post_id,content,cdate) VALUES($1,$2,$3,now());';
+    var innerData = [userID,postID,content];
+
+    dbclient.query(innerQuery,innerData, (err, res) => {
+      if (err) {
+        console.log("DB ERROR AddComment: \n" + err);
+        callback(false,'Failed to add comment.');
+        return;
+      }
+
+      callback(true,'Comment added successfully.');
     });
   });
 }

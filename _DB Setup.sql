@@ -45,3 +45,12 @@ CREATE TABLE messages(
 	date timestamptz,
 	PRIMARY KEY(msg_id)
 );
+
+CREATE TABLE comments(
+	comment_id bigserial UNIQUE NOT NULL,
+	post_id bigint NOT NULL,
+	usr_id bigint NOT NULL,
+	content varchar(2048),
+	cdate timestamp DEFAULT '2022-01-01 08:00:00',
+	PRIMARY KEY(comment_id)
+);

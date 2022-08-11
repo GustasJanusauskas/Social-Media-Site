@@ -1,0 +1,32 @@
+<div id="Comments">
+    <div class="FeedPost">
+        <h3 id="PostTitle">{{post.title}} by {{post.author}}</h3>
+        <p id="PostBody">{{post.body}}</p>
+
+        <button *ngIf="post.authorID && userID && post.authorID == userID" class="TopbarButton">
+            <mat-icon class="BodyIcon">delete</mat-icon>
+            Remove post
+        </button>
+
+        <div id="PostedDateText">Posted {{post.date}}</div>
+    </div> 
+    <h2>Comments</h2>
+    <div id="CommentsFeed">
+        <mat-card *ngFor="let comment of commentsList" class="CommentCard">
+            <mat-card-subtitle>{{comment.author}}</mat-card-subtitle>
+            <mat-card-content>
+                <p>{{comment.content}}</p>
+            </mat-card-content>
+            <mat-card-subtitle>Sent {{comment.date}}</mat-card-subtitle>
+        </mat-card>
+    </div>
+    <mat-form-field class="MessageInputField" hintLabel="Max 2000 characters" appearance="fill">
+        <mat-label>Type your comment.</mat-label>
+        <textarea matInput #input maxlength="2000" class="MessageInputTextArea" placeholder="Comment here." [(ngModel)]="commentField"></textarea>
+        <mat-hint align="end">{{commentField.length}}/2000</mat-hint>
+    </mat-form-field>
+    <button class="FriendButton">
+        <mat-icon class="BodyIcon">send</mat-icon>
+        Add comment
+    </button>
+</div>

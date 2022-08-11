@@ -78,7 +78,7 @@ textarea {
 	resize: none;
 }
 
-.FeedPost {
+.FeedPost, .PostComment {
 	padding: 1.5em;
 	margin-bottom: 2em;
 	background-color: azure;
@@ -97,7 +97,7 @@ textarea {
 	margin-bottom: 0;
 }
 
-#FeedInner {
+#FeedInner, #CommentsFeed {
 	height: 40em;
 	overflow-y: auto;
 
@@ -275,6 +275,10 @@ textarea {
 	overflow-x: hidden;
 
 	height: 25em;
+}
+
+.MessageInputTextArea {
+	resize: none;
 }
 
 .MessageInputTextArea:focus {
