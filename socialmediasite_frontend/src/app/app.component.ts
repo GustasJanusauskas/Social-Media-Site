@@ -1,6 +1,8 @@
 import { Component, QueryList, Directive, ViewChildren } from '@angular/core';
 import { PageEvent } from '@angular/material/paginator';
 
+import { CommentsComponent } from "./comments/comments.component";
+
 import { UserdataService } from './services/userdata.service';
 import { MessagingService } from "./services/messaging.service";
 import { HelperFunctionsService } from "./services/helper-functions.service";
@@ -61,13 +63,15 @@ export class AppComponent {
   currentChat?: Chat;
   chatMsgField: string = "";
 
+  //Comments
+  selectedPost: Post = {authorID:-1};
+
   //Imported helper functions
   noJsonSymbols = HelperFunctionsService.noJsonSymbols;
   lettersOnly = HelperFunctionsService.lettersOnly;
   toTitleCase = HelperFunctionsService.toTitleCase;
   createFakeArray = HelperFunctionsService.createFakeArray;
   
-
   @ViewChildren('chatDiv') chatDiv!: QueryList<any>;
   @ViewChildren('backgroundDiv') backgroundDiv!: QueryList<any>;
 
@@ -131,7 +135,7 @@ export class AppComponent {
     },125);
 
     //Connect messaging websock
-    this.setMain('comments',() => {
+    this.setMain('feed',() => {
       this.connectMsg();
     });
   }
@@ -442,7 +446,7 @@ export class AppComponent {
     var session = HelperFunctionsService.getCookie('session');
     if (session == null || session.length < 64 ) return;
     if (!this.currentChat || !this.currentChat.recipientID) return;
-    if (this.chatMsgField.length > 350 || !this.chatMsgField) return;
+    if (this.chatMsgField.length > 350 || !this.chatMsgField.trim()) return;
 
     //Check whether autoscroll is required on each chat
     var scrollChat: boolean[] = new Array<boolean>(this.chatDiv.length);
@@ -465,6 +469,9 @@ export class AppComponent {
 
     //Apply autoscroll if needed
     this.scrollDivs(scrollChat);
+
+    //Clear form
+    this.chatMsgField = "";
   }
 
   selectProfile(event: Event, profile: UserInfo = {session:''}) {
@@ -487,6 +494,11 @@ export class AppComponent {
         this.setMain('profile');
       });
     }
+  }
+
+  selectPost(post: Post) {
+    this.selectedPost = post;
+    this.setMain('comments');
   }
 
   scrollDivs(scrollAllowList?: boolean[]) {
@@ -524,7 +536,8 @@ export class AppComponent {
   }
 
   animateBackground(size: number = 40) { //size in em
-    if (this.userinfo.session != '' && size < 40) size = 40; //minimum size is 40em (for chat window and navigation when logged in)
+    var session = HelperFunctionsService.getCookie('session');
+    if (size < 40 && (session == null || session.length < 64) ) size = 40; //minimum size is 40em (for chat window and navigation when logged in)
 
     this.backgroundDiv.forEach((item,index,arr) => {
       item.nativeElement.style = `max-height: ${size}em; height: ${1000}em;`;

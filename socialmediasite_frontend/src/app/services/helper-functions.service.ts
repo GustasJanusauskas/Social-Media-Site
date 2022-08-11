@@ -7,6 +7,17 @@ export class HelperFunctionsService {
 
   constructor() { }
 
+  static formatToPSQLTime(time: Date) {
+    var amPM = 'am';
+    if (time.getHours() > 12) {
+      time.setHours(time.getHours() - 12);
+      amPM = 'pm';
+    }
+
+    var result = `${time.getFullYear()}-${time.getMonth() > 8 ? time.getMonth() + 1 : '0' + (time.getMonth() + 1)}-${time.getUTCDate() > 9 ? time.getUTCDate() : '0' + time.getUTCDate()} at ${time.getHours() > 9 ? time.getHours() : '0' + time.getHours()}:${time.getMinutes() > 9 ? time.getMinutes() : '0' + time.getMinutes()}${amPM}`;
+    return result;
+  }
+
   static lettersOnly(event: KeyboardEvent, extended: boolean = false) {
     if (extended) return `abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ,.;"'()`.includes(event.key);
     return 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'.includes(event.key);

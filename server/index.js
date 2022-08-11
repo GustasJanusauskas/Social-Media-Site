@@ -2,6 +2,7 @@
 
 const UserInfo = require('./classes/userinfo');
 const PostInfo = require('./classes/postinfo');
+const CommentInfo = require('./classes/commentinfo');
 
 const fs = require('fs');
 const ws = require('ws');
@@ -174,9 +175,19 @@ app.put("/removepost", (req, res) => {
   });
 });
 
-app.post("/addcomment", (req, res) => {
-  AddComment( req.body.session, sanitizeHtml( req.body.content ), req.body.postID , (success,msg) => {
-    if (!success) console.log(msg);
+app.put("/getcomments", (req, res) => {
+  GetComments(req.body.postID,(success,inf) => {
+    res.json(inf);
+  });
+});
+
+app.put("/addcomment", (req, res) => {
+  AddComment( req.body.session, sanitizeHtml( req.body.content ), req.body.postID , (cid,msg) => {
+    if (cid == -1) console.log(msg);
+    res.json({
+      comment_id: cid,
+      err: cid == -1 ? msg : ''
+    });
   });
 });
 
@@ -299,16 +310,19 @@ function ChangeFriend(session,friendID,status,callback) {
 
 function RemovePost(session,postID,callback) {
   GetIDFromSession(session, (userID) => {
+    //Remove post ID from profile
     var innerQuery = 'UPDATE profiles SET posts = array_remove(posts,$1) WHERE usr_id = $2;';
     var innerData = [postID,userID];
 
     dbclient.query(innerQuery,innerData, (err, res) => {
-      if (err) {
+      //If no rows updated, assume user doesn't actually have a post with this ID
+      if (err || res.rowCount == 0) {
         console.log("DB ERROR RemovePostUpdateProfile: \n" + err);
         callback(false,'Failed to remove post ID from profile.');
         return;
       }
-
+      //Then remove post from the posts table
+      //Extra check of usr_id to prevent malicious user from deleting another user's post.
       var innerInQuery = 'DELETE FROM posts WHERE post_ID = $1 AND usr_id = $2;';
       dbclient.query(innerInQuery,innerData, (err, res) => {
         if (err) {
@@ -317,8 +331,20 @@ function RemovePost(session,postID,callback) {
           return;
         }
 
-        if (VERBOSE_DEBUG) console.log('User ' + userID + ' deleted post ' + postID);
-        callback(true,'Post removed successfully.');
+        //Finally, remove all comments that were on the post.
+        //If a malicious user tries to delete another user's post, server will have thrown a DB ERROR RemovePostUpdateProfile before now.
+        var innerInInQuery = 'DELETE FROM comments WHERE post_ID = $1';
+        var innerInInData = [postID];
+        dbclient.query(innerInInQuery,innerInInData, (err, res) => {
+          if (err) {
+            console.log("DB ERROR RemovePostComments: \n" + err);
+            callback(false,'Failed to remove post comments.');
+            return;
+          }
+
+          if (VERBOSE_DEBUG) console.log('User ' + userID + ' deleted post ' + postID);
+          callback(true,'Post removed successfully.');
+        });
       });
     });
   });
@@ -355,18 +381,46 @@ function AddPost(session,title,body,callback) {
 
 function AddComment(session,content,postID,callback) {
   GetIDFromSession(session, (userID) => {
-    var innerQuery = 'INSERT INTO comments(usr_id,post_id,content,cdate) VALUES($1,$2,$3,now());';
+    var innerQuery = 'INSERT INTO comments(usr_id,post_id,content,cdate) VALUES($1,$2,$3,now()) RETURNING comment_id;';
     var innerData = [userID,postID,content];
 
     dbclient.query(innerQuery,innerData, (err, res) => {
       if (err) {
         console.log("DB ERROR AddComment: \n" + err);
-        callback(false,'Failed to add comment.');
+        callback(-1,'Failed to add comment.');
         return;
       }
 
-      callback(true,'Comment added successfully.');
+      callback(res.rows[0].comment_id,'Comment added successfully.');
     });
+  });
+}
+
+function GetComments(postID,callback) {
+  var innerQuery = "SELECT comment_id, content, post_id, usr_id, to_char(cdate, 'YYYY-MM-DD at HH12:MIam') AS date FROM comments WHERE post_id = $1 ORDER BY cdate LIMIT 500;";
+  var innerData = [postID];
+
+  var result = [];
+  dbclient.query(innerQuery,innerData, (err, res) => {
+    if (err || res.rows.length == 0) {
+      if (err) console.log("DB ERROR GetComments: \n" + err);
+      result.error = 'Failed to get comments.';
+      callback(false,result);
+      return;
+    }
+
+    for (var x = 0; x < res.rowCount; x++) {
+      var temp = new CommentInfo(res.rows[x].comment_id);
+
+      temp.content = res.rows[x].content;
+      temp.date = res.rows[x].date;
+      temp.postID = res.rows[x].post_id;
+      temp.authorID = res.rows[x].usr_id;
+
+      result.push(temp);
+    }
+
+    callback(true, result);
   });
 }
 
@@ -378,7 +432,6 @@ function GetFriendPosts(friends,callback) {
   dbclient.query(innerQuery,innerData, (err, res) => {
     if (err || res.rows.length == 0) {
       if (err) console.log("DB ERROR GetFriendPosts: \n" + err);
-      result.error = 'Failed to get friend post info.';
       callback(false,result);
       return;
     }
@@ -418,7 +471,6 @@ function GetUserPosts(ID,callback) {
   dbclient.query(innerQuery,innerData, (err, res) => {
     if (err || res.rows.length == 0) {
       if (err) console.log("DB ERROR GetUserPosts: \n" + err);
-      result.error = 'Failed to get user posts.';
       callback(false,result);
       return;
     }

@@ -8,6 +8,7 @@ import {UserInfo} from '../interfaces/userinfo';
 import {PostInfo} from '../interfaces/postinfo';
 import { Post } from '../interfaces/post';
 import { MessageSend } from "../interfaces/message";
+import { Comment } from '../interfaces/comment';
 
 const httpOptions = {
   headers: new HttpHeaders({
@@ -67,9 +68,14 @@ export class UserdataService {
     return this.http.put<any>('/removepost',data,httpOptions);
   }
 
+  getComments(postID: number) {
+    var data: Comment = {postID};
+    return this.http.put<Comment[]>('/getcomments',data,httpOptions);
+  }
+
   addComment(session: string, postID: number, content: string) {
     var data = {session,postID,content};
-    return this.http.post<any>('/addcomment',data,httpOptions);
+    return this.http.put<any>('/addcomment',data,httpOptions);
   }
 
   updateProfile(session: string, userinfo: UserInfo) {

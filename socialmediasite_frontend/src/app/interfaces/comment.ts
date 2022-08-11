@@ -3,7 +3,7 @@ export class Comment {
     date?: string;
     author?: string;
 
-    authorID: number = 0;
+    authorID?: number = 0;
     postID: number = 0;
-    commentID: number = 0;
+    commentID?: number = 0;
 }
