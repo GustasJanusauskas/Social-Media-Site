@@ -3,12 +3,12 @@ import { PageEvent } from '@angular/material/paginator';
 
 import { UserdataService } from './services/userdata.service';
 import { MessagingService } from "./services/messaging.service";
+import { HelperFunctionsService } from "./services/helper-functions.service";
 
 import { UserInfo } from './interfaces/userinfo';
 import { Post } from './interfaces/post';
 import { Chat } from './interfaces/chat';
 import { Message, MessageSend } from './interfaces/message';
-import { serializeNodes } from '@angular/compiler/src/i18n/digest';
 
 //Enables extra debug messages
 export const VERBOSE_DEBUG = true;
@@ -60,6 +60,13 @@ export class AppComponent {
   chatList: Chat[] = [];
   currentChat?: Chat;
   chatMsgField: string = "";
+
+  //Imported helper functions
+  noJsonSymbols = HelperFunctionsService.noJsonSymbols;
+  lettersOnly = HelperFunctionsService.lettersOnly;
+  toTitleCase = HelperFunctionsService.toTitleCase;
+  createFakeArray = HelperFunctionsService.createFakeArray;
+  
 
   @ViewChildren('chatDiv') chatDiv!: QueryList<any>;
   @ViewChildren('backgroundDiv') backgroundDiv!: QueryList<any>;
@@ -135,7 +142,7 @@ export class AppComponent {
 
   //Gets userinfo, updates friends list, 'logged in as' labels
   updateUI(callback?: Function) {
-    var session = this.getCookie('session');
+    var session = HelperFunctionsService.getCookie('session');
     if (session == null || session.length < 64 ) {
       //Clear user data if session was deleted/expired
       this.loggedInAs= 'Not logged in';
@@ -212,7 +219,7 @@ export class AppComponent {
       return;
     }
 
-    var session = this.getCookie('session');
+    var session = HelperFunctionsService.getCookie('session');
     if (session == null || session.length < 64 ) {
       this.formError = 'Must be logged in to update profile.';
       return;
@@ -243,7 +250,7 @@ export class AppComponent {
       return;
     }
 
-    var session = this.getCookie('session');
+    var session = HelperFunctionsService.getCookie('session');
     if (session == null || session.length < 64 ) {
       this.formError = 'Must be logged in to make a post.';
       return;
@@ -263,7 +270,7 @@ export class AppComponent {
   }
 
   removePost(event: Event,postID: number, showProfile: boolean = false) {
-    var session = this.getCookie('session');
+    var session = HelperFunctionsService.getCookie('session');
     if (session == null || session.length < 64 ) return;
 
     this.userdataService.removePost(session,postID).subscribe(data => {
@@ -280,7 +287,7 @@ export class AppComponent {
     this.updateUI(() => {
       switch (text) {
         case 'feed':
-          var session = this.getCookie('session');
+          var session = HelperFunctionsService.getCookie('session');
           //Not logged in - show new public posts (-1 gets all new posts)
           if (session == null || session.length < 64 ) {
             this.getUserPosts(-1,(data:Post[]) => {
@@ -319,7 +326,7 @@ export class AppComponent {
       if (data.success) {
         //Set session string, update UI
         this.formError = 'Logged in succesfully.';
-        this.setCookie('session','' + data.session,30);
+        HelperFunctionsService.setCookie('session','' + data.session,30);
         this.updateUI(() => {
           //Connect messaging websock
           this.connectMsg();
@@ -339,7 +346,7 @@ export class AppComponent {
   }
 
   logoff(event: Event) {
-    this.deleteCookie('session');
+    HelperFunctionsService.deleteCookie('session');
     this.connectMsg(true);
 
     this.updateUI();
@@ -383,7 +390,7 @@ export class AppComponent {
   }
 
   changeFriendStatus(event: Event, profile: UserInfo, friend: boolean) {
-    var session = this.getCookie('session');
+    var session = HelperFunctionsService.getCookie('session');
     if (session == null || session.length < 64 ) return;
 
     this.userdataService.changeFriendStatus(session,profile.ID || -1,friend).subscribe(data => {
@@ -399,7 +406,7 @@ export class AppComponent {
   }
 
   openChat(event: Event, profile: UserInfo) {
-    var session = this.getCookie('session');
+    var session = HelperFunctionsService.getCookie('session');
     if (session == null || session.length < 64 ) return;
 
     //If chat isn't already open, add new tab
@@ -423,7 +430,7 @@ export class AppComponent {
   connectMsg(disconnect:boolean = false) {
     var session;
     if (!disconnect) {
-      session = this.getCookie('session');
+      session = HelperFunctionsService.getCookie('session');
       if (session ==null || session.length < 64 ) return;
     }
 
@@ -432,7 +439,7 @@ export class AppComponent {
   }
 
   sendMsg() {
-    var session = this.getCookie('session');
+    var session = HelperFunctionsService.getCookie('session');
     if (session == null || session.length < 64 ) return;
     if (!this.currentChat || !this.currentChat.recipientID) return;
     if (this.chatMsgField.length > 350 || !this.chatMsgField) return;
@@ -494,15 +501,6 @@ export class AppComponent {
     });
   }
 
-  lettersOnly(event: KeyboardEvent, extended: boolean = false) {
-    if (extended) return `abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ,.;"'()`.includes(event.key);
-    return 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'.includes(event.key);
-  }
-
-  noJsonSymbols(event: KeyboardEvent) {
-    return !`"{}`.includes(event.key);
-  }
-
   searchUpdate(event: Event) {
     this.lastSearchCharacterInput = Date.now();
   }
@@ -555,44 +553,4 @@ export class AppComponent {
   getLocalFriendFromID(chat: Chat) {
     return this.friendList.find( (val) => {return val.ID == (chat.recipientID);}) || {session:''};
   }
-
-  createFakeArray(l:number) {
-    var res = new Array(l);
-    for (let x = 0; x < l; x++) {
-      res[x] = x;
-    }
-    return res;
-  }
-
-  toTitleCase(str: String) {
-    return str.replace(
-      /\w\S*/g,
-      function(txt) {
-        return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
-      }
-    );
-  }
-
-  setCookie(cname: string, cvalue: string, exdays: number) {
-    const d = new Date();
-    d.setTime(d.getTime() + (exdays*24*60*60*1000));
-    let expires = 'expires='+ d.toUTCString();
-    document.cookie = cname + '=' + cvalue + ';' + expires + ';path=/;SameSite=Strict;';
-  }
-
-  getCookie(name: string) {
-    var nameEQ = name + '=';
-    var ca = document.cookie.split(';');
-    for(var i=0;i < ca.length;i++) {
-        var c = ca[i];
-        while (c.charAt(0)==' ') c = c.substring(1,c.length);
-        if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
-    }
-    return null;
-  }
-
-  deleteCookie( name: string ) {
-      document.cookie = name + '=; expires=Thu, 01 Jan 1970 00:00:01 GMT;SameSite=Strict;';
-  }
-
 }

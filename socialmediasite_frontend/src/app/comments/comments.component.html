@@ -22,7 +22,7 @@
     </div>
     <mat-form-field class="MessageInputField" hintLabel="Max 2000 characters" appearance="fill">
         <mat-label>Type your comment.</mat-label>
-        <textarea matInput #input maxlength="2000" class="MessageInputTextArea" placeholder="Comment here." [(ngModel)]="commentField"></textarea>
+        <textarea matInput #input maxlength="2000" class="MessageInputTextArea" placeholder="Comment here." (keypress)="noJsonSymbols($event)" [(ngModel)]="commentField"></textarea>
         <mat-hint align="end">{{commentField.length}}/2000</mat-hint>
     </mat-form-field>
     <button class="FriendButton">

@@ -1,4 +1,7 @@
 import { Component, OnInit } from '@angular/core';
+
+import { HelperFunctionsService } from "../services/helper-functions.service";
+
 import { Post } from '../interfaces/post';
 import { Comment } from "../interfaces/comment";
 
@@ -13,6 +16,9 @@ export class CommentsComponent implements OnInit {
 
   commentsList: Comment[] = [{content:'testComment',author:'testAuth',date:new Date().toLocaleString(),postID:0,authorID:0,commentID:0}];
   commentField: string = "";
+
+  //Imported helper functions
+  noJsonSymbols = HelperFunctionsService.noJsonSymbols;
 
   constructor() { }
 
