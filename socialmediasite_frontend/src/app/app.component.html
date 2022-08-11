@@ -59,7 +59,7 @@
 				<label class="LogLabel">Password:</label> <input type="password" placeholder="Enter password" id="PassInput" [(ngModel)]="password" autocomplete="off">
 				<br>
 				<button class="MainbarButton" id="RegisterMainButton" (click)="register($event)">Register</button>
-				<br>
+				<br><br>
 				<b>{{formError}}</b>
 			</div>
 			<div *ngIf="bodyHTML=='post'" id="AddPost">
@@ -73,7 +73,7 @@
 				Characters left: {{postCharLeft}}
 				<br>
 				<button class="MainbarButton" id="PostMainButton" (click)="addPost($event)">Post</button>
-				<br>
+				<br><br>
 				<b>{{formError}}</b>
 			</div>
 			<div *ngIf="bodyHTML=='ownprofile'" id="Profile">
@@ -93,7 +93,7 @@
 				Characters left: {{profileDescCharLeft}}
 				<br>
 				<button class="MainbarButton" id="PostMainButton" [disabled]="!updateProfileEnabled" (click)="updateProfile($event)">{{updateProfileEnabled ? "Update profile" : "Reading image.." }}</button>
-				<br>
+				<br><br>
 				<b>{{formError}}</b>
 			</div>
 			<div *ngIf="bodyHTML=='profile'" id="Profile">
@@ -172,7 +172,7 @@
 								{{friend.firstName && friend.lastName ? friend.firstName + ' ' + friend.lastName : friend.username}}
 							</button> 
 							<mat-menu #matFriendMenu="matMenu">
-								<button (click)="selectProfile($event,friend);" mat-menu-item>
+								<button (click)="animateBackground(61.25); selectProfile($event,friend);" mat-menu-item>
 									<mat-icon class="BodyIcon">account_circle</mat-icon>
 									Show Profile
 								</button>

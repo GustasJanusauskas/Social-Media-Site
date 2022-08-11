@@ -537,7 +537,7 @@ export class AppComponent {
 
   animateBackground(size: number = 40) { //size in em
     var session = HelperFunctionsService.getCookie('session');
-    if (size < 40 && (session == null || session.length < 64) ) size = 40; //minimum size is 40em (for chat window and navigation when logged in)
+    if (size < 40 && (session != null && session.length >= 64) ) size = 40; //minimum size is 40em (for chat window and navigation when logged in)
 
     this.backgroundDiv.forEach((item,index,arr) => {
       item.nativeElement.style = `max-height: ${size}em; height: ${1000}em;`;
