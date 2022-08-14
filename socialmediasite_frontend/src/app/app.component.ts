@@ -186,22 +186,6 @@ export class AppComponent {
     });
   }
 
-  getFriendPosts(userID: number,callback: Function) {
-    this.userdataService.getFriendPosts(userID).subscribe(data => {
-      callback(data);
-      return data;
-    });
-    return null;
-  }
-
-  getUserPosts(userID: number,callback: Function) {
-    this.userdataService.getUserPosts(userID).subscribe(data => {
-      callback(data);
-      return data;
-    });
-    return null;
-  }
-
   updateProfile(event: Event) {
     if (!this.userinfo.firstName || !this.userinfo.lastName || this.userinfo.firstName?.trim().length == 0 || this.userinfo.lastName?.trim().length == 0) {
       this.formError = 'Profile must have both a first and last name set.';
@@ -272,14 +256,14 @@ export class AppComponent {
           var session = HelperFunctionsService.getCookie('session');
           //Not logged in - show new public posts (-1 gets all new posts)
           if (session == null || session.length < 64 ) {
-            this.getUserPosts(-1,(data:Post[]) => {
+            this.userdataService.getUserPosts(-1).subscribe( data => {
               this.postList = data;
             });
           }
           //Logged in - show friend posts
           else {
             if (this.userinfo.friends != undefined && this.userinfo.ID != undefined) {
-              this.getFriendPosts(this.userinfo.ID,(data:Post[]) => {
+              this.userdataService.getFriendPosts(this.userinfo.ID).subscribe(data => {
                 this.postList = data;
               });
             }
@@ -466,7 +450,7 @@ export class AppComponent {
 
     //Get user's posts
     if (tempProfile.ID) {
-      this.getUserPosts(tempProfile.ID,(data:Post[]) => {
+      this.userdataService.getUserPosts(tempProfile.ID).subscribe( data => {
         this.postList = data;
         this.selectedProfile = tempProfile;
         this.setMain('profile');
@@ -477,12 +461,6 @@ export class AppComponent {
   scrollDivs(scrollAllowList?: boolean[]) {
     this.chatDiv.forEach( (item, index, arr) => {
       if ( ( scrollAllowList && scrollAllowList[index] ) || !scrollAllowList) setTimeout( () => {item.nativeElement.scrollTop = item.nativeElement.scrollHeight}, 10);
-    });
-  }
-
-  convertPostDates(posts:Post[]) {
-    posts.forEach(post => {
-      post.date = '';
     });
   }
 
