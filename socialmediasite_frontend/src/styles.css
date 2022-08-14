@@ -78,25 +78,6 @@ textarea {
 	resize: none;
 }
 
-.FeedPost, .PostComment {
-	padding: 1.5em;
-	margin-bottom: 2em;
-	background-color: azure;
-	white-space: pre-line;
-
-	border-style: solid;
-	border-color: var(--textClr);
-	border-width: 1px;
-	border-radius: 0.75em;
-
-	max-height: 20em;
-	overflow-y: auto;
-}
-
-.FeedPost.Profile {
-	margin-bottom: 0;
-}
-
 #FeedInner, #CommentsFeed {
 	height: 40em;
 	overflow-y: auto;
@@ -108,15 +89,6 @@ textarea {
 
 #Feed {
 	text-align:center;
-}
-
-#PostBody {
-	text-align:justify;
-}
-
-#PostedDateText {
-	color: #6f617e;
-	font-size: small;
 }
 
 #EmailInput, #UserInput, #PassInput, #ProfileInput {

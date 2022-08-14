@@ -1,6 +1,6 @@
 <div [class]="postClass">
-    <h3 id="PostTitle">{{post.title}} by {{post.author}}</h3>
-    <p id="PostBody">{{post.body}}</p>
+    <h3 class="PostTitle">{{post.title}} by {{post.author}}</h3>
+    <p class="PostBody">{{post.body}}</p>
 
     <button *ngIf="post.authorID && userinfo.ID && post.authorID == userinfo.ID" class="TopbarButton" (click)="removePost($event,post.postID || -1,profilePost)">
         <mat-icon class="BodyIcon">delete</mat-icon>
@@ -15,6 +15,6 @@
         {{post.likes ? (post.likes.indexOf(userinfo.ID || -1) != -1 ? 'Remove like' : 'Like') : 'Login to like'}}
     </button>
 
-    <div id="PostedDateText">{{post.likes ? post.likes.length : 0}} {{post.likes && post.likes.length == 1 ? 'like.' : 'likes.'}}</div>
-    <div id="PostedDateText">Posted {{post.date}}</div>
+    <div class="PostedDateText">{{post.likes ? post.likes.length : 0}} {{post.likes && post.likes.length == 1 ? 'like.' : 'likes.'}}</div>
+    <div class="PostedDateText">Posted {{post.date}}</div>
 </div> 
