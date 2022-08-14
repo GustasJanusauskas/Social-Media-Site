@@ -293,17 +293,17 @@ export class AppComponent {
         //Set session string, update UI
         this.formError = 'Logged in succesfully.';
         HelperFunctionsService.setCookie('session','' + data.session,30);
-        this.updateUI(() => {
-          //Connect messaging websock
-          this.connectMsg();
-        });
-
-        //Make background larger for expanded navigation/chat
-        this.animateBackground(40);
 
         //Clear login form
         this.username = '';
         this.password = '';
+
+        //Path to feed
+        this.animateBackground(45.75);
+        this.setMain('feed', () => {
+          //Connect messaging websock
+          this.connectMsg();
+        });
       }
       else {
         this.formError = '' + data.session;
