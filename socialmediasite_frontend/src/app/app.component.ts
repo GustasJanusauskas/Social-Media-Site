@@ -182,16 +182,6 @@ export class AppComponent {
         });
       });
 
-      //Sort alphabetically (doesn't work)
-      /*
-      this.friendList.sort((a,b) => {
-        if (!a.firstName) return -1;
-        else if (!b.firstName) return 1;
-
-        return (a.firstName.toLowerCase() < b.firstName.toLowerCase()) ? -1 : (a.firstName.toLowerCase() > b.firstName.toLowerCase()) ? 1 : 0;
-      });
-      */
-
       if (callback) callback();
     });
   }
@@ -269,18 +259,6 @@ export class AppComponent {
       }
       else {
         this.formError = 'Failed to add post, please try again later.';
-      }
-    });
-  }
-
-  removePost(event: Event,postID: number, showProfile: boolean = false) {
-    var session = HelperFunctionsService.getCookie('session');
-    if (session == null || session.length < 64 ) return;
-
-    this.userdataService.removePost(session,postID).subscribe(data => {
-      if (data.success) {
-        if (showProfile) this.selectProfile(event,this.userinfo);
-        else this.setMain('feed');
       }
     });
   }
@@ -393,20 +371,6 @@ export class AppComponent {
     });
   }
 
-  likePost(post:Post,status:boolean) {
-    var session = HelperFunctionsService.getCookie('session');
-    if (session == null || session.length < 64 ) return;
-    if (!post || !post.postID) return;
-
-    this.userdataService.changeLikeStatus(session,post.postID,status).subscribe(data => {
-      if (data.success) {
-        if (!this.userinfo.ID) return;
-
-        status ? post.likes?.push(this.userinfo.ID) : post.likes?.splice(post.likes?.indexOf(this.userinfo.ID),1);
-      }
-    });
-  }
-
   changeFriendStatus(event: Event, profile: UserInfo, friend: boolean) {
     var session = HelperFunctionsService.getCookie('session');
     if (session == null || session.length < 64 ) return;
@@ -508,11 +472,6 @@ export class AppComponent {
         this.setMain('profile');
       });
     }
-  }
-
-  selectPost(post: Post) {
-    this.selectedPost = post;
-    this.setMain('comments');
   }
 
   scrollDivs(scrollAllowList?: boolean[]) {

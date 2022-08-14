@@ -106,53 +106,19 @@
 					Add to friend list
 				</button>
 				<h2>Posts</h2>
-				<mat-paginator [length]="postList.length" [pageSize]="1" [pageSizeOptions]="[1,5,10,25]" (page)="pageEvent = $event" aria-label="Select page">
+				<mat-paginator [length]="postList.length" [pageSize]="1" hidePageSize="true" (page)="pageEvent = $event" aria-label="Select page">
 				</mat-paginator>
 				<br>
 				<div *ngIf="pageEvent">
 					<div *ngFor="let ind of createFakeArray(pageEvent.pageSize)">
-						<div *ngIf="ind < postList.length" class="FeedPost Profile">
-							<h3 id="PostTitle">{{postList[pageEvent.pageIndex * pageEvent.pageSize + ind].title}} by {{postList[pageEvent.pageIndex * pageEvent.pageSize + ind].author}}</h3>
-							<p id="PostBody">{{postList[pageEvent.pageIndex * pageEvent.pageSize + ind].body}}</p>
-
-							<button *ngIf="postList[pageEvent.pageIndex * pageEvent.pageSize + ind].authorID && userinfo.ID && postList[pageEvent.pageIndex * pageEvent.pageSize + ind].authorID == userinfo.ID" class="TopbarButton" (click)="removePost($event,postList[pageEvent.pageIndex * pageEvent.pageSize + ind].postID || -1,true)">
-								<mat-icon class="BodyIcon">delete</mat-icon>
-								Remove post
-							</button>
-							<button class="TopbarButton" (click)="selectPost(postList[pageEvent.pageIndex * pageEvent.pageSize + ind]);">
-								<mat-icon class="BodyIcon">comment</mat-icon>
-								View comments
-							</button>
-
-							<div id="PostedDateText" *ngIf="postList[pageEvent.pageIndex * pageEvent.pageSize + ind].likes">{{postList[pageEvent.pageIndex * pageEvent.pageSize + ind].likes!.length}} {{postList[pageEvent.pageIndex * pageEvent.pageSize + ind].likes!.length == 1 ? 'like.' : 'likes.'}}</div>
-							<div id="PostedDateText">Posted {{postList[pageEvent.pageIndex * pageEvent.pageSize + ind].date}}</div>
-						</div>
+						<app-post [postClass]="'FeedPost Profile'" [profilePost]="true" *ngIf="ind < postList.length" [post]="postList[pageEvent.pageIndex * pageEvent.pageSize + ind]" [userinfo]="userinfo" [rootComponent]="this"></app-post>
 					</div>
 				</div>
 			</div>
 			<div *ngIf="bodyHTML=='feed'" id="Feed">
 				<h2>{{userinfo.session == '' ? 'Feed' : 'Your Feed'}}</h2>
 				<div id="FeedInner">
-					<div class="FeedPost" *ngFor="let post of postList;">
-						<h3 id="PostTitle">{{post.title}} by {{post.author}}</h3>
-						<p id="PostBody">{{post.body}}</p>
-
-						<button *ngIf="post.authorID && userinfo.ID && post.authorID == userinfo.ID" class="TopbarButton" (click)="removePost($event,post.postID || -1)">
-							<mat-icon class="BodyIcon">delete</mat-icon>
-							Remove post
-						</button>
-						<button class="TopbarButton" (click)="animateBackground(62.125);selectPost(post);">
-							<mat-icon class="BodyIcon">comment</mat-icon>
-							View comments
-						</button>
-						<button *ngIf="userinfo.ID" class="TopbarButton" (click)="post.likes ? likePost(post,post.likes.indexOf(userinfo.ID || -1) == -1) : null;">
-							<mat-icon [class]="post.likes && post.likes.indexOf(userinfo.ID || -1) != -1 ? 'material-icons' : 'material-icons-outlined'">thumb_up</mat-icon>
-							{{post.likes ? (post.likes.indexOf(userinfo.ID || -1) != -1 ? 'Remove like' : 'Like') : 'Login to like'}}
-						</button>
-
-						<div id="PostedDateText">{{post.likes ? post.likes.length : 0}} {{post.likes && post.likes.length == 1 ? 'like.' : 'likes.'}}</div>
-						<div id="PostedDateText">Posted {{post.date}}</div>
-					</div> 
+					<app-post *ngFor="let post of postList;" [post]="post" [userinfo]="userinfo" [rootComponent]="this"></app-post>
 				</div>
 			</div>
 			<div *ngIf="bodyHTML=='settings'" id="Settings">
@@ -160,7 +126,7 @@
 				<label class="SettingsLabel">Setting 1: </label>
 				<mat-checkbox class="SettingsCheckbox">Enable</mat-checkbox>
 			</div>
-			<app-comments *ngIf="bodyHTML=='comments'" [post]="selectedPost" [userinfo]="userinfo"></app-comments>
+			<app-comments *ngIf="bodyHTML=='comments'" [post]="selectedPost" [userinfo]="userinfo" [rootComponent]="this"></app-comments>
 		</div>
 		<div id="FriendbarMain" class="BackgroundElement" style="height: 1000em;" #backgroundDiv>
 			<mat-tab-group mat-stretch-tabs md-no-pagination *ngIf="userinfo.session != ''" (selectedTabChange)="onTabChange($event);">

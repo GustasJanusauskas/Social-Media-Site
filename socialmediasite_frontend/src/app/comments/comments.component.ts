@@ -6,6 +6,7 @@ import { UserdataService } from "../services/userdata.service";
 import { Post } from '../interfaces/post';
 import { Comment } from "../interfaces/comment";
 import { UserInfo } from "../interfaces/userinfo";
+import { AppComponent } from '../app.component';
 
 @Component({
   selector: 'app-comments',
@@ -16,6 +17,7 @@ import { UserInfo } from "../interfaces/userinfo";
 export class CommentsComponent implements OnInit {
   @Input() post!: Post;
   @Input() userinfo!: UserInfo;
+  @Input() rootComponent!: AppComponent;
 
   commentsList: Comment[] = [];
   commentField: string = "";

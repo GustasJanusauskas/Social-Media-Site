@@ -17,11 +17,13 @@ import { MatInputModule } from '@angular/material/input';
 import { MatCheckboxModule } from "@angular/material/checkbox";
 import { MatIconModule } from "@angular/material/icon";
 import { CommentsComponent } from './comments/comments.component';
+import { PostComponent } from './post/post.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    CommentsComponent
+    CommentsComponent,
+    PostComponent
   ],
   imports: [
     BrowserModule,
