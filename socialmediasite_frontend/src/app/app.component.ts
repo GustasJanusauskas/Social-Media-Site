@@ -456,6 +456,9 @@ export class AppComponent {
         this.setMain('profile');
       });
     }
+    //Update paginator
+    this.pageEvent.pageIndex = 0;
+    this.pageEvent.length = this.postList.length;
   }
 
   scrollDivs(scrollAllowList?: boolean[]) {
