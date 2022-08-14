@@ -200,6 +200,15 @@ app.put("/changefriendstatus", (req,res) => {
   });
 });
 
+app.put("/changelikestatus", (req,res) => {
+  ChangeLike(req.body.session,req.body.postID,req.body.status, (success,msg) => {
+    if (!success) console.log(msg);
+    res.json({
+      success:success
+    });
+  });
+});
+
 app.put("/messagehistory", (req, res) => {
   GetIDFromSession(req.body.session, (userID) => {
     GetConversation(userID,req.body.recipientID,(success,inf) => {
@@ -272,6 +281,39 @@ function GetConversation(usr1,usr2,callback) {
     });
 
     callback(true,result);
+  });
+}
+
+function ChangeLike(session,postID,status,callback) {
+  //Getting UserID from session
+  GetIDFromSession(session, (userID) => {
+    var innerQuery;
+    var innerData;
+    //Add like
+    if (status) {
+      innerQuery = 'UPDATE posts SET usr_likes = ( CASE WHEN $1 = ANY(usr_likes) THEN usr_likes ELSE array_append(usr_likes,$1) END ) WHERE post_id = $2;';
+      innerData = [userID,postID];
+    }
+    //Remove like
+    else {
+      innerQuery = 'UPDATE posts SET usr_likes = array_remove(usr_likes,$1) WHERE post_id = $2;';
+      innerData = [userID,postID];
+    }
+
+    if (VERBOSE_DEBUG) {
+      console.log('Like status change:');
+      console.log({pID:postID,uID:userID,status});
+    }
+
+    dbclient.query(innerQuery,innerData, (err, res) => {
+      if (err) {
+        console.log("DB ERROR ChangeLike: \n" + err);
+        callback(false,'Failed to change like status.');
+        return;
+      }
+
+      callback(true,'Like status changed successfully!');
+    });
   });
 }
 
@@ -352,7 +394,7 @@ function RemovePost(session,postID,callback) {
 
 function AddPost(session,title,body,callback) {
   GetIDFromSession(session, (userID) => {
-    var innerQuery = 'INSERT INTO posts(usr_id,ptitle,pbody,pdate) VALUES($1,$2,$3,now()) RETURNING post_id;';
+    var innerQuery = "INSERT INTO posts(usr_id,ptitle,pbody,pdate,usr_likes) VALUES($1,$2,$3,now(),'{}') RETURNING post_id;";
     var innerData = [userID,title,body];
 
     dbclient.query(innerQuery,innerData, (err, res) => {
@@ -425,7 +467,7 @@ function GetComments(postID,callback) {
 }
 
 function GetFriendPosts(friends,callback) {
-  var innerQuery = "SELECT posts.ptitle, posts.pbody, to_char(posts.pdate, 'YYYY-MM-DD at HH12:MIam') AS pdate, posts.usr_id, posts.post_id, CONCAT(profiles.firstname,' ',profiles.lastname) AS author FROM posts, profiles WHERE posts.usr_id = ANY (array(SELECT friends FROM profiles WHERE usr_id = $1 )) AND posts.usr_id = profiles.usr_id ORDER BY posts.pdate DESC LIMIT 50;";
+  var innerQuery = "SELECT posts.ptitle, posts.pbody, to_char(posts.pdate, 'YYYY-MM-DD at HH12:MIam') AS pdate, posts.usr_id, posts.post_id, posts.usr_likes AS likes, CONCAT(profiles.firstname,' ',profiles.lastname) AS author FROM posts, profiles WHERE posts.usr_id = ANY (array(SELECT friends FROM profiles WHERE usr_id = $1 )) AND posts.usr_id = profiles.usr_id ORDER BY posts.pdate DESC LIMIT 50;";
   var innerData = [friends];
 
   var result = [];
@@ -443,6 +485,8 @@ function GetFriendPosts(friends,callback) {
       temp.body = res.rows[x].pbody;
       temp.date = res.rows[x].pdate;
       temp.author = res.rows[x].author;
+      temp.likes = res.rows[x].likes || 0;
+
       temp.authorID = res.rows[x].usr_id;
       temp.postID = res.rows[x].post_id;
 
@@ -459,11 +503,11 @@ function GetUserPosts(ID,callback) {
 
   //ID of -1 gets newest posts, regardless of user
   if (ID == -1) {
-    innerQuery = "SELECT posts.ptitle, posts.pbody, to_char(posts.pdate, 'YYYY-MM-DD at HH12:MIam') AS pdate, posts.usr_id, posts.post_id, CONCAT(profiles.firstname,' ',profiles.lastname) AS author FROM posts,profiles WHERE profiles.usr_id = posts.usr_id ORDER BY posts.pdate DESC LIMIT 50;";
+    innerQuery = "SELECT posts.ptitle, posts.pbody, to_char(posts.pdate, 'YYYY-MM-DD at HH12:MIam') AS pdate, posts.usr_id, posts.post_id, posts.usr_likes AS likes, CONCAT(profiles.firstname,' ',profiles.lastname) AS author FROM posts,profiles WHERE profiles.usr_id = posts.usr_id ORDER BY posts.pdate DESC LIMIT 50;";
     innerData = [];
   }
   else {
-    innerQuery = "SELECT posts.ptitle, posts.pbody, to_char(posts.pdate, 'YYYY-MM-DD at HH12:MIam') AS pdate, posts.usr_id, posts.post_id, CONCAT(profiles.firstname,' ',profiles.lastname) AS author FROM posts, profiles WHERE posts.usr_id = $1 AND posts.usr_id = profiles.usr_id ORDER BY posts.pdate DESC;";
+    innerQuery = "SELECT posts.ptitle, posts.pbody, to_char(posts.pdate, 'YYYY-MM-DD at HH12:MIam') AS pdate, posts.usr_id, posts.post_id, posts.usr_likes AS likes, CONCAT(profiles.firstname,' ',profiles.lastname) AS author FROM posts, profiles WHERE posts.usr_id = $1 AND posts.usr_id = profiles.usr_id ORDER BY posts.pdate DESC;";
     innerData = [ID];
   }
 
@@ -481,7 +525,9 @@ function GetUserPosts(ID,callback) {
       temp.title = res.rows[x].ptitle;
       temp.body = res.rows[x].pbody;
       temp.date = res.rows[x].pdate;
+      temp.likes = res.rows[x].likes || 0;
       temp.author = res.rows[x].author;
+
       temp.authorID = res.rows[x].usr_id;
       temp.postID = res.rows[x].post_id;
 

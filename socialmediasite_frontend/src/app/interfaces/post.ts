@@ -2,6 +2,7 @@ export class Post {
     title?: string;
     body?: string;
     date?: string;
+    likes?: number[] = [];
 
     author?: string;
     authorID: number = 0;

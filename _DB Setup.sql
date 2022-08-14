@@ -34,6 +34,7 @@ CREATE TABLE posts(
 	ptitle varchar(256),
 	pbody varchar(4096),
 	pdate timestamp DEFAULT '2022-01-01 08:00:00',
+	usr_likes bigint[],
 	PRIMARY KEY(post_id)
 );
 

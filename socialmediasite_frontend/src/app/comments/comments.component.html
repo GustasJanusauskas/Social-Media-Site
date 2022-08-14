@@ -2,6 +2,7 @@
     <div class="FeedPost">
         <h3 id="PostTitle">{{post.title}} by {{post.author}}</h3>
         <p id="PostBody">{{post.body}}</p>
+        <div id="PostedDateText">{{post.likes ? post.likes.length : 0}} {{post.likes && post.likes.length == 1 ? 'like.' : 'likes.'}}</div>
         <div id="PostedDateText">Posted {{post.date}}</div>
     </div> 
     <h2>Comments</h2>

@@ -91,6 +91,12 @@ export class UserdataService {
     return this.http.put<any>('/changefriendstatus',data,httpOptions);
   }
 
+  changeLikeStatus(session: string, postID: number, status: boolean) {
+    var data = {session:session,postID:postID,status:status};
+
+    return this.http.put<any>('/changelikestatus',data,httpOptions);
+  }
+
   getMessageHistory(session: string, recipientID: number) {
     var data = {session,recipientID};
 

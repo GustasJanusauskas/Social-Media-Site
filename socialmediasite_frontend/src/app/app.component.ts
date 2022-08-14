@@ -393,6 +393,20 @@ export class AppComponent {
     });
   }
 
+  likePost(post:Post,status:boolean) {
+    var session = HelperFunctionsService.getCookie('session');
+    if (session == null || session.length < 64 ) return;
+    if (!post || !post.postID) return;
+
+    this.userdataService.changeLikeStatus(session,post.postID,status).subscribe(data => {
+      if (data.success) {
+        if (!this.userinfo.ID) return;
+
+        status ? post.likes?.push(this.userinfo.ID) : post.likes?.splice(post.likes?.indexOf(this.userinfo.ID),1);
+      }
+    });
+  }
+
   changeFriendStatus(event: Event, profile: UserInfo, friend: boolean) {
     var session = HelperFunctionsService.getCookie('session');
     if (session == null || session.length < 64 ) return;

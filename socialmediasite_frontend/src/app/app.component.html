@@ -5,7 +5,7 @@
 			<button *ngIf="userinfo.session == ''" class="TopbarButton" id="RegisterButton" (click)="animateBackground(17.85); setMain('register');">Register</button>
 
 			<b *ngIf="userinfo.session != ''">Logged in as {{loggedInAs}} </b>
-			<button *ngIf="userinfo.session != ''" class="TopbarButton" id="LogoffButton" (click)="animateBackground(35.5); logoff($event);">Log off</button>
+			<button *ngIf="userinfo.session != ''" class="TopbarButton" id="LogoffButton" (click)="animateBackground(45.75); logoff($event);">Log off</button>
 
 			<input type="text" placeholder="Search" id="SearchInput" [(ngModel)]="search" (ngModelChange)="searchUpdate($event)" (keyup.enter)="animateBackground(61.25); selectProfile($event);" matInput [matAutocomplete]="auto">
 			<mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
@@ -124,6 +124,7 @@
 								View comments
 							</button>
 
+							<div id="PostedDateText" *ngIf="postList[pageEvent.pageIndex * pageEvent.pageSize + ind].likes">{{postList[pageEvent.pageIndex * pageEvent.pageSize + ind].likes!.length}} {{postList[pageEvent.pageIndex * pageEvent.pageSize + ind].likes!.length == 1 ? 'like.' : 'likes.'}}</div>
 							<div id="PostedDateText">Posted {{postList[pageEvent.pageIndex * pageEvent.pageSize + ind].date}}</div>
 						</div>
 					</div>
@@ -144,7 +145,12 @@
 							<mat-icon class="BodyIcon">comment</mat-icon>
 							View comments
 						</button>
+						<button *ngIf="userinfo.ID" class="TopbarButton" (click)="post.likes ? likePost(post,post.likes.indexOf(userinfo.ID || -1) == -1) : null;">
+							<mat-icon [class]="post.likes && post.likes.indexOf(userinfo.ID || -1) != -1 ? 'material-icons' : 'material-icons-outlined'">thumb_up</mat-icon>
+							{{post.likes ? (post.likes.indexOf(userinfo.ID || -1) != -1 ? 'Remove like' : 'Like') : 'Login to like'}}
+						</button>
 
+						<div id="PostedDateText">{{post.likes ? post.likes.length : 0}} {{post.likes && post.likes.length == 1 ? 'like.' : 'likes.'}}</div>
 						<div id="PostedDateText">Posted {{post.date}}</div>
 					</div> 
 				</div>
