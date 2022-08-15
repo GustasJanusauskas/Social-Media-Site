@@ -1,11 +1,7 @@
-import { Component, Injectable, Input, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 
 import { HelperFunctionsService } from "../services/helper-functions.service";
 import { UserdataService } from "../services/userdata.service";
-
-import { Post } from '../interfaces/post';
-import { UserInfo } from "../interfaces/userinfo";
-import { AppComponent } from '../app.component';
 
 @Component({
   selector: 'app-new-post',

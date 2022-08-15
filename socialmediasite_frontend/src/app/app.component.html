@@ -73,68 +73,7 @@
 			<app-comments *ngIf="bodyHTML=='comments'" [post]="selectedPost" [userinfo]="userinfo" [rootComponent]="this"></app-comments>
 		</div>
 		<div id="FriendbarMain" class="BackgroundElement" style="height: 1000em;" #backgroundDiv>
-			<mat-tab-group *ngIf="userinfo.session != ''" (selectedTabChange)="onTabChange($event);">
-				<mat-tab> 
-					<ng-template mat-tab-label>
-						<mat-icon class="ChatTabIcon">group</mat-icon>
-						Friends
-					</ng-template>
-
-					<div id="FriendbarInner">
-						<div id="FriendOption" *ngFor="let friend of friendList;">
-
-							<button mat-button [matMenuTriggerFor]="matFriendMenu" class="FriendButton">
-								<mat-icon class="BodyIcon" [style]="'color:' + (friend.online ? 'darkgreen' : 'darkred')">blur_circular</mat-icon>
-								{{friend.firstName && friend.lastName ? friend.firstName + ' ' + friend.lastName : friend.username}}
-							</button> 
-							<mat-menu #matFriendMenu="matMenu">
-								<button (click)="selectProfile(friend);" mat-menu-item>
-									<mat-icon class="BodyIcon">account_circle</mat-icon>
-									Show Profile
-								</button>
-								<button (click)="openChat(friend);" mat-menu-item>
-									<mat-icon class="BodyIcon">chat</mat-icon>
-									Message
-								</button>
-								<button (click)="changeFriendStatus(friend,false);" mat-menu-item>
-									<mat-icon class="BodyIcon">person_remove</mat-icon>
-									Remove Friend
-								</button>
-							</mat-menu>
-
-						</div>
-					</div>
-
-				</mat-tab>
-				<mat-tab *ngFor="let chat of chatList;">
-					<ng-template mat-tab-label>
-						<mat-icon class="ChatTabIcon" *ngIf="!chat.msgRequest" [style]="'color:' + (chat.recipient.online ? 'darkgreen' : 'darkred')">blur_circular</mat-icon>
-						{{chat.msgRequest ? 'Message request: ' + chat.recipient.username : 'Chat: ' + chat.recipient.firstName}}
-					</ng-template>
-
-					<button class="CloseChatButton" (click)="chatList.splice(chatList.indexOf(chat,0),1);"></button>
-					<div class="ChatTab" #chatDiv>
-						<mat-card *ngFor="let msg of chat.messages" class="PrivateMessageCard">
-							<mat-card-subtitle>{{msg.author.firstName && msg.author.lastName ? msg.author.firstName + ' ' + msg.author.lastName + ' (' + msg.author.username + ')' : msg.author.username}}</mat-card-subtitle>
-							<mat-card-content>
-								<p>{{msg.body}}</p>
-							</mat-card-content>
-							<mat-card-subtitle>Sent {{msg.date}}</mat-card-subtitle>
-						</mat-card>
-					</div>
-
-					<mat-form-field class="MessageInputField" hintLabel="Max 350 characters" appearance="fill">
-						<mat-label>Type your message.</mat-label>
-						<textarea matInput #input maxlength="350" class="MessageInputTextArea" [placeholder]="chat.msgRequest ? 'Message here. By replying you will add ' + chat.recipient.firstName + ' to your friends list.' : 'Message here.'" (keypress)="noJsonSymbols($event)" [(ngModel)]="chatMsgField"></textarea>
-						<mat-hint align="end">{{chatMsgField.length}}/350</mat-hint>
-					</mat-form-field>
-
-					<button class="FriendButton" (click)="sendMsg();">
-						<mat-icon class="BodyIcon">send</mat-icon>
-						{{chat.msgRequest ? 'Send message and add friend' : 'Send message'}}
-					</button>
-				</mat-tab>
-			</mat-tab-group>
+			<app-friends [userinfo]="userinfo" [rootComponent]="this"></app-friends>
 		</div>
 	</div>
 </div>
