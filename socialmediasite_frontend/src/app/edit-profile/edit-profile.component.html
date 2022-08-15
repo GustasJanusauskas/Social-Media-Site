@@ -1,0 +1,20 @@
+<div id="EditProfile">
+    <h2>Edit profile</h2>
+
+    <h3>Change profile image</h3>
+    <input class="FileUpload" type="file" accept=".png, .jpg, .jpeg, .bmp, .gif, .tiff, .tif" (change)="onAvatarChange($event)">
+
+    <h3>Personal info</h3>
+    <label class="LogLabel">First name:</label> <input type="text" placeholder="Edit your first name" id="ProfileInput" [(ngModel)]="userinfo.firstName" (keypress)="lettersOnly($event)" autocomplete="off">
+    <br>
+    <label class="LogLabel">Last name:</label> <input type="text" placeholder="Edit your last name" id="ProfileInput" [(ngModel)]="userinfo.lastName" (keypress)="lettersOnly($event)" autocomplete="off">
+
+    <h3>Profile description</h3>
+    <textarea placeholder="Enter your profile description" id="PostBodyInput" [(ngModel)]="userinfo.profileDesc" (ngModelChange)="updateCharCounter()" autocomplete="off"> </textarea>
+    <br>
+    Characters left: {{profileDescCharLeft}}
+    <br>
+    <button class="MainbarButton" id="PostMainButton" [disabled]="!updateProfileEnabled" (click)="updateProfile()">{{updateProfileEnabled ? "Update profile" : "Reading image.." }}</button>
+    <br><br>
+    <b>{{formError}}</b>
+</div>

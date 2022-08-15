@@ -19,13 +19,15 @@ import { MatIconModule } from "@angular/material/icon";
 import { CommentsComponent } from './comments/comments.component';
 import { PostComponent } from './post/post.component';
 import { ProfileComponent } from './profile/profile.component';
+import { EditProfileComponent } from './edit-profile/edit-profile.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     CommentsComponent,
     PostComponent,
-    ProfileComponent
+    ProfileComponent,
+    EditProfileComponent
   ],
   imports: [
     BrowserModule,

@@ -31,15 +31,12 @@ export class AppComponent {
   formError : string = '';
 
   //UserData
-  loggedInAs: string = 'Not logged in';
   userinfo: UserInfo = {session:''};
   friendList: UserInfo[] = [];
-  profileDescCharLeft : number = 1024;
-  profilePic: File = File.prototype;
-  updateProfileEnabled: boolean = true;
 
-  //Profiles
+  // Profiles/Comments
   selectedProfile!: UserInfo;
+  selectedPost: Post = {authorID:-1};
 
   //Add Post
   postTitle: string = '';
@@ -60,9 +57,6 @@ export class AppComponent {
   chatList: Chat[] = [];
   currentChat?: Chat;
   chatMsgField: string = "";
-
-  //Comments
-  selectedPost: Post = {authorID:-1};
 
   //Imported helper functions
   noJsonSymbols = HelperFunctionsService.noJsonSymbols;
@@ -165,7 +159,6 @@ export class AppComponent {
     var session = HelperFunctionsService.getCookie('session');
     if (session == null || session.length < 64 ) {
       //Clear user data if session was deleted/expired
-      this.loggedInAs= 'Not logged in';
       this.userinfo = {session:''};
       this.friendList = [];
 
@@ -181,7 +174,6 @@ export class AppComponent {
 
       //Update userinfo, displayed data
       this.userinfo = data;
-      this.loggedInAs = '' + data.username;
       
       //Update friends list
       var promises: Promise<void>[] = [];
@@ -221,34 +213,6 @@ export class AppComponent {
 
         if (callback) callback();
       });
-    });
-  }
-
-  updateProfile(event: Event) {
-    if (!this.userinfo.firstName || !this.userinfo.lastName || this.userinfo.firstName?.trim().length == 0 || this.userinfo.lastName?.trim().length == 0) {
-      this.formError = 'Profile must have both a first and last name set.';
-      return;
-    }
-
-    if (this.profilePic != File.prototype && this.profilePic.size > 8.192 * 1000 * 1000) {
-      this.formError = 'Profile picture size must be under 8 megabytes.';
-      return;
-    }
-
-    var session = HelperFunctionsService.getCookie('session');
-    if (session == null || session.length < 64 ) {
-      this.formError = 'Must be logged in to update profile.';
-      return;
-    }
-
-    this.formError = 'Updating profile..';
-    this.userdataService.updateProfile(session,this.userinfo).subscribe(data => {
-      if (data.success) {
-        this.formError = 'Profile updated!';
-      }
-      else {
-        this.formError = 'Failed to update profile, please try again later.';
-      }
     });
   }
 
@@ -533,24 +497,6 @@ export class AppComponent {
     this.lastSearchCharacterInput = Date.now();
   }
 
-  onAvatarChange(event: Event) {
-    const target = event.target as HTMLInputElement;
-
-    if (target.files) {
-      this.profilePic = target.files[0];
-      this.updateProfileEnabled = false;
-
-      const reader = new FileReader();
-      reader.readAsDataURL(this.profilePic);
-      reader.onload = () => {
-        this.userinfo.avatar = reader.result?.toString().substring(reader.result?.toString().indexOf(',') + 1);
-        this.userinfo.avatarPath = this.profilePic.name;
-
-        this.updateProfileEnabled = true;
-      }
-    }
-  }
-
   animateBackground(size: number = 40) { //size in em
     var session = HelperFunctionsService.getCookie('session');
     if (size < 40 && (session != null && session.length >= 64) ) size = 40; //minimum size is 40em (for chat window and navigation when logged in)
@@ -572,9 +518,6 @@ export class AppComponent {
     switch (counterID) {
       case 'post':
         this.postCharLeft = 4096 - this.postBody.length;
-        break;
-      case 'profile':
-        if (this.userinfo.profileDesc) this.profileDescCharLeft = 1024 - this.userinfo.profileDesc?.length;
         break;
     }
   }
