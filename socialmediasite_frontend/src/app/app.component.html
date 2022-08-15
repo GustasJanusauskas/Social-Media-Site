@@ -1,13 +1,13 @@
 <div class="Main">
 	<div id="Top">
 		<div id="Topbar" class="BackgroundElement">
-			<button *ngIf="userinfo.session == ''" class="TopbarButton" id="LoginButton" (click)="animateBackground(16.15); setMain('login');">Login</button>
-			<button *ngIf="userinfo.session == ''" class="TopbarButton" id="RegisterButton" (click)="animateBackground(17.85); setMain('register');">Register</button>
+			<button *ngIf="userinfo.session == ''" class="TopbarButton" id="LoginButton" (click)="setMain('login');">Login</button>
+			<button *ngIf="userinfo.session == ''" class="TopbarButton" id="RegisterButton" (click)="setMain('register');">Register</button>
 
 			<b *ngIf="userinfo.session != ''">Logged in as {{loggedInAs}} </b>
-			<button *ngIf="userinfo.session != ''" class="TopbarButton" id="LogoffButton" (click)="animateBackground(45.75); logoff($event);">Log off</button>
+			<button *ngIf="userinfo.session != ''" class="TopbarButton" id="LogoffButton" (click)="logoff($event);">Log off</button>
 
-			<input type="text" placeholder="Search" id="SearchInput" [(ngModel)]="search" (ngModelChange)="searchUpdate($event)" (keyup.enter)="animateBackground(61.25); selectProfile($event);" matInput [matAutocomplete]="auto">
+			<input type="text" placeholder="Search" id="SearchInput" [(ngModel)]="search" (ngModelChange)="searchUpdate($event)" (keyup.enter)="selectProfile($event);" matInput [matAutocomplete]="auto">
 			<mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
 				<mat-option *ngFor="let option of results" [value]="option.username">
 					<img class="ProfilePic Thumb" [src]="option.thumbPath || 'assets/defaultProfile.png'">
@@ -19,25 +19,25 @@
 	<div id="Bottom">
 		<div id="SidebarMain" class="BackgroundElement" style="height: 1000em;" #backgroundDiv>
 			<h2>Navigation</h2>
-			<button class="SidebarButton" id="FirstButton" (click)="animateBackground(45.75); setMain('feed');">
+			<button class="SidebarButton" id="FirstButton" (click)="setMain('feed');">
 				<mat-icon class="SidebarIcon">home</mat-icon>
 				Feed
 			</button>
 
-			<button *ngIf="userinfo.session != ''" class="SidebarButton" (click)="animateBackground(35.5); setMain('post');">
+			<button *ngIf="userinfo.session != ''" class="SidebarButton" (click)="setMain('post');">
 				<mat-icon class="SidebarIcon">post_add</mat-icon>
 				Add Post
 			</button>
 
-			<button *ngIf="userinfo.session != ''" class="SidebarButton" (click)="animateBackground(61.25); selectProfile($event,userinfo);">
+			<button *ngIf="userinfo.session != ''" class="SidebarButton" (click)="selectProfile($event,userinfo);">
 				<mat-icon class="SidebarIcon">account_circle</mat-icon>
 				My profile
 			</button>
-			<button *ngIf="userinfo.session != ''" class="SidebarButton" (click)="animateBackground(45); setMain('ownprofile');">
+			<button *ngIf="userinfo.session != ''" class="SidebarButton" (click)="setMain('ownprofile');">
 				<mat-icon class="SidebarIcon">edit</mat-icon>
 				Edit profile
 			</button>
-			<!--<button class="SidebarButton" (click)="animateBackground(30); setMain('settings');">Settings</button> -->
+			<!--<button class="SidebarButton" (click)="setMain('settings');">Settings</button> -->
 		</div>
 		<div id="BodyMain" class="BackgroundElement" style="height: 1000em;" #backgroundDiv>
 			<div *ngIf="bodyHTML=='login'" id="Login">
@@ -144,7 +144,7 @@
 								{{friend.firstName && friend.lastName ? friend.firstName + ' ' + friend.lastName : friend.username}}
 							</button> 
 							<mat-menu #matFriendMenu="matMenu">
-								<button (click)="animateBackground(61.25); selectProfile($event,friend);" mat-menu-item>
+								<button (click)="selectProfile($event,friend);" mat-menu-item>
 									<mat-icon class="BodyIcon">account_circle</mat-icon>
 									Show Profile
 								</button>

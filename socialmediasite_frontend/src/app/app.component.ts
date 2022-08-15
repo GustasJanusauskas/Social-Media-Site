@@ -268,6 +268,25 @@ export class AppComponent {
               });
             }
           }
+          this.animateBackground(45.75);
+          break;
+        case 'post':
+          this.animateBackground(35.5);
+          break;
+        case 'profile':
+          this.animateBackground(61.25);
+          break;
+        case 'ownprofile':
+          this.animateBackground(45);
+          break;
+        case 'settings':
+          this.animateBackground(30);
+          break;
+        case 'login':
+          this.animateBackground(16.15);
+          break;
+        case 'register':
+          this.animateBackground(17.85);
           break;
       }
 
@@ -299,7 +318,6 @@ export class AppComponent {
         this.password = '';
 
         //Path to feed
-        this.animateBackground(45.75);
         this.setMain('feed', () => {
           //Connect messaging websock
           this.connectMsg();
