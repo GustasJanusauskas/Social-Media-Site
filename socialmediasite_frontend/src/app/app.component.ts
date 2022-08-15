@@ -44,14 +44,7 @@ export class AppComponent {
   results: UserInfo[] = [];
   lastSearchCharacterInput: number = Number.NaN;
   searchInterval;
-
-  //Imported helper functions
-  noJsonSymbols = HelperFunctionsService.noJsonSymbols;
-  lettersOnly = HelperFunctionsService.lettersOnly;
-  toTitleCase = HelperFunctionsService.toTitleCase;
-  createFakeArray = HelperFunctionsService.createFakeArray;
   
-  @ViewChildren('chatDiv') chatDiv!: QueryList<any>;
   @ViewChildren('backgroundDiv') backgroundDiv!: QueryList<any>;
   @ViewChildren(FriendsComponent) friendsComponent!: QueryList<FriendsComponent>;
 
