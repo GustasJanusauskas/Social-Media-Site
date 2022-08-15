@@ -56,7 +56,8 @@ export class PostComponent implements OnInit {
       if (data.success) {
         if (!this.userinfo.ID) return;
 
-        status ? post.likes?.push(this.userinfo.ID) : post.likes?.splice(post.likes?.indexOf(this.userinfo.ID),1);
+        status ? post.likes!++ : post.likes!--;
+        post.userLiked = status;
       }
     });
   }

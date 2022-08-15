@@ -2,7 +2,9 @@ export class Post {
     title?: string;
     body?: string;
     date?: string;
-    likes?: number[] = [];
+
+    likes?: number = 0;
+    userLiked?: boolean;
 
     author?: string;
     authorID: number = 0;

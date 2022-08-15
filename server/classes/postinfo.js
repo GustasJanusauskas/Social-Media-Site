@@ -6,7 +6,10 @@ class PostInfo {
     title = "";
     body = "";
     date = "";
-    likes = [];
+
+    likes = 0;
+    userLiked = false;
+
     author = "";
     authorID = 0;
     postID = 0;

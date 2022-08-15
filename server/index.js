@@ -466,9 +466,9 @@ function GetComments(postID,callback) {
   });
 }
 
-function GetFriendPosts(friends,callback) {
-  var innerQuery = "SELECT posts.ptitle, posts.pbody, to_char(posts.pdate, 'YYYY-MM-DD at HH12:MIam') AS pdate, posts.usr_id, posts.post_id, posts.usr_likes AS likes, CONCAT(profiles.firstname,' ',profiles.lastname) AS author FROM posts, profiles WHERE posts.usr_id = ANY (array(SELECT friends FROM profiles WHERE usr_id = $1 )) AND posts.usr_id = profiles.usr_id ORDER BY posts.pdate DESC LIMIT 50;";
-  var innerData = [friends];
+function GetFriendPosts(userID,callback) {
+  var innerQuery = "SELECT posts.ptitle, posts.pbody, to_char(posts.pdate, 'YYYY-MM-DD at HH12:MIam') AS pdate, posts.usr_id, posts.post_id, array_length(posts.usr_likes,1) AS likes, CONCAT(profiles.firstname,' ',profiles.lastname) AS author, $1 = ANY(posts.usr_likes) as userliked FROM posts, profiles WHERE posts.usr_id = ANY(array(SELECT friends FROM profiles WHERE usr_id = $1 )) AND posts.usr_id = profiles.usr_id ORDER BY posts.pdate DESC LIMIT 50;";
+  var innerData = [userID];
 
   var result = [];
   dbclient.query(innerQuery,innerData, (err, res) => {
@@ -486,6 +486,7 @@ function GetFriendPosts(friends,callback) {
       temp.date = res.rows[x].pdate;
       temp.author = res.rows[x].author;
       temp.likes = res.rows[x].likes || 0;
+      temp.userLiked = res.rows[x].userliked;
 
       temp.authorID = res.rows[x].usr_id;
       temp.postID = res.rows[x].post_id;
@@ -503,11 +504,11 @@ function GetUserPosts(ID,callback) {
 
   //ID of -1 gets newest posts, regardless of user
   if (ID == -1) {
-    innerQuery = "SELECT posts.ptitle, posts.pbody, to_char(posts.pdate, 'YYYY-MM-DD at HH12:MIam') AS pdate, posts.usr_id, posts.post_id, posts.usr_likes AS likes, CONCAT(profiles.firstname,' ',profiles.lastname) AS author FROM posts,profiles WHERE profiles.usr_id = posts.usr_id ORDER BY posts.pdate DESC LIMIT 50;";
+    innerQuery = "SELECT posts.ptitle, posts.pbody, to_char(posts.pdate, 'YYYY-MM-DD at HH12:MIam') AS pdate, posts.usr_id, posts.post_id, array_length(posts.usr_likes,1) AS likes, CONCAT(profiles.firstname,' ',profiles.lastname) AS author FROM posts,profiles WHERE profiles.usr_id = posts.usr_id ORDER BY posts.pdate DESC LIMIT 50;";
     innerData = [];
   }
   else {
-    innerQuery = "SELECT posts.ptitle, posts.pbody, to_char(posts.pdate, 'YYYY-MM-DD at HH12:MIam') AS pdate, posts.usr_id, posts.post_id, posts.usr_likes AS likes, CONCAT(profiles.firstname,' ',profiles.lastname) AS author FROM posts, profiles WHERE posts.usr_id = $1 AND posts.usr_id = profiles.usr_id ORDER BY posts.pdate DESC;";
+    innerQuery = "SELECT posts.ptitle, posts.pbody, to_char(posts.pdate, 'YYYY-MM-DD at HH12:MIam') AS pdate, posts.usr_id, posts.post_id, array_length(posts.usr_likes,1) AS likes, CONCAT(profiles.firstname,' ',profiles.lastname) AS author, $1 = ANY(posts.usr_likes) as userliked FROM posts, profiles WHERE posts.usr_id = $1 AND posts.usr_id = profiles.usr_id ORDER BY posts.pdate DESC;";
     innerData = [ID];
   }
 
@@ -527,6 +528,7 @@ function GetUserPosts(ID,callback) {
       temp.date = res.rows[x].pdate;
       temp.likes = res.rows[x].likes || 0;
       temp.author = res.rows[x].author;
+      temp.userLiked = res.rows[x].userliked;
 
       temp.authorID = res.rows[x].usr_id;
       temp.postID = res.rows[x].post_id;

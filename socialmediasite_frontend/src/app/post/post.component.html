@@ -10,11 +10,11 @@
         <mat-icon class="BodyIcon">comment</mat-icon>
         View comments
     </button>
-    <button *ngIf="userinfo.ID" class="TopbarButton" (click)="post.likes ? likePost(post,post.likes.indexOf(userinfo.ID || -1) == -1) : null;">
-        <mat-icon [class]="post.likes && post.likes.indexOf(userinfo.ID || -1) != -1 ? 'material-icons' : 'material-icons-outlined'">thumb_up</mat-icon>
-        {{post.likes ? (post.likes.indexOf(userinfo.ID || -1) != -1 ? 'Remove like' : 'Like') : 'Login to like'}}
+    <button *ngIf="userinfo.ID" class="TopbarButton" (click)="likePost(post,!post.userLiked)">
+        <mat-icon [class]="post.likes && post.userLiked ? 'material-icons' : 'material-icons-outlined'">thumb_up</mat-icon>
+        {{post.likes && post.userLiked ? 'Remove like' : 'Like'}}
     </button>
 
-    <div class="PostedDateText">{{post.likes ? post.likes.length : 0}} {{post.likes && post.likes.length == 1 ? 'like.' : 'likes.'}}</div>
+    <div class="PostedDateText">{{post.likes ? post.likes : 0}} {{post.likes && post.likes == 1 ? 'like.' : 'likes.'}}</div>
     <div class="PostedDateText">Posted {{post.date}}</div>
 </div> 
