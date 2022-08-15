@@ -3,9 +3,10 @@ import { Message } from './message';
 
 export interface Chat {
     recipientID: number;
-    recipient?: UserInfo;
+    recipient: UserInfo;
 
     sender: UserInfo;
-
     messages: Message[];
+
+    msgRequest?: boolean;
 }

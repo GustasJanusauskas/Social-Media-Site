@@ -117,6 +117,24 @@ export class AppComponent {
         
         chat.messages.push(localMessage);
       }
+      //If message is not from a friend and a chat tab isn't open, add a message request tab
+      else {
+        if (!this.userinfo.friends) return;
+        var friend = this.userinfo.friends.find(fID => {
+          return msg.senderID == fID;
+        });
+
+        if (!friend) {
+          this,userdataService.getPublicUserInfo(msg.senderID || -1).subscribe(data => {
+            if (!data.error) {
+              localMessage.author = data;
+
+              this.openChat(data, undefined, true);
+              this.chatList[this.chatList.length - 1].messages.push(localMessage);
+            }
+          });
+        }
+      }
 
       //Apply autoscroll on each chat if needed
       this.scrollDivs(scrollChat);
@@ -395,7 +413,7 @@ export class AppComponent {
     });
   }
 
-  changeFriendStatus(event: Event, profile: UserInfo, friend: boolean) {
+  changeFriendStatus(profile: UserInfo, friend: boolean) {
     var session = HelperFunctionsService.getCookie('session');
     if (session == null || session.length < 64 ) return;
 
@@ -411,11 +429,11 @@ export class AppComponent {
     });
   }
 
-  openChat(profile: UserInfo) {
+  openChat(profile: UserInfo, callback?: Function, msgRequest: boolean = false) {
     var session = HelperFunctionsService.getCookie('session');
     if (session == null || session.length < 64 ) return;
 
-    //If chat isn't already open, add new tab
+    //Check if chat is already open
     var bypass: boolean = false;
     this.chatList.forEach(chat => {
       if (chat.recipientID == profile.ID) {
@@ -423,13 +441,23 @@ export class AppComponent {
         return;
       }
     });
-    if (!bypass) this.chatList.push({recipientID:profile.ID || -1, sender: this.userinfo, messages:[], recipient:profile});
+    if (bypass) {
+      if (callback) callback(null);
+      return;
+    }
+
+    //Create new chat, set any necessary flags
+    var chat: Chat = {recipientID:profile.ID || -1, sender: this.userinfo, messages:[], recipient:profile};
+    if (msgRequest) chat.msgRequest = true;
+    this.chatList.push(chat);
 
     //Request message history from server
     this.userdataService.getMessageHistory(session,profile.ID || -1).subscribe( data => {
       data.forEach(msg => {
         this.chatList[this.chatList.length - 1].messages.push({body:msg.body,author:msg.senderID == this.userinfo.ID ? this.userinfo : profile,date:new Date(Math.trunc(msg.date)).toLocaleString()});
       });
+
+      if (callback) callback(chat);
     });
   }
 
@@ -455,6 +483,12 @@ export class AppComponent {
     this.chatDiv.forEach( (item, index, arr) => {
       scrollChat[index] = item.nativeElement.scrollTop + item.nativeElement.clientHeight == item.nativeElement.scrollHeight;
     });
+
+    //If message request, add friend
+    if (this.currentChat.msgRequest) {
+      this.changeFriendStatus(this.currentChat.recipient,true);
+      this.currentChat.msgRequest = false;
+    }
 
     //Create 2 versions of message: a local one with all of the info, and a smaller, more secure sendable version.
     //An identical local message will be generated on receiver's computer.

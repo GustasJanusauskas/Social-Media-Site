@@ -101,7 +101,7 @@
 				<h2>{{toTitleCase(selectedProfile.firstName || "") + " " + toTitleCase(selectedProfile.lastName || "")}}</h2>
 				<p>{{selectedProfile.profileDesc || "No profile description."}}</p>
 				<br>
-				<button *ngIf="userinfo.friends && !userinfo.friends.includes(selectedProfile.ID || -1)" class="TopbarButton" (click)="changeFriendStatus($event,selectedProfile,true);" >
+				<button *ngIf="userinfo.friends && !userinfo.friends.includes(selectedProfile.ID || -1)" class="TopbarButton" (click)="changeFriendStatus(selectedProfile,true);" >
 					<mat-icon class="BodyIcon">person_add</mat-icon>
 					Add to friend list
 				</button>
@@ -152,7 +152,7 @@
 									<mat-icon class="BodyIcon">chat</mat-icon>
 									Message
 								</button>
-								<button (click)="changeFriendStatus($event,friend,false);" mat-menu-item>
+								<button (click)="changeFriendStatus(friend,false);" mat-menu-item>
 									<mat-icon class="BodyIcon">person_remove</mat-icon>
 									Remove Friend
 								</button>
@@ -164,8 +164,8 @@
 				</mat-tab>
 				<mat-tab *ngFor="let chat of chatList;">
 					<ng-template mat-tab-label>
-						<mat-icon class="ChatTabIcon" [style]="'color:' + (chat.recipient!.online ? 'darkgreen' : 'darkred')">blur_circular</mat-icon>
-						{{'Chat: ' + chat.recipient!.firstName}}
+						<mat-icon class="ChatTabIcon" *ngIf="!chat.msgRequest" [style]="'color:' + (chat.recipient.online ? 'darkgreen' : 'darkred')">blur_circular</mat-icon>
+						{{chat.msgRequest ? 'Message request: ' + chat.recipient.username : 'Chat: ' + chat.recipient.firstName}}
 					</ng-template>
 
 					<button class="CloseChatButton" (click)="chatList.splice(chatList.indexOf(chat,0),1);"></button>
@@ -181,13 +181,13 @@
 
 					<mat-form-field class="MessageInputField" hintLabel="Max 350 characters" appearance="fill">
 						<mat-label>Type your message.</mat-label>
-						<textarea matInput #input maxlength="350" class="MessageInputTextArea" placeholder="Message here." (keypress)="noJsonSymbols($event)" [(ngModel)]="chatMsgField"></textarea>
+						<textarea matInput #input maxlength="350" class="MessageInputTextArea" [placeholder]="chat.msgRequest ? 'Message here. By replying you will add ' + chat.recipient.firstName + ' to your friends list.' : 'Message here.'" (keypress)="noJsonSymbols($event)" [(ngModel)]="chatMsgField"></textarea>
 						<mat-hint align="end">{{chatMsgField.length}}/350</mat-hint>
 					</mat-form-field>
 
 					<button class="FriendButton" (click)="sendMsg();">
 						<mat-icon class="BodyIcon">send</mat-icon>
-						Send message
+						{{chat.msgRequest ? 'Send message and add friend' : 'Send message'}}
 					</button>
 				</mat-tab>
 			</mat-tab-group>
