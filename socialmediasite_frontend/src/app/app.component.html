@@ -148,7 +148,7 @@
 									<mat-icon class="BodyIcon">account_circle</mat-icon>
 									Show Profile
 								</button>
-								<button (click)="openChat($event,friend);" mat-menu-item>
+								<button (click)="openChat(friend);" mat-menu-item>
 									<mat-icon class="BodyIcon">chat</mat-icon>
 									Message
 								</button>
@@ -162,10 +162,10 @@
 					</div>
 
 				</mat-tab>
-				<mat-tab *ngFor="let chat of chatList;" [title]="getLocalFriendFromID(chat).firstName + (getLocalFriendFromID(chat).online ? ' is online.' : 'is offline.')">
+				<mat-tab *ngFor="let chat of chatList;">
 					<ng-template mat-tab-label>
-						<mat-icon class="ChatTabIcon" [style]="'color:' + (getLocalFriendFromID(chat).online ? 'darkgreen' : 'darkred')">{{getLocalFriendFromID(chat).online ? 'blur_circular' : 'blur_circular'}}</mat-icon>
-						{{'Chat: ' + getLocalFriendFromID(chat).firstName}}
+						<mat-icon class="ChatTabIcon" [style]="'color:' + (chat.recipient!.online ? 'darkgreen' : 'darkred')">blur_circular</mat-icon>
+						{{'Chat: ' + chat.recipient!.firstName}}
 					</ng-template>
 
 					<button class="CloseChatButton" (click)="chatList.splice(chatList.indexOf(chat,0),1);"></button>
@@ -189,7 +189,6 @@
 						<mat-icon class="BodyIcon">send</mat-icon>
 						Send message
 					</button>
-
 				</mat-tab>
 			</mat-tab-group>
 		</div>

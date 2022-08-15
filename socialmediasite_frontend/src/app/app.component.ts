@@ -168,21 +168,43 @@ export class AppComponent {
       this.loggedInAs = '' + data.username;
       
       //Update friends list
+      var promises: Promise<void>[] = [];
       this.friendList = [];
       data.friends?.forEach((value) => {
-        this.userdataService.getPublicUserInfo(value).subscribe(data => {
-          if (data.error) {
-            console.log('Error for friend with user ID ' + value + ': ' + data.error);
-            return;
-          }
-          //Don't add self to friends list.
-          if (data.ID == this.userinfo.ID) return;
-          
-          this.friendList.push(data);
-        });
+        promises.push(new Promise<void>((resolve,reject) => {
+          this.userdataService.getPublicUserInfo(value).subscribe(data => { console.log(promises);
+            if (data.error) {
+              console.log('Error for friend with user ID ' + value + ': ' + data.error);
+              reject();
+              return;
+            }
+            //Don't add self to friends list.
+            if (data.ID == this.userinfo.ID) {
+              reject();
+              return;
+            }
+            
+            this.friendList.push(data);
+            resolve();
+          });
+        }));
       });
 
-      if (callback) callback();
+      //When all friend list data is received and updated
+      Promise.allSettled(promises).then(() => {
+        //Sort friend list alphabetically
+        this.friendList.sort((a:UserInfo,b:UserInfo) => {
+          if (!a.firstName) return -1;
+          else if (!b.firstName) return 1;
+  
+          return (a.firstName.toLowerCase() < b.firstName.toLowerCase()) ? -1 : (a.firstName.toLowerCase() > b.firstName.toLowerCase()) ? 1 : 0;  
+        });
+
+        //Update chat info
+        this.updateChatInfo();
+
+        if (callback) callback();
+      });
     });
   }
 
@@ -389,7 +411,7 @@ export class AppComponent {
     });
   }
 
-  openChat(event: Event, profile: UserInfo) {
+  openChat(profile: UserInfo) {
     var session = HelperFunctionsService.getCookie('session');
     if (session == null || session.length < 64 ) return;
 
@@ -401,7 +423,7 @@ export class AppComponent {
         return;
       }
     });
-    if (!bypass) this.chatList.push({recipientID:profile.ID || -1, sender: this.userinfo, messages:[]});
+    if (!bypass) this.chatList.push({recipientID:profile.ID || -1, sender: this.userinfo, messages:[], recipient:profile});
 
     //Request message history from server
     this.userdataService.getMessageHistory(session,profile.ID || -1).subscribe( data => {
@@ -535,7 +557,12 @@ export class AppComponent {
     }
   }
 
-  getLocalFriendFromID(chat: Chat) {
-    return this.friendList.find( (val) => {return val.ID == (chat.recipientID);}) || {session:''};
+  updateChatInfo() {
+    this.chatList.forEach(chat => {
+      const temp = this.friendList.find((value) => {
+        return value.ID == chat.recipientID;
+      });
+      if (temp != undefined) chat.recipient = temp;
+    });
   }
 }
