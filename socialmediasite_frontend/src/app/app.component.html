@@ -37,7 +37,6 @@
 				<mat-icon class="SidebarIcon">edit</mat-icon>
 				Edit profile
 			</button>
-			<!--<button class="SidebarButton" (click)="setMain('settings');">Settings</button> -->
 		</div>
 		<div id="BodyMain" class="BackgroundElement" style="height: 1000em;" #backgroundDiv>
 			<div *ngIf="bodyHTML=='login'" id="Login">
@@ -70,11 +69,6 @@
 				<div id="FeedInner">
 					<app-post *ngFor="let post of postList;" [post]="post" [userinfo]="userinfo" [rootComponent]="this"></app-post>
 				</div>
-			</div>
-			<div *ngIf="bodyHTML=='settings'" id="Settings">
-				<h2>Settings</h2>
-				<label class="SettingsLabel">Setting 1: </label>
-				<mat-checkbox class="SettingsCheckbox">Enable</mat-checkbox>
 			</div>
 			<app-comments *ngIf="bodyHTML=='comments'" [post]="selectedPost" [userinfo]="userinfo" [rootComponent]="this"></app-comments>
 		</div>

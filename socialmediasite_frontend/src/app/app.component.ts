@@ -243,9 +243,6 @@ export class AppComponent {
         case 'ownprofile':
           if (animate) this.animateBackground(45);
           break;
-        case 'settings':
-          if (animate) this.animateBackground(30);
-          break;
         case 'login':
           if (animate) this.animateBackground(16.15);
           break;
