@@ -6,7 +6,7 @@
         <mat-icon class="BodyIcon">delete</mat-icon>
         Remove post
     </button>
-    <button class="TopbarButton" *ngIf="commentsEnabled" (click)="rootComponent.animateBackground(62.125);selectPost(post);">
+    <button class="TopbarButton" *ngIf="commentsEnabled" (click)="selectPost(post);">
         <mat-icon class="BodyIcon">comment</mat-icon>
         View comments
     </button>

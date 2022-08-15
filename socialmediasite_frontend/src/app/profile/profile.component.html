@@ -1,0 +1,19 @@
+<div id="Profile">
+    <img [src]="selectedProfile.avatarPath || 'assets/defaultProfile.png'" class="ProfilePic">
+    <h2>{{toTitleCase(selectedProfile.firstName || "") + " " + toTitleCase(selectedProfile.lastName || "")}}</h2>
+    <p>{{selectedProfile.profileDesc || "No profile description."}}</p>
+    <br>
+    <button *ngIf="userinfo.friends && !userinfo.friends.includes(selectedProfile.ID || -1)" class="TopbarButton" (click)="rootComponent.changeFriendStatus(selectedProfile,true);" >
+        <mat-icon class="BodyIcon">person_add</mat-icon>
+        Add to friend list
+    </button>
+    <h2>Posts</h2>
+    <mat-paginator [length]="postList.length" [pageSize]="1" hidePageSize="true" (page)="pageEvent = $event" aria-label="Select page">
+    </mat-paginator>
+    <br>
+    <div *ngIf="pageEvent">
+        <div *ngFor="let ind of createFakeArray(pageEvent.pageSize)">
+            <app-post [postClass]="'FeedPost Profile'" [profilePost]="true" *ngIf="ind < postList.length" [post]="postList[pageEvent.pageIndex * pageEvent.pageSize + ind]" [userinfo]="userinfo" [rootComponent]="rootComponent"></app-post>
+        </div>
+    </div>
+</div>

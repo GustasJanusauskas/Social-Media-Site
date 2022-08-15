@@ -109,7 +109,7 @@ textarea {
 	height: 2em;
 }
 
-#Login, #Register, #AddPost, #Profile, #Settings {
+#Login, #Register, #AddPost, #Profile, #EditProfile, #Settings {
 	text-align: center;
 }
 

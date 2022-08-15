@@ -36,7 +36,7 @@ export class PostComponent implements OnInit {
 
     this.userdataService.removePost(session,postID).subscribe(data => {
       if (data.success) {
-        if (showProfile) this.rootComponent.selectProfile(event,this.userinfo);
+        if (showProfile) this.rootComponent.selectProfile(this.userinfo);
         else this.rootComponent.setMain('feed');
       }
     });

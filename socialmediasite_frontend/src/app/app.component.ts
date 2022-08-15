@@ -1,7 +1,6 @@
-import { Component, QueryList, Directive, ViewChildren } from '@angular/core';
-import { PageEvent } from '@angular/material/paginator';
+import { Component, QueryList, ViewChildren } from '@angular/core';
 
-import { CommentsComponent } from "./comments/comments.component";
+import { ProfileComponent } from './profile/profile.component';
 
 import { UserdataService } from './services/userdata.service';
 import { MessagingService } from "./services/messaging.service";
@@ -39,6 +38,9 @@ export class AppComponent {
   profilePic: File = File.prototype;
   updateProfileEnabled: boolean = true;
 
+  //Profiles
+  selectedProfile!: UserInfo;
+
   //Add Post
   postTitle: string = '';
   postBody: string = '';
@@ -53,10 +55,6 @@ export class AppComponent {
   results: UserInfo[] = [];
   lastSearchCharacterInput: number = Number.NaN;
   searchInterval;
-
-  //Profiles
-  selectedProfile!: UserInfo;
-  pageEvent: PageEvent = {pageIndex:0,pageSize:1,length:1};
 
   //Private messages
   chatList: Chat[] = [];
@@ -190,7 +188,7 @@ export class AppComponent {
       this.friendList = [];
       data.friends?.forEach((value) => {
         promises.push(new Promise<void>((resolve,reject) => {
-          this.userdataService.getPublicUserInfo(value).subscribe(data => { console.log(promises);
+          this.userdataService.getPublicUserInfo(value).subscribe(data => {
             if (data.error) {
               console.log('Error for friend with user ID ' + value + ': ' + data.error);
               reject();
@@ -380,7 +378,6 @@ export class AppComponent {
     this.chatList = [];
     this.chatMsgField = '';
     this.currentChat = undefined;
-    this.selectedProfile = {session:''};
     this.postTitle = '';
     this.postBody = '';
   }
@@ -510,7 +507,7 @@ export class AppComponent {
     this.chatMsgField = "";
   }
 
-  selectProfile(event: Event, profile: UserInfo = {session:''}) {
+  selectProfile(profile: UserInfo = {session:''}) {
     var tempProfile: UserInfo;
     //If profile not provided, search results array, assume search bar used
     if (!profile.ID) {
@@ -522,17 +519,8 @@ export class AppComponent {
       tempProfile = profile;
     }
 
-    //Get user's posts
-    if (tempProfile.ID) {
-      this.userdataService.getUserPosts(tempProfile.ID).subscribe( data => {
-        this.postList = data;
-        this.selectedProfile = tempProfile;
-        this.setMain('profile');
-      });
-    }
-    //Update paginator
-    this.pageEvent.pageIndex = 0;
-    this.pageEvent.length = this.postList.length;
+    this.selectedProfile = tempProfile;
+    this.setMain('profile');
   }
 
   scrollDivs(scrollAllowList?: boolean[]) {

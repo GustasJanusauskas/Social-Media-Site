@@ -1,12 +1,13 @@
 import { Component, Injectable, Input, OnInit } from '@angular/core';
 
+import { AppComponent } from '../app.component';
+
 import { HelperFunctionsService } from "../services/helper-functions.service";
 import { UserdataService } from "../services/userdata.service";
 
 import { Post } from '../interfaces/post';
 import { Comment } from "../interfaces/comment";
 import { UserInfo } from "../interfaces/userinfo";
-import { AppComponent } from '../app.component';
 
 @Component({
   selector: 'app-comments',
@@ -30,13 +31,13 @@ export class CommentsComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.getComments();
+    this.getComments(this.post);
   }
 
-  getComments() {
-    if (!this.post) console.log('no post');
+  getComments(post: Post) {
+    if (!post) console.log('no post');
 
-    this.userdataService.getComments(this.post.postID || -1).subscribe( (data) => {
+    this.userdataService.getComments(post.postID || -1).subscribe( (data) => {
       data.forEach(comment => {
         this.userdataService.getPublicUserInfo(comment.authorID || -1).subscribe( (data) => {
           comment.author = `${data.firstName} ${data.lastName} (${data.username})`;

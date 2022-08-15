@@ -7,7 +7,7 @@
 			<b *ngIf="userinfo.session != ''">Logged in as {{loggedInAs}} </b>
 			<button *ngIf="userinfo.session != ''" class="TopbarButton" id="LogoffButton" (click)="logoff($event);">Log off</button>
 
-			<input type="text" placeholder="Search" id="SearchInput" [(ngModel)]="search" (ngModelChange)="searchUpdate($event)" (keyup.enter)="selectProfile($event);" matInput [matAutocomplete]="auto">
+			<input type="text" placeholder="Search" id="SearchInput" [(ngModel)]="search" (ngModelChange)="searchUpdate($event)" (keyup.enter)="selectProfile();" matInput [matAutocomplete]="auto">
 			<mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
 				<mat-option *ngFor="let option of results" [value]="option.username">
 					<img class="ProfilePic Thumb" [src]="option.thumbPath || 'assets/defaultProfile.png'">
@@ -29,7 +29,7 @@
 				Add Post
 			</button>
 
-			<button *ngIf="userinfo.session != ''" class="SidebarButton" (click)="selectProfile($event,userinfo);">
+			<button *ngIf="userinfo.session != ''" class="SidebarButton" (click)="selectProfile(userinfo);">
 				<mat-icon class="SidebarIcon">account_circle</mat-icon>
 				My profile
 			</button>
@@ -76,7 +76,7 @@
 				<br><br>
 				<b>{{formError}}</b>
 			</div>
-			<div *ngIf="bodyHTML=='ownprofile'" id="Profile">
+			<div *ngIf="bodyHTML=='ownprofile'" id="EditProfile">
 				<h2>Edit profile</h2>
 
 				<h3>Change profile image</h3>
@@ -96,25 +96,7 @@
 				<br><br>
 				<b>{{formError}}</b>
 			</div>
-			<div *ngIf="bodyHTML=='profile'" id="Profile">
-				<img [src]="selectedProfile.avatarPath || 'assets/defaultProfile.png'" class="ProfilePic">
-				<h2>{{toTitleCase(selectedProfile.firstName || "") + " " + toTitleCase(selectedProfile.lastName || "")}}</h2>
-				<p>{{selectedProfile.profileDesc || "No profile description."}}</p>
-				<br>
-				<button *ngIf="userinfo.friends && !userinfo.friends.includes(selectedProfile.ID || -1)" class="TopbarButton" (click)="changeFriendStatus(selectedProfile,true);" >
-					<mat-icon class="BodyIcon">person_add</mat-icon>
-					Add to friend list
-				</button>
-				<h2>Posts</h2>
-				<mat-paginator [length]="postList.length" [pageSize]="1" hidePageSize="true" (page)="pageEvent = $event" aria-label="Select page">
-				</mat-paginator>
-				<br>
-				<div *ngIf="pageEvent">
-					<div *ngFor="let ind of createFakeArray(pageEvent.pageSize)">
-						<app-post [postClass]="'FeedPost Profile'" [profilePost]="true" *ngIf="ind < postList.length" [post]="postList[pageEvent.pageIndex * pageEvent.pageSize + ind]" [userinfo]="userinfo" [rootComponent]="this"></app-post>
-					</div>
-				</div>
-			</div>
+			<app-profile *ngIf="bodyHTML=='profile'" [selectedProfile]="selectedProfile" [userinfo]="userinfo" [rootComponent]="this"></app-profile>
 			<div *ngIf="bodyHTML=='feed'" id="Feed">
 				<h2>{{userinfo.session == '' ? 'Feed' : 'Your Feed'}}</h2>
 				<div id="FeedInner">
@@ -144,7 +126,7 @@
 								{{friend.firstName && friend.lastName ? friend.firstName + ' ' + friend.lastName : friend.username}}
 							</button> 
 							<mat-menu #matFriendMenu="matMenu">
-								<button (click)="selectProfile($event,friend);" mat-menu-item>
+								<button (click)="selectProfile(friend);" mat-menu-item>
 									<mat-icon class="BodyIcon">account_circle</mat-icon>
 									Show Profile
 								</button>
