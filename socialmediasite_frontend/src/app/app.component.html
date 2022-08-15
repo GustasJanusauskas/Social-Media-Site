@@ -129,7 +129,7 @@
 			<app-comments *ngIf="bodyHTML=='comments'" [post]="selectedPost" [userinfo]="userinfo" [rootComponent]="this"></app-comments>
 		</div>
 		<div id="FriendbarMain" class="BackgroundElement" style="height: 1000em;" #backgroundDiv>
-			<mat-tab-group mat-stretch-tabs md-no-pagination *ngIf="userinfo.session != ''" (selectedTabChange)="onTabChange($event);">
+			<mat-tab-group *ngIf="userinfo.session != ''" (selectedTabChange)="onTabChange($event);">
 				<mat-tab> 
 					<ng-template mat-tab-label>
 						<mat-icon class="ChatTabIcon">group</mat-icon>
