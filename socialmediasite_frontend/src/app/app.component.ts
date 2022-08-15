@@ -137,7 +137,7 @@ export class AppComponent {
     //Connect messaging websock
     this.setMain('feed',() => {
       this.connectMsg();
-    });
+    },false);
   }
 
   async ngOnDestroy() {
@@ -247,7 +247,7 @@ export class AppComponent {
     });
   }
 
-  setMain(text: string, callback?: Function) {
+  setMain(text: string, callback?: Function, animate: boolean = true) {
     this.formError = '';
     this.bodyHTML = text;
     this.updateUI(() => {
@@ -268,25 +268,25 @@ export class AppComponent {
               });
             }
           }
-          this.animateBackground(45.75);
+          if (animate) this.animateBackground(45.75);
           break;
         case 'post':
-          this.animateBackground(35.5);
+          if (animate) this.animateBackground(35.5);
           break;
         case 'profile':
-          this.animateBackground(61.25);
+          if (animate) this.animateBackground(61.25);
           break;
         case 'ownprofile':
-          this.animateBackground(45);
+          if (animate) this.animateBackground(45);
           break;
         case 'settings':
-          this.animateBackground(30);
+          if (animate) this.animateBackground(30);
           break;
         case 'login':
-          this.animateBackground(16.15);
+          if (animate) this.animateBackground(16.15);
           break;
         case 'register':
-          this.animateBackground(17.85);
+          if (animate) this.animateBackground(17.85);
           break;
       }
 
