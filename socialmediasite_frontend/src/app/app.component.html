@@ -62,20 +62,7 @@
 				<br><br>
 				<b>{{formError}}</b>
 			</div>
-			<div *ngIf="bodyHTML=='post'" id="AddPost">
-				<h2>Add a new post</h2>
-				<h3>Title</h3>
-				<input type="text" placeholder="Enter your post title" id="PostTitleInput" (keypress)="noJsonSymbols($event)" [(ngModel)]="postTitle" autocomplete="off">
-				<br>
-				<h3>Body</h3>
-				<textarea placeholder="Enter your post content" id="PostBodyInput" (keypress)="noJsonSymbols($event)" [(ngModel)]="postBody" (ngModelChange)="updateCharCounter($event)" autocomplete="off"> </textarea>
-				<br>
-				Characters left: {{postCharLeft}}
-				<br>
-				<button class="MainbarButton" id="PostMainButton" (click)="addPost($event)">Post</button>
-				<br><br>
-				<b>{{formError}}</b>
-			</div>
+			<app-new-post *ngIf="bodyHTML=='post'"></app-new-post>
 			<app-edit-profile *ngIf="bodyHTML=='ownprofile'" [userinfo]="userinfo" [rootComponent]="this"></app-edit-profile>
 			<app-profile *ngIf="bodyHTML=='profile'" [selectedProfile]="selectedProfile" [userinfo]="userinfo" [rootComponent]="this"></app-profile>
 			<div *ngIf="bodyHTML=='feed'" id="Feed">

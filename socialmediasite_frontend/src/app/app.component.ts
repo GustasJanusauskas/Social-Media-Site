@@ -24,7 +24,7 @@ export class AppComponent {
   emailRegex : RegExp = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
   title = 'socialmediasite';
 
-  // Login/Register
+  //Login/Register
   email: string = '';
   username: string = '';
   password: string = '';
@@ -34,14 +34,9 @@ export class AppComponent {
   userinfo: UserInfo = {session:''};
   friendList: UserInfo[] = [];
 
-  // Profiles/Comments
+  //Profiles/Comments
   selectedProfile!: UserInfo;
   selectedPost: Post = {authorID:-1};
-
-  //Add Post
-  postTitle: string = '';
-  postBody: string = '';
-  postCharLeft : number = 4096;
 
   //Main Body
   bodyHTML: string = '';
@@ -216,39 +211,6 @@ export class AppComponent {
     });
   }
 
-  addPost(event: Event) {
-    if (this.postTitle.trim().length == 0 || this.postBody.trim().length == 0) {
-      this.formError = 'Post must have a title and body.';
-      return;
-    }
-    if (this.postTitle.length > 256) {
-      this.formError = 'Post title too long must be under 256 characters.';
-      return;
-    }
-    if (this.postBody.length > 4096) {
-      this.formError = 'Post too long, must be under 4096 characters.';
-      return;
-    }
-
-    var session = HelperFunctionsService.getCookie('session');
-    if (session == null || session.length < 64 ) {
-      this.formError = 'Must be logged in to make a post.';
-      return;
-    }
-
-    this.formError = 'Posting..';
-    this.userdataService.addPost(session,this.postTitle,this.postBody).subscribe(data => {
-      if (data.success) {
-        this.postTitle = '';
-        this.postBody = '';
-        this.formError = 'Post added to wall!';
-      }
-      else {
-        this.formError = 'Failed to add post, please try again later.';
-      }
-    });
-  }
-
   setMain(text: string, callback?: Function, animate: boolean = true) {
     this.formError = '';
     this.bodyHTML = text;
@@ -289,6 +251,9 @@ export class AppComponent {
           break;
         case 'register':
           if (animate) this.animateBackground(17.85);
+          break;
+        case 'comments':
+          if (animate) this.animateBackground(62.125);
           break;
       }
 
@@ -342,8 +307,6 @@ export class AppComponent {
     this.chatList = [];
     this.chatMsgField = '';
     this.currentChat = undefined;
-    this.postTitle = '';
-    this.postBody = '';
   }
 
   register(event: Event) {
@@ -512,14 +475,6 @@ export class AppComponent {
     }
 
     this.scrollDivs();
-  }
-
-  updateCharCounter(event: Event,counterID: string = 'post') {
-    switch (counterID) {
-      case 'post':
-        this.postCharLeft = 4096 - this.postBody.length;
-        break;
-    }
   }
 
   updateChatInfo() {

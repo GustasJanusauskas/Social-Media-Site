@@ -20,6 +20,7 @@ import { CommentsComponent } from './comments/comments.component';
 import { PostComponent } from './post/post.component';
 import { ProfileComponent } from './profile/profile.component';
 import { EditProfileComponent } from './edit-profile/edit-profile.component';
+import { NewPostComponent } from './new-post/new-post.component';
 
 @NgModule({
   declarations: [
@@ -27,7 +28,8 @@ import { EditProfileComponent } from './edit-profile/edit-profile.component';
     CommentsComponent,
     PostComponent,
     ProfileComponent,
-    EditProfileComponent
+    EditProfileComponent,
+    NewPostComponent
   ],
   imports: [
     BrowserModule,
