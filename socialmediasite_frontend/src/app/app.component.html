@@ -7,7 +7,7 @@
 			<b *ngIf="userinfo.session != ''">Logged in as {{userinfo.username}} </b>
 			<button *ngIf="userinfo.session != ''" class="TopbarButton" id="LogoffButton" (click)="logoff($event);">Log off</button>
 
-			<input type="text" placeholder="Search" id="SearchInput" [(ngModel)]="search" (ngModelChange)="searchUpdate($event)" (keyup.enter)="selectProfile();" matInput [matAutocomplete]="auto">
+			<input type="text" placeholder="Search" id="SearchInput" [(ngModel)]="search" (ngModelChange)="searchUpdate()" (keyup.enter)="selectProfile();" matInput [matAutocomplete]="auto">
 			<mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
 				<mat-option *ngFor="let option of results" [value]="option.username">
 					<img class="ProfilePic Thumb" [src]="option.thumbPath || 'assets/defaultProfile.png'">
@@ -39,28 +39,8 @@
 			</button>
 		</div>
 		<div id="BodyMain" class="BackgroundElement" style="height: 1000em;" #backgroundDiv>
-			<div *ngIf="bodyHTML=='login'" id="Login">
-				<h2>Log in</h2>
-				<label class="LogLabel">Username/Email:</label> <input type="text" placeholder="Enter your username or email" id="UserInput" [(ngModel)]="username" autocomplete="off">
-				<br>
-				<label class="LogLabel">Password:</label> <input type="password" placeholder="Enter your password" id="PassInput" [(ngModel)]="password" autocomplete="off">
-				<br>
-				<button class="MainbarButton" id="LoginMainButton" (click)="login($event)">Login</button>
-				<br><br>
-				<b>{{formError}}</b>
-			</div>
-			<div *ngIf="bodyHTML=='register'" id="Register">
-				<h2>Create a new account</h2>
-				<label class="LogLabel">Email:</label> <input type="text" placeholder="Enter your email adress" id="EmailInput" [(ngModel)]="email" autocomplete="off">
-				<br>
-				<label class="LogLabel">Username:</label> <input type="text" placeholder="Enter username" id="UserInput" [(ngModel)]="username" autocomplete="off">
-				<br>
-				<label class="LogLabel">Password:</label> <input type="password" placeholder="Enter password" id="PassInput" [(ngModel)]="password" autocomplete="off">
-				<br>
-				<button class="MainbarButton" id="RegisterMainButton" (click)="register($event)">Register</button>
-				<br><br>
-				<b>{{formError}}</b>
-			</div>
+			<app-login *ngIf="bodyHTML=='login'" [rootComponent]="this" [friendsComponent]="friendsComponent.first"></app-login>
+			<app-register *ngIf="bodyHTML=='register'"></app-register>
 			<app-new-post *ngIf="bodyHTML=='post'"></app-new-post>
 			<app-edit-profile *ngIf="bodyHTML=='ownprofile'" [userinfo]="userinfo" [rootComponent]="this"></app-edit-profile>
 			<app-profile *ngIf="bodyHTML=='profile'" [selectedProfile]="selectedProfile" [userinfo]="userinfo" [rootComponent]="this"></app-profile>

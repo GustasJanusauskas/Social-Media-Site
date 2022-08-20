@@ -19,14 +19,6 @@ export const VERBOSE_DEBUG = true;
 })
 
 export class AppComponent {
-  emailRegex : RegExp = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-
-  //Login/Register
-  email: string = '';
-  username: string = '';
-  password: string = '';
-  formError : string = '';
-
   //UserData
   userinfo: UserInfo = {session:''};
   friendList: UserInfo[] = [];
@@ -134,7 +126,6 @@ export class AppComponent {
   }
 
   setMain(text: string, callback?: Function, animate: boolean = true) {
-    this.formError = '';
     this.bodyHTML = text;
     this.updateUI(() => {
       switch (text) {
@@ -180,75 +171,12 @@ export class AppComponent {
     });
   }
 
-  login(event: Event) {
-    //Verify data
-    if (this.username.length < 4 || this.username.length > 128) {
-      this.formError = 'Username must be between 4 and 128 characters long.';
-      return;
-    }
-    if (this.password.length < 12 || this.password.length > 128) {
-      this.formError = 'Password must be between 12 and 128 characters long.';
-      return;
-    }
-
-    this.formError = 'Logging in..';
-    //Send data to backend
-    this.userdataService.loginUser(this.username,this.password).subscribe(data => {
-      if (data.success) {
-        //Set session string, update UI
-        this.formError = 'Logged in succesfully.';
-        HelperFunctionsService.setCookie('session','' + data.session,30);
-
-        //Clear login form
-        this.username = '';
-        this.password = '';
-
-        //Path to feed
-        this.setMain('feed', () => {
-          //Connect messaging websock
-          if (this.friendsComponent.first) this.friendsComponent.first.connectMsg();
-        });
-      }
-      else {
-        this.formError = '' + data.session;
-      }
-    });
-  }
-
   logoff(event: Event) {
     HelperFunctionsService.deleteCookie('session');
     if (this.friendsComponent.first) this.friendsComponent.first.connectMsg(true);
 
     this.updateUI();
     this.setMain('feed');
-  }
-
-  register(event: Event) {
-    //Verify data
-    if (!this.emailRegex.test(this.email)) {
-      this.formError = 'Your email is invalid.';
-      return;
-    }
-    if (this.username.length < 4 || this.username.length > 128) {
-      this.formError = 'Username must be between 4 and 128 characters long.';
-      return;
-    }
-    if (this.password.length < 12 || this.password.length > 128) {
-      this.formError = 'Password must be between 12 and 128 characters long.';
-      return;
-    }
-
-    this.formError = 'Registering user...';
-    //Send data to backend
-    this.userdataService.registerUser(this.username,this.password,this.email).subscribe(data => {
-      if (data.success) {
-        this.email = '';
-        this.formError = 'User registered! You can now log in.';
-      }
-      else {
-        this.formError = '' + data.session;
-      }
-    });
   }
 
   changeFriendStatus(profile: UserInfo, friend: boolean) {
@@ -290,7 +218,7 @@ export class AppComponent {
     this.setMain('profile');
   }
 
-  searchUpdate(event: Event) {
+  searchUpdate() {
     this.lastSearchCharacterInput = Date.now();
   }
 
@@ -298,7 +226,7 @@ export class AppComponent {
     var session = HelperFunctionsService.getCookie('session');
     if (size < 40 && (session != null && session.length >= 64) ) size = 40; //minimum size is 40em (for chat window and navigation when logged in)
 
-    this.backgroundDiv.forEach((item,index,arr) => {
+    this.backgroundDiv.forEach((item) => {
       item.nativeElement.style = `max-height: ${size}em; height: ${1000}em;`;
     });
   }

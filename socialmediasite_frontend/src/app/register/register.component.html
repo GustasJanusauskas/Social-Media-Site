@@ -1,0 +1,12 @@
+<div id="Register">
+    <h2>Create a new account</h2>
+    <label class="LogLabel">Email:</label> <input type="text" placeholder="Enter your email adress" id="EmailInput" [(ngModel)]="email" autocomplete="off">
+    <br>
+    <label class="LogLabel">Username:</label> <input type="text" placeholder="Enter username" id="UserInput" [(ngModel)]="username" autocomplete="off">
+    <br>
+    <label class="LogLabel">Password:</label> <input type="password" placeholder="Enter password" id="PassInput" [(ngModel)]="password" autocomplete="off">
+    <br>
+    <button class="MainbarButton" id="RegisterMainButton" (click)="register()">Register</button>
+    <br><br>
+    <b>{{formError}}</b>
+</div>

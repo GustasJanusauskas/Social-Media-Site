@@ -1,0 +1,10 @@
+<div id="Login">
+    <h2>Log in</h2>
+    <label class="LogLabel">Username/Email:</label> <input type="text" placeholder="Enter your username or email" id="UserInput" [(ngModel)]="username" autocomplete="off">
+    <br>
+    <label class="LogLabel">Password:</label> <input type="password" placeholder="Enter your password" id="PassInput" [(ngModel)]="password" autocomplete="off">
+    <br>
+    <button class="MainbarButton" id="LoginMainButton" (click)="login()">Login</button>
+    <br><br>
+    <b>{{formError}}</b>
+</div>
