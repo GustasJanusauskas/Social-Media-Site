@@ -255,6 +255,13 @@ export class AppComponent {
     this.userdataService.changeFriendStatus(session,profile.ID || -1,friend).subscribe(data => {
       if (data.success) {
         this.updateUI();
+        if (!friend) {
+          //If unfriend, close chat tab if open
+          const tabIndex = this.friendsComponent.first.chatList.findIndex( (value) => {
+            return value.recipientID == profile.ID;
+          });
+          if (tabIndex != -1) this.friendsComponent.first.chatList.splice(tabIndex,1);
+        }
 
         if (VERBOSE_DEBUG) console.log('Friend removed.');
       }
