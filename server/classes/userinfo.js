@@ -3,7 +3,7 @@
 class UserInfo {
     session = "";
     success = false;
-    search = "";
+    error = "";
 
     email = "";
     username = "";
@@ -16,10 +16,9 @@ class UserInfo {
     thumbPath = "";
     avatar = "";
     friends = [0,0];
-    posts = [""];
+    posts = [0,0];
 
     online = false;
-
     ID = -1;
 
     constructor(a) { this.session = a}

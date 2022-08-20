@@ -24,7 +24,7 @@ export class UserdataService {
   constructor(private http: HttpClient) {}
 
   findUsers(searchStr: string) {
-    var data: UserInfo = {session:'',search:searchStr};
+    var data = {search:searchStr};
     return this.http.put<UserInfo[]>('/findusers',data,httpOptions);
   }
 
@@ -44,22 +44,22 @@ export class UserdataService {
   }
 
   getPublicUserInfo(userID: number): Observable<UserInfo> {
-    var data: UserInfo = {session:'',ID:userID};
+    var data = {ID:userID};
     return this.http.put<UserInfo>('/publicuserinfo',data,httpOptions);
   }
 
   getUserInfo(session: string): Observable<UserInfo> {
-    var data: UserInfo = {session:session};
+    var data = {session:session};
     return this.http.put<UserInfo>('/userinfo',data,httpOptions);
   }
 
   loginUser(user: string, pass: string): Observable<LoginResponse> {
-    var data: LoginResponse = {username: user, password: pass};
+    var data = {username: user, password: pass};
     return this.http.put<LoginResponse>('/login',data,httpOptions);
   }
 
   registerUser(user: string, pass: string, email: string): Observable<LoginResponse> {
-    var data: LoginResponse = {username: user, password: pass, email: email};
+    var data = {username: user, password: pass, email: email};
     return this.http.put<LoginResponse>('/register',data,httpOptions);
   }
 
@@ -74,7 +74,7 @@ export class UserdataService {
   }
 
   getComments(postID: number) {
-    var data: Comment = {postID};
+    var data = {postID};
     return this.http.put<Comment[]>('/getcomments',data,httpOptions);
   }
 

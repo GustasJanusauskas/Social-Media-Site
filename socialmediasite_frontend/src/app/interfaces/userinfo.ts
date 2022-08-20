@@ -2,11 +2,10 @@ export interface UserInfo {
     session: string;
     success?: boolean;
     error?: string;
-    search?: string;
 
     email?: string;
     username?: string;
-    creationdate?: any;
+    creationdate?: string;
 
     firstName?: string;
     lastName?: string;
@@ -18,6 +17,5 @@ export interface UserInfo {
     posts?: string[];
 
     online?: boolean;
-
     ID?: number;
 }

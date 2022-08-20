@@ -144,8 +144,6 @@ app.put("/updateprofile", (req, res) => {
 app.put("/login", (req, res) => {
   LoginUser( sanitizeHtml( req.body.username ),req.body.password,req.headers.host,(success,msg) => {
     res.json({
-      username: '',
-      password: '',
       success: success,
       session: msg
     });
@@ -155,8 +153,6 @@ app.put("/login", (req, res) => {
 app.put("/register", (req, res) => {
   RegisterUser( sanitizeHtml( req.body.username ),req.body.password,req.body.email,(success,msg) => {
     res.json({
-      username: '',
-      password: '',
       success: success,
       session: msg
     });
