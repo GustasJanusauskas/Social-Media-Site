@@ -15,10 +15,10 @@ import { Post } from "../interfaces/post";
   styleUrls: ['./profile.component.css']
 })
 export class ProfileComponent implements OnInit {
-  @Input() selectedProfile!: UserInfo;
   @Input() userinfo!: UserInfo;
   @Input() rootComponent!: AppComponent;
 
+  selectedProfile: UserInfo = {session:''};
   postList: Post[] = [];
   pageEvent: PageEvent = {pageIndex:0,pageSize:1,length:1};
 
@@ -31,7 +31,7 @@ export class ProfileComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.getProfile(this.selectedProfile);
+
   }
 
   getProfile(profile: UserInfo) {

@@ -5,7 +5,7 @@
 			<button *ngIf="userinfo.session == ''" class="TopbarButton" id="RegisterButton" (click)="setMain('register');">Register</button>
 
 			<b *ngIf="userinfo.session != ''">Logged in as {{userinfo.username}} </b>
-			<button *ngIf="userinfo.session != ''" class="TopbarButton" id="LogoffButton" (click)="logoff($event);">Log off</button>
+			<button *ngIf="userinfo.session != ''" class="TopbarButton" id="LogoffButton" (click)="logoff();">Log off</button>
 
 			<input type="text" placeholder="Search" id="SearchInput" [(ngModel)]="search" (ngModelChange)="searchUpdate()" (keyup.enter)="selectProfile();" matInput [matAutocomplete]="auto">
 			<mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
@@ -48,7 +48,7 @@
 			<app-register *ngIf="bodyHTML=='register'"></app-register>
 			<app-new-post *ngIf="bodyHTML=='post'"></app-new-post>
 			<app-edit-profile *ngIf="bodyHTML=='ownprofile'" [userinfo]="userinfo" [rootComponent]="this"></app-edit-profile>
-			<app-profile *ngIf="bodyHTML=='profile'" [selectedProfile]="selectedProfile" [userinfo]="userinfo" [rootComponent]="this"></app-profile>
+			<app-profile *ngIf="bodyHTML=='profile'" [userinfo]="userinfo" [rootComponent]="this"></app-profile>
 			<div *ngIf="bodyHTML=='feed'" id="Feed">
 				<h2>{{publicFeed ? 'Public Feed' : 'Personal Feed'}}</h2>
 				<div id="FeedInner">

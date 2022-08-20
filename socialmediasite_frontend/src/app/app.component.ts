@@ -1,6 +1,7 @@
 import { Component, QueryList, ViewChildren } from '@angular/core';
 
 import { FriendsComponent } from './friends/friends.component';
+import { ProfileComponent } from "./profile/profile.component";
 
 import { UserdataService } from './services/userdata.service';
 import { MessagingService } from "./services/messaging.service";
@@ -24,7 +25,6 @@ export class AppComponent {
   friendList: UserInfo[] = [];
 
   //Profiles/Comments
-  selectedProfile!: UserInfo;
   selectedPost: Post = {authorID:-1};
 
   //Main Body/Feed
@@ -40,6 +40,7 @@ export class AppComponent {
   
   @ViewChildren('backgroundDiv') backgroundDiv!: QueryList<any>;
   @ViewChildren(FriendsComponent) friendsComponent!: QueryList<FriendsComponent>;
+  @ViewChildren(ProfileComponent) profileComponent!: QueryList<ProfileComponent>;
 
   constructor(private userdataService: UserdataService, private messagingService: MessagingService) {
     const session = HelperFunctionsService.getCookie('session');
@@ -182,7 +183,7 @@ export class AppComponent {
     });
   }
 
-  logoff(event: Event) {
+  logoff() {
     HelperFunctionsService.deleteCookie('session');
     if (this.friendsComponent.first) {
       this.friendsComponent.first.connectMsg(true);
@@ -228,8 +229,10 @@ export class AppComponent {
       tempProfile = profile;
     }
 
-    this.selectedProfile = tempProfile;
-    this.setMain('profile');
+    console.log(this.profileComponent.first);
+    this.setMain('profile',() => {
+      this.profileComponent.first.getProfile(tempProfile);
+    });
   }
 
   searchUpdate() {
