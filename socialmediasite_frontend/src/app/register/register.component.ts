@@ -42,7 +42,11 @@ export class RegisterComponent implements OnInit {
     //Send data to backend
     this.userdataService.registerUser(this.username,this.password,this.email).subscribe(data => {
       if (data.success) {
+        //Clear form
         this.email = '';
+        this.username = '';
+        this.password = '';
+
         this.formError = 'User registered! You can now log in.';
       }
       else {

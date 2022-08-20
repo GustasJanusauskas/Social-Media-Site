@@ -175,7 +175,10 @@ export class AppComponent {
 
   logoff(event: Event) {
     HelperFunctionsService.deleteCookie('session');
-    if (this.friendsComponent.first) this.friendsComponent.first.connectMsg(true);
+    if (this.friendsComponent.first) {
+      this.friendsComponent.first.connectMsg(true);
+      this.friendsComponent.first.chatList = [];
+    }
 
     this.updateUI();
     this.setMain('feed');

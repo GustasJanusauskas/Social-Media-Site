@@ -140,7 +140,7 @@ export class FriendsComponent implements OnInit {
     var session;
     if (!disconnect) {
       session = HelperFunctionsService.getCookie('session');
-      if (session ==null || session.length < 64 ) return;
+      if (session == null || session.length < 64 ) return;
     }
 
     var request: MessageSend = {body:'',recipientID:-1,date:0,session,handshake: (disconnect ? 'disconnect' : 'handshake')};
