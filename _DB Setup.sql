@@ -25,7 +25,9 @@ CREATE TABLE profiles(
 	picture varchar(256),
 	thumb varchar(256),
 	friends bigint[],
-	posts bigint[]
+	posts bigint[],
+	blocked bigint[],
+	friendrequests bigint[]
 );
 
 CREATE TABLE posts(

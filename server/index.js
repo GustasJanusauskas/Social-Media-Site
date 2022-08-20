@@ -178,8 +178,10 @@ app.put("/removepost", (req, res) => {
 });
 
 app.put("/getcomments", (req, res) => {
-  GetComments(req.body.postID,(success,inf) => {
-    res.json(inf);
+  GetIDFromSession(req.body.session, (ID) => {
+    GetComments(req.body.postID,ID,(success,inf) => {
+      res.json(inf);
+    });
   });
 });
 
@@ -194,7 +196,16 @@ app.put("/addcomment", (req, res) => {
 });
 
 app.put("/changefriendstatus", (req,res) => {
-  ChangeFriend(req.body.session,req.body.friendID,req.body.status, (success,msg) => {
+  ChangeArray(req.body.session,req.body.friendID,req.body.status,'friends','profiles', (success,msg) => {
+    if (!success) console.log(msg);
+    res.json({
+      success:success
+    });
+  });
+});
+
+app.put("/changeblockstatus", (req,res) => {
+  ChangeArray(req.body.session,req.body.friendID,req.body.status,'blocked','profiles', (success,msg) => {
     if (!success) console.log(msg);
     res.json({
       success:success
@@ -203,7 +214,7 @@ app.put("/changefriendstatus", (req,res) => {
 });
 
 app.put("/changelikestatus", (req,res) => {
-  ChangeLike(req.body.session,req.body.postID,req.body.status, (success,msg) => {
+  ChangeArray(req.body.session,req.body.postID,req.body.status,'usr_likes','posts', (success,msg) => {
     if (!success) console.log(msg);
     res.json({
       success:success
@@ -286,68 +297,40 @@ function GetConversation(usr1,usr2,callback) {
   });
 }
 
-function ChangeLike(session,postID,status,callback) {
+function ChangeArray(session,otherID,status,column,table,callback) {
+  //Injection prevention (unused)
+  if (!['friends','blocked','usr_likes'].includes(column)) return;
+  if (!['profiles','posts'].includes(table)) return;
+
   //Getting UserID from session
   GetIDFromSession(session, (userID) => {
+    const idFormat = (table == 'posts') ? 'post_id' : 'usr_id';
+
     var innerQuery;
-    var innerData;
-    //Add like
+    var innerData = (table == 'posts') ? [userID,otherID] : [otherID,userID];
+
+    //Add user to array
     if (status) {
-      innerQuery = 'UPDATE posts SET usr_likes = ( CASE WHEN $1 = ANY(usr_likes) THEN usr_likes ELSE array_append(usr_likes,$1) END ) WHERE post_id = $2;';
-      innerData = [userID,postID];
+      innerQuery = `UPDATE ${table} SET ${column} = ( CASE WHEN $1 = ANY(${column}) THEN ${column} ELSE array_append(${column},$1) END ) WHERE ${idFormat} = $2;`;
     }
-    //Remove like
+    //Remove user from array
     else {
-      innerQuery = 'UPDATE posts SET usr_likes = array_remove(usr_likes,$1) WHERE post_id = $2;';
-      innerData = [userID,postID];
+      innerQuery = `UPDATE ${table} SET ${column} = array_remove(${column},$1) WHERE ${idFormat} = $2;`;
     }
 
     if (VERBOSE_DEBUG) {
-      console.log('Like status change:');
-      console.log({pID:postID,uID:userID,status});
+      console.log(`Array change, table ${table} in column ${column}:`);
+      console.log({otherID,userID,change: status ? 'added' : 'removed'});
     }
 
     dbclient.query(innerQuery,innerData, (err, res) => {
       if (err) {
-        console.log("DB ERROR ChangeLike: \n" + err);
-        callback(false,'Failed to change like status.');
+        console.log("DB ERROR ChangeProfileArray: \n" + err);
+        callback(false,'Failed to change array.');
         return;
       }
 
-      callback(true,'Like status changed successfully!');
-    });
-  });
-}
-
-function ChangeFriend(session,friendID,status,callback) {
-  //Getting UserID from session
-  GetIDFromSession(session, (userID) => {
-    var innerQuery;
-    var innerData;
-    //Add friend
-    if (status) {
-      innerQuery = 'UPDATE profiles SET friends = ( CASE WHEN $1 = ANY(friends) THEN friends ELSE array_append(friends,$1) END ) WHERE usr_id = $2;';
-      innerData = [friendID,userID];
-    }
-    //Remove friend
-    else {
-      innerQuery = 'UPDATE profiles SET friends = array_remove(friends,$1) WHERE usr_id = $2;';
-      innerData = [friendID,userID];
-    }
-
-    if (VERBOSE_DEBUG) {
-      console.log('Friend status change:');
-      console.log({fID:friendID,uID:userID,status});
-    }
-
-    dbclient.query(innerQuery,innerData, (err, res) => {
-      if (err) {
-        console.log("DB ERROR ChangeFriend: \n" + err);
-        callback(false,'Failed to change friend status.');
-        return;
-      }
-
-      callback(true,'Friend status changed successfully!');
+      callback(true,'Array changed successfully!');
     });
   });
 }
@@ -440,9 +423,9 @@ function AddComment(session,content,postID,callback) {
   });
 }
 
-function GetComments(postID,callback) {
-  var innerQuery = "SELECT comment_id, content, post_id, usr_id, to_char(cdate, 'YYYY-MM-DD at HH12:MIam') AS date FROM comments WHERE post_id = $1 ORDER BY cdate LIMIT 500;";
-  var innerData = [postID];
+function GetComments(postID,userID,callback) {
+  var innerQuery = "SELECT comment_id, content, post_id, usr_id, to_char(cdate, 'YYYY-MM-DD at HH12:MIam') AS date FROM comments WHERE post_id = $1 AND NOT usr_id = ANY( COALESCE( (SELECT blocked FROM profiles WHERE usr_id = $2),'{}') ) ORDER BY cdate LIMIT 500;";
+  var innerData = [postID,userID];
 
   var result = [];
   dbclient.query(innerQuery,innerData, (err, res) => {
@@ -476,24 +459,24 @@ function GetPosts(ID,postType,usePopularity,callback) {
     //Gets newest posts by all users
     if (usePopularity) {
       //Popularity = 3 * likes - age (in hours);
-      innerQuery = "SELECT posts.ptitle, posts.pbody, to_char(posts.pdate, 'YYYY-MM-DD at HH12:MIam') AS pdate, posts.usr_id, posts.post_id, array_length(posts.usr_likes,1) AS likes, CONCAT(profiles.firstname,' ',profiles.lastname) AS author, $1 = ANY(posts.usr_likes) as userliked, COALESCE(array_length(posts.usr_likes,1),0) * 3 - (EXTRACT(EPOCH FROM (NOW() - posts.pdate) ) / 3600) as popularity FROM posts,profiles WHERE profiles.usr_id = posts.usr_id ORDER BY popularity DESC LIMIT 100;";
+      innerQuery = "SELECT posts.ptitle, posts.pbody, to_char(posts.pdate, 'YYYY-MM-DD at HH12:MIam') AS pdate, posts.usr_id, posts.post_id, array_length(posts.usr_likes,1) AS likes, CONCAT(profiles.firstname,' ',profiles.lastname) AS author, $1 = ANY(posts.usr_likes) as userliked, COALESCE(array_length(posts.usr_likes,1),0) * 3 - (EXTRACT(EPOCH FROM (NOW() - posts.pdate) ) / 3600) as popularity FROM posts,profiles WHERE profiles.usr_id = posts.usr_id AND NOT posts.usr_id = ANY( COALESCE( (SELECT blocked FROM profiles WHERE usr_id = $1),'{}') ) ORDER BY popularity DESC LIMIT 100;";
     }
     else {
-      innerQuery = "SELECT posts.ptitle, posts.pbody, to_char(posts.pdate, 'YYYY-MM-DD at HH12:MIam') AS pdate, posts.usr_id, posts.post_id, array_length(posts.usr_likes,1) AS likes, CONCAT(profiles.firstname,' ',profiles.lastname) AS author, $1 = ANY(posts.usr_likes) as userliked FROM posts,profiles WHERE profiles.usr_id = posts.usr_id ORDER BY posts.pdate DESC LIMIT 100;";
+      innerQuery = "SELECT posts.ptitle, posts.pbody, to_char(posts.pdate, 'YYYY-MM-DD at HH12:MIam') AS pdate, posts.usr_id, posts.post_id, array_length(posts.usr_likes,1) AS likes, CONCAT(profiles.firstname,' ',profiles.lastname) AS author, $1 = ANY(posts.usr_likes) as userliked FROM posts,profiles WHERE profiles.usr_id = posts.usr_id AND NOT posts.usr_id = ANY( COALESCE( (SELECT blocked FROM profiles WHERE usr_id = $1),'{}') ) ORDER BY posts.pdate DESC LIMIT 100;";
     }
   }
   else if (postType == 'user') {
     //Get one users posts, ordered chronologically
-    innerQuery = "SELECT posts.ptitle, posts.pbody, to_char(posts.pdate, 'YYYY-MM-DD at HH12:MIam') AS pdate, posts.usr_id, posts.post_id, array_length(posts.usr_likes,1) AS likes, CONCAT(profiles.firstname,' ',profiles.lastname) AS author, $1 = ANY(posts.usr_likes) as userliked FROM posts, profiles WHERE posts.usr_id = $1 AND posts.usr_id = profiles.usr_id ORDER BY posts.pdate DESC;";
+    innerQuery = "SELECT posts.ptitle, posts.pbody, to_char(posts.pdate, 'YYYY-MM-DD at HH12:MIam') AS pdate, posts.usr_id, posts.post_id, array_length(posts.usr_likes,1) AS likes, CONCAT(profiles.firstname,' ',profiles.lastname) AS author, $1 = ANY(posts.usr_likes) as userliked FROM posts, profiles WHERE posts.usr_id = $1 AND posts.usr_id = profiles.usr_id AND NOT posts.usr_id = ANY( COALESCE( (SELECT blocked FROM profiles WHERE usr_id = $1),'{}') ) ORDER BY posts.pdate DESC;";
   }
   else if (postType == 'friend') {
     //Gets the users friends posts
     if (usePopularity) {
       //Popularity = 3 * likes - age (in hours);
-      innerQuery = "SELECT posts.ptitle, posts.pbody, to_char(posts.pdate, 'YYYY-MM-DD at HH12:MIam') AS pdate, posts.usr_id, posts.post_id, array_length(posts.usr_likes,1) AS likes, CONCAT(profiles.firstname,' ',profiles.lastname) AS author, $1 = ANY(posts.usr_likes) as userliked, COALESCE(array_length(posts.usr_likes,1),0) * 3 - (EXTRACT(EPOCH FROM (NOW() - posts.pdate) ) / 3600) as popularity FROM posts, profiles WHERE posts.usr_id = ANY(array(SELECT friends FROM profiles WHERE usr_id = $1 )) AND posts.usr_id = profiles.usr_id ORDER BY popularity DESC LIMIT 100;";
+      innerQuery = "SELECT posts.ptitle, posts.pbody, to_char(posts.pdate, 'YYYY-MM-DD at HH12:MIam') AS pdate, posts.usr_id, posts.post_id, array_length(posts.usr_likes,1) AS likes, CONCAT(profiles.firstname,' ',profiles.lastname) AS author, $1 = ANY(posts.usr_likes) as userliked, COALESCE(array_length(posts.usr_likes,1),0) * 3 - (EXTRACT(EPOCH FROM (NOW() - posts.pdate) ) / 3600) as popularity FROM posts, profiles WHERE posts.usr_id = ANY(array(SELECT friends FROM profiles WHERE usr_id = $1 )) AND posts.usr_id = profiles.usr_id AND NOT posts.usr_id = ANY( COALESCE( (SELECT blocked FROM profiles WHERE usr_id = $1),'{}') ) ORDER BY popularity DESC LIMIT 100;";
     }
     else {
-      innerQuery = "SELECT posts.ptitle, posts.pbody, to_char(posts.pdate, 'YYYY-MM-DD at HH12:MIam') AS pdate, posts.usr_id, posts.post_id, array_length(posts.usr_likes,1) AS likes, CONCAT(profiles.firstname,' ',profiles.lastname) AS author, $1 = ANY(posts.usr_likes) as userliked FROM posts, profiles WHERE posts.usr_id = ANY(array(SELECT friends FROM profiles WHERE usr_id = $1 )) AND posts.usr_id = profiles.usr_id ORDER BY posts.pdate DESC LIMIT 100;";
+      innerQuery = "SELECT posts.ptitle, posts.pbody, to_char(posts.pdate, 'YYYY-MM-DD at HH12:MIam') AS pdate, posts.usr_id, posts.post_id, array_length(posts.usr_likes,1) AS likes, CONCAT(profiles.firstname,' ',profiles.lastname) AS author, $1 = ANY(posts.usr_likes) as userliked FROM posts, profiles WHERE posts.usr_id = ANY(array(SELECT friends FROM profiles WHERE usr_id = $1 )) AND posts.usr_id = profiles.usr_id AND NOT posts.usr_id = ANY( COALESCE( (SELECT blocked FROM profiles WHERE usr_id = $1),'{}') ) ORDER BY posts.pdate DESC LIMIT 100;";
     }
   }
 
