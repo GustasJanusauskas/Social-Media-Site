@@ -91,7 +91,7 @@ export class AppComponent {
       
       //Update friends list
       var promises: Promise<void>[] = [];
-      this.friendList = [];
+      var newFriendList : UserInfo[] = [];
       data.friends?.forEach((value) => {
         promises.push(new Promise<void>((resolve,reject) => {
           this.userdataService.getPublicUserInfo(value).subscribe(data => {
@@ -106,7 +106,7 @@ export class AppComponent {
               return;
             }
             
-            this.friendList.push(data);
+            newFriendList.push(data);
             resolve();
           });
         }));
@@ -114,13 +114,16 @@ export class AppComponent {
 
       //When all friend list data is received and updated
       Promise.allSettled(promises).then(() => {
-        //Sort friend list alphabetically
-        this.friendList.sort((a:UserInfo,b:UserInfo) => {
+        //Sort reconstructed friend list alphabetically
+        newFriendList.sort((a:UserInfo,b:UserInfo) => {
           if (!a.firstName) return -1;
           else if (!b.firstName) return 1;
   
           return (a.firstName.toLowerCase() < b.firstName.toLowerCase()) ? -1 : (a.firstName.toLowerCase() > b.firstName.toLowerCase()) ? 1 : 0;  
         });
+
+        //Update friendlist
+        this.friendList = newFriendList;
 
         //Update chat info
         if (this.friendsComponent.first) this.friendsComponent.first.updateChatInfo();
