@@ -105,6 +105,11 @@ export class UserdataService {
     return this.http.put<any>('/changeblockstatus',data,httpOptions);
   }
 
+  ignoreFriendRequest(session: string, userID: number) {
+    var data = {session:session,friendID:userID};
+    return this.http.put<any>('/ignorefriendrequest',data,httpOptions);
+  }
+
   getMessageHistory(session: string, recipientID: number) {
     var data = {session,recipientID};
     return this.http.put<MessageSend[]>('/messagehistory',data,httpOptions);

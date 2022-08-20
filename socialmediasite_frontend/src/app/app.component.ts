@@ -23,6 +23,7 @@ export class AppComponent {
   //UserData
   userinfo: UserInfo = {session:''};
   friendList: UserInfo[] = [];
+  friendRequestList: UserInfo[] = [];
 
   //Profiles/Comments
   selectedPost: Post = {authorID:-1};
@@ -85,9 +86,11 @@ export class AppComponent {
       //Update userinfo, displayed data
       this.userinfo = data;
       
-      //Update friends list
+      //Update friend list and friend request list
       var promises: Promise<void>[] = [];
+
       var newFriendList : UserInfo[] = [];
+      //Gather public info for all friends
       data.friends?.forEach((value) => {
         promises.push(new Promise<void>((resolve,reject) => {
           this.userdataService.getPublicUserInfo(value).subscribe(data => {
@@ -108,6 +111,23 @@ export class AppComponent {
         }));
       });
 
+      var newFriendRequestList : UserInfo[] = [];
+      //Gather public info for all friend requests
+      data.friendRequests?.forEach((value) => {
+        promises.push(new Promise<void>((resolve,reject) => {
+          this.userdataService.getPublicUserInfo(value).subscribe(data => {
+            if (data.error) {
+              console.log('Error for friend request with user ID ' + value + ': ' + data.error);
+              reject();
+              return;
+            }
+            
+            newFriendRequestList.push(data);
+            resolve();
+          });
+        }));
+      });
+      
       //When all friend list data is received and updated
       Promise.allSettled(promises).then(() => {
         //Sort reconstructed friend list alphabetically
@@ -118,8 +138,9 @@ export class AppComponent {
           return (a.firstName.toLowerCase() < b.firstName.toLowerCase()) ? -1 : (a.firstName.toLowerCase() > b.firstName.toLowerCase()) ? 1 : 0;  
         });
 
-        //Update friendlist
+        //Update lists
         this.friendList = newFriendList;
+        this.friendRequestList = newFriendRequestList;
 
         //Update chat info
         if (this.friendsComponent.first) this.friendsComponent.first.updateChatInfo();
@@ -219,6 +240,17 @@ export class AppComponent {
       }
 
       if (callback) callback();
+    });
+  }
+
+  ignoreFriendRequest(profile: UserInfo) {
+    const session = HelperFunctionsService.getCookie('session');
+    if (session == null || session.length < 64 ) return;
+
+    this.userdataService.ignoreFriendRequest(session ,profile.ID || -1).subscribe( data => {
+      if (data.success) {
+        this.updateUI();
+      }
     });
   }
 

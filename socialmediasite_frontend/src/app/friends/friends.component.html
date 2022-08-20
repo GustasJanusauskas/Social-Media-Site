@@ -6,7 +6,7 @@
         </ng-template>
 
         <div id="FriendbarInner">
-            <div id="FriendOption" *ngFor="let friend of rootComponent.friendList;">
+            <div class="FriendOption" *ngFor="let friend of rootComponent.friendList;">
 
                 <button mat-button [matMenuTriggerFor]="matFriendMenu" class="FriendButton">
                     <mat-icon class="BodyIcon" [style]="'color:' + (friend.online ? 'darkgreen' : 'darkred')">blur_circular</mat-icon>
@@ -31,6 +31,37 @@
                     </button>
                 </mat-menu>
 
+            </div>
+        </div>
+
+    </mat-tab>
+    <mat-tab *ngIf="userinfo.friendRequests && userinfo.friendRequests.length > 0"> 
+        <ng-template mat-tab-label>
+            <mat-icon class="ChatTabIcon">group_add</mat-icon>
+            Friend requests
+        </ng-template>
+
+        <div id="FriendRequestsInner">
+            <div class="FriendRequestOption" *ngFor="let friend of rootComponent.friendRequestList;">
+
+                <button mat-button [matMenuTriggerFor]="matFriendMenu" class="FriendButton">
+                    <mat-icon class="BodyIcon" [style]="'color:' + (friend.online ? 'darkgreen' : 'darkred')">blur_circular</mat-icon>
+                    {{friend.firstName && friend.lastName ? friend.firstName + ' ' + friend.lastName : friend.username}}
+                </button> 
+                <mat-menu #matFriendMenu="matMenu">
+                    <button (click)="rootComponent.selectProfile(friend);" mat-menu-item>
+                        <mat-icon class="BodyIcon">account_circle</mat-icon>
+                        Show Profile
+                    </button>
+                    <button (click)="rootComponent.changeFriendStatus(friend,true);" mat-menu-item>
+                        <mat-icon class="BodyIcon">person_add</mat-icon>
+                        Accept Friend Request
+                    </button>
+                    <button (click)="rootComponent.ignoreFriendRequest(friend);" mat-menu-item>
+                        <mat-icon class="BodyIcon">person_off</mat-icon>
+                        Ignore Friend Request
+                    </button>
+                </mat-menu>
             </div>
         </div>
 

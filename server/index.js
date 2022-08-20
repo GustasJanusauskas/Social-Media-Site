@@ -196,28 +196,44 @@ app.put("/addcomment", (req, res) => {
 });
 
 app.put("/changefriendstatus", (req,res) => {
-  ChangeArray(req.body.session,req.body.friendID,req.body.status,'friends','profiles', (success,msg) => {
+  ChangeFriend(req.body.session,req.body.friendID,req.body.status, (success) => {
     if (!success) console.log(msg);
+
     res.json({
       success:success
+    });
+  });
+});
+
+app.put("/ignorefriendrequest", (req,res) => {
+  GetIDFromSession(req.body.session, (userID) => {
+    ChangeArray(userID,req.body.friendID,false,'friendrequests','profiles', (success,msg) => {
+      if (!success) console.log(msg);
+      res.json({
+        success:success
+      });
     });
   });
 });
 
 app.put("/changeblockstatus", (req,res) => {
-  ChangeArray(req.body.session,req.body.friendID,req.body.status,'blocked','profiles', (success,msg) => {
-    if (!success) console.log(msg);
-    res.json({
-      success:success
+  GetIDFromSession(req.body.session, (userID) => {
+    ChangeArray(userID,req.body.friendID,req.body.status,'blocked','profiles', (success,msg) => {
+      if (!success) console.log(msg);
+      res.json({
+        success:success
+      });
     });
   });
 });
 
 app.put("/changelikestatus", (req,res) => {
-  ChangeArray(req.body.session,req.body.postID,req.body.status,'usr_likes','posts', (success,msg) => {
-    if (!success) console.log(msg);
-    res.json({
-      success:success
+  GetIDFromSession(req.body.session, (userID) => {
+    ChangeArray(userID,req.body.postID,req.body.status,'usr_likes','posts', (success,msg) => {
+      if (!success) console.log(msg);
+      res.json({
+        success:success
+      });
     });
   });
 });
@@ -297,41 +313,66 @@ function GetConversation(usr1,usr2,callback) {
   });
 }
 
-function ChangeArray(session,otherID,status,column,table,callback) {
+function ChangeFriend(session,otherID,status,callback) {
+  GetIDFromSession(session, (userID) => {
+    //Add to friend list
+    ChangeArray(userID,otherID,status,'friends','profiles', (success,msg) => {
+      if (!success) console.log(msg);
+
+      //Remove friend request (if any)
+      ChangeArray(userID,otherID,false,'friendrequests','profiles', (success,msg) => {
+        if (!success) console.log(msg);
+
+        //If other user doesn't have us in their friends list, add a friend request
+        GetPublicUserInfo(otherID,(success,result) => {
+          if (success && !result.friends.includes(userID)) {
+            ChangeArray(otherID,userID,true,'friendrequests','profiles', (success,msg) => {
+              if (!success) console.log(msg);
+
+              if (callback) callback(success);
+            });
+          }
+          else {
+            if (callback) callback(success);
+          }
+        });
+      });
+    });
+  });
+}
+
+function ChangeArray(userID,otherID,status,column,table,callback) {
   //Injection prevention (unused)
-  if (!['friends','blocked','usr_likes'].includes(column)) return;
+  if (!['friends','blocked','usr_likes','friendrequests'].includes(column)) return;
   if (!['profiles','posts'].includes(table)) return;
 
-  //Getting UserID from session
-  GetIDFromSession(session, (userID) => {
-    const idFormat = (table == 'posts') ? 'post_id' : 'usr_id';
+  const idFormat = (table == 'posts') ? 'post_id' : 'usr_id';
 
-    var innerQuery;
-    var innerData = (table == 'posts') ? [userID,otherID] : [otherID,userID];
+  var innerQuery;
+  var innerData = (table == 'posts') ? [userID,otherID] : [otherID,userID];
 
-    //Add user to array
-    if (status) {
-      innerQuery = `UPDATE ${table} SET ${column} = ( CASE WHEN $1 = ANY(${column}) THEN ${column} ELSE array_append(${column},$1) END ) WHERE ${idFormat} = $2;`;
+  //Add user to array
+  if (status) {
+    innerQuery = `UPDATE ${table} SET ${column} = ( CASE WHEN $1 = ANY(${column}) THEN ${column} ELSE array_append(${column},$1) END ) WHERE ${idFormat} = $2;`;
+  }
+  //Remove user from array
+  else {
+    innerQuery = `UPDATE ${table} SET ${column} = array_remove(${column},$1) WHERE ${idFormat} = $2;`;
+  }
+
+  if (VERBOSE_DEBUG) {
+    console.log(`Array change, table ${table} in column ${column}:`);
+    console.log({otherID,userID,change: status ? 'added' : 'removed'});
+  }
+
+  dbclient.query(innerQuery,innerData, (err, res) => {
+    if (err) {
+      console.log("DB ERROR ChangeProfileArray: \n" + err);
+      callback(false,'Failed to change array.');
+      return;
     }
-    //Remove user from array
-    else {
-      innerQuery = `UPDATE ${table} SET ${column} = array_remove(${column},$1) WHERE ${idFormat} = $2;`;
-    }
 
-    if (VERBOSE_DEBUG) {
-      console.log(`Array change, table ${table} in column ${column}:`);
-      console.log({otherID,userID,change: status ? 'added' : 'removed'});
-    }
-
-    dbclient.query(innerQuery,innerData, (err, res) => {
-      if (err) {
-        console.log("DB ERROR ChangeProfileArray: \n" + err);
-        callback(false,'Failed to change array.');
-        return;
-      }
-
-      callback(true,'Array changed successfully!');
-    });
+    callback(true,'Array changed successfully!');
   });
 }
 
