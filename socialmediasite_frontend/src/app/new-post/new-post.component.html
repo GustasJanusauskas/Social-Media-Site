@@ -1,12 +1,22 @@
 <div id="AddPost">
     <h2>Add a new post</h2>
     <h3>Title</h3>
-    <input type="text" placeholder="Enter your post title" id="PostTitleInput" (keypress)="noJsonSymbols($event)" [(ngModel)]="postTitle" autocomplete="off">
+    <mat-form-field id="PostTitleForm" hintLabel="Max 256 characters" appearance="fill">
+        <mat-label>Type the post title.</mat-label>
+        <input matInput maxlength="256" type="text" placeholder="Enter your post title" id="PostTitleInput" [(ngModel)]="postTitle" autocomplete="off">
+        <mat-hint align="end">{{postTitle.length}}/256</mat-hint>
+    </mat-form-field>
     <br>
     <h3>Body</h3>
-    <textarea placeholder="Enter your post content" id="PostBodyInput" (keypress)="noJsonSymbols($event)" [(ngModel)]="postBody" (ngModelChange)="updateCharCounter()" autocomplete="off"> </textarea>
-    <br>
-    Characters left: {{postCharLeft}}
+    <mat-form-field id="PostBodyForm" hintLabel="Max 4096 characters" appearance="fill">
+        <mat-label>Type the post content.</mat-label>
+        <textarea matInput maxlength="4096" placeholder="Enter your post content" id="PostBodyInput" style="resize: none;" [(ngModel)]="postBody" autocomplete="off"> </textarea>
+        <button matSuffix mat-icon-button aria-label="Upload image" (click)="postImg.click()">
+            <mat-icon>add_photo_alternate</mat-icon>
+        </button>
+        <mat-hint align="end">{{postBody.length}}/4096</mat-hint>
+    </mat-form-field>
+    <input type="file" accept=".png, .jpg, .jpeg, .bmp, .gif, .tiff, .tif" id="PostImgUpload" style="display:none" (change)="handleImageUpload($event)" #postImg>
     <br>
     <button class="MainbarButton" id="PostMainButton" (click)="addPost()">Post</button>
     <br><br>

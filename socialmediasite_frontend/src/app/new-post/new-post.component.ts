@@ -11,7 +11,8 @@ import { UserdataService } from "../services/userdata.service";
 export class NewPostComponent implements OnInit {
   postTitle: string = '';
   postBody: string = '';
-  postCharLeft : number = 4096;
+  postLinkedImages: string[] = [];
+
   formError: string = "";
 
   //Imported helper functions
@@ -22,11 +23,28 @@ export class NewPostComponent implements OnInit {
   }
 
   ngOnInit(): void {
-
+    
   }
 
-  updateCharCounter() {
-    this.postCharLeft = 4096 - this.postBody.length;
+  handleImageUpload(event: Event) {
+    var session = HelperFunctionsService.getCookie('session');
+    if (session == null || session.length < 64 ) return;
+
+    const target = event.target as HTMLInputElement;
+
+    if (target.files) {
+      const reader = new FileReader();
+      reader.readAsDataURL(target.files[0]);
+      reader.onload = () => {
+        const image = reader.result?.toString().substring(reader.result?.toString().indexOf(',') + 1);
+        if (!image) return;
+
+        this.userdataService.uploadImage(session!,image).subscribe( (data) => {
+          this.postLinkedImages.push(data.filename);
+          this.postBody += `[img]${data.filename}[/img]`;
+        });
+      }
+    }
   }
 
   addPost() {
@@ -50,10 +68,12 @@ export class NewPostComponent implements OnInit {
     }
 
     this.formError = 'Posting..';
-    this.userdataService.addPost(session,this.postTitle,this.postBody).subscribe(data => {
+    this.userdataService.addPost(session,this.postTitle,this.postBody,this.postLinkedImages).subscribe(data => {
       if (data.success) {
         this.postTitle = '';
         this.postBody = '';
+        this.postLinkedImages = [];
+
         this.formError = 'Post added to wall!';
       }
       else {

@@ -1,0 +1,17 @@
+#PostBodyInput:focus, #PostTitleInput:focus {
+    outline: none;
+}
+
+#PostBodyInput {
+    height: 16em;
+}
+
+#PostBodyForm, #PostTitleForm {
+	width: 35em;
+	padding-left: 0.5em;
+	margin-bottom: 0.75em;
+}
+
+#PostTitleInput {
+	height: 2em;
+}

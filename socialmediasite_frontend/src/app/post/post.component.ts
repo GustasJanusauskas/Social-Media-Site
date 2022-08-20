@@ -28,9 +28,10 @@ export class PostComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.post.body = this.parsePost(this.post.body || '');
   }
 
-  removePost(event: Event,postID: number, showProfile: boolean = false) {
+  removePost(postID: number, showProfile: boolean = false) {
     var session = HelperFunctionsService.getCookie('session');
     if (session == null || session.length < 64 ) return;
 
@@ -45,6 +46,22 @@ export class PostComponent implements OnInit {
   selectPost(post: Post) {
     this.rootComponent.selectedPost = post;
     this.rootComponent.setMain('comments');
+  }
+
+  parsePost(post: string) {
+    var result = '';
+    var matches = Array.from(post.matchAll(/\[img\].*?\[\/img\]/g));
+    if (matches.length == 0) return post;
+
+    var lastInd = 0;
+    var temp: string;
+    for (let x = 0; x < matches.length; x++) {
+      temp = matches[x][0].replace('[img]','').replace('[/img]','');
+      result += post.slice(lastInd,matches[x].index) + `<img class='PostImage' src='${temp}'>`;
+      lastInd = matches[x].index! + matches[x][0].length;
+    }
+
+    return result;
   }
 
   likePost(post:Post,status:boolean) {

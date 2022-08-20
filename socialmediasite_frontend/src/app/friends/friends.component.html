@@ -85,7 +85,7 @@
 
         <mat-form-field class="MessageInputField" hintLabel="Max 350 characters" appearance="fill">
             <mat-label>Type your message.</mat-label>
-            <textarea matInput #input maxlength="350" class="MessageInputTextArea" [placeholder]="chat.msgRequest ? 'Message here. By replying you will add ' + chat.recipient.firstName + ' to your friends list.' : 'Message here.'" (keypress)="noJsonSymbols($event)" [(ngModel)]="chatMsgField"></textarea>
+            <textarea matInput #input maxlength="350" class="MessageInputTextArea" style="resize: none;" [placeholder]="chat.msgRequest ? 'Message here. By replying you will add ' + chat.recipient.firstName + ' to your friends list.' : 'Message here.'" (keypress)="noJsonSymbols($event)" [(ngModel)]="chatMsgField"></textarea>
             <mat-hint align="end">{{chatMsgField.length}}/350</mat-hint>
         </mat-form-field>
 

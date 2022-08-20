@@ -63,8 +63,8 @@ export class UserdataService {
     return this.http.put<LoginResponse>('/register',data,httpOptions);
   }
 
-  addPost(session: string, postTitle: string, postBody: string) {
-    var data: PostInfo = {session:session,title:postTitle,body:postBody};
+  addPost(session: string, postTitle: string, postBody: string, postLinkedImages: string[] = []) {
+    var data: PostInfo = {session:session,title:postTitle,body:postBody,postLinkedImages};
     return this.http.put<PostInfo>('/addpost',data,httpOptions);
   }
 
@@ -88,6 +88,11 @@ export class UserdataService {
     data.session = session;
 
     return this.http.put<UserInfo>('/updateprofile',data,httpOptions);
+  }
+
+  uploadImage(session: string, image: string) {
+    var data = {session,image};
+    return this.http.put<any>('/uploadimage',data,httpOptions);
   }
 
   changeFriendStatus(session: string, userID: number, status: boolean) {

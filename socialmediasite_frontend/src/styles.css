@@ -98,17 +98,6 @@ textarea {
 	margin-bottom: 0.75em;
 }
 
-#PostBodyInput, #PostTitleInput {
-	height: 16em;
-	width: 24em;
-	padding-left: 0.5em;
-	margin-bottom: 0.75em;
-}
-
-#PostTitleInput {
-	height: 2em;
-}
-
 #Login, #Register, #AddPost, #Profile, #EditProfile, #Settings {
 	text-align: center;
 }
@@ -247,10 +236,6 @@ textarea {
 	overflow-x: hidden;
 
 	height: 25em;
-}
-
-.MessageInputTextArea {
-	resize: none;
 }
 
 .MessageInputTextArea:focus {

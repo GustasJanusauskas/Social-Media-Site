@@ -11,17 +11,24 @@
 
 	max-height: 20em;
 	overflow-y: auto;
+	overflow-x: hidden;
 }
 
 .FeedPost.Profile {
 	margin-bottom: 0;
 }
 
-.PostBody {
+.PostBody, .PostTitle {
 	text-align:justify;
 }
 
 .PostedDateText {
 	color: #6f617e;
 	font-size: small;
+}
+
+.PostImage {
+	max-width: 100%;
+	height: auto;
+	border-radius: 0.75em;
 }

@@ -181,7 +181,7 @@ export class AppComponent {
           if (animate) this.animateBackground(45.75);
           break;
         case 'post':
-          if (animate) this.animateBackground(35.5);
+          if (animate) this.animateBackground(45);
           break;
         case 'profile':
           if (animate) this.animateBackground(61.25);

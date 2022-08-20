@@ -4,4 +4,5 @@ export interface PostInfo {
 
     title?:string;
     body?:string;
+    postLinkedImages?:string[];
 }

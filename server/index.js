@@ -89,6 +89,7 @@ wss.on('connection', (ws,req) => {
 //FILES
 app.use(express.static(path.join(__dirname,'..',String.raw`socialmediasite_frontend\dist\socialmediasite_frontend`)));
 app.use(express.static(path.join(__dirname,'..',String.raw`avatars`)));
+app.use(express.static(path.join(__dirname,'..',String.raw`userimages`)));
 
 //HTTP
 app.get("/", (req, res) => {
@@ -141,6 +142,15 @@ app.put("/updateprofile", (req, res) => {
   });
 });
 
+app.put("/uploadimage", (req, res) => {
+  UploadImage( req.body.session,req.body.image,(success,filename) => {
+    res.json({
+      success: success,
+      filename: filename
+    });
+  });
+});
+
 app.put("/login", (req, res) => {
   LoginUser( sanitizeHtml( req.body.username ),req.body.password,req.headers.host,(success,msg) => {
     res.json({
@@ -160,7 +170,7 @@ app.put("/register", (req, res) => {
 });
 
 app.put("/addpost", (req, res) => {
-  AddPost( req.body.session, sanitizeHtml( req.body.title ), sanitizeHtml( req.body.body ), (success,msg) => {
+  AddPost( req.body.session, sanitizeHtml( req.body.title ), sanitizeHtml( req.body.body ), req.body.postLinkedImages, (success,msg) => {
     if (!success) console.log(msg);
     res.json({
       success:success
@@ -386,50 +396,70 @@ function ChangeArray(userID,otherID,status,column,table,callback) {
 
 function RemovePost(session,postID,callback) {
   GetIDFromSession(session, (userID) => {
-    //Remove post ID from profile
-    var innerQuery = 'UPDATE profiles SET posts = array_remove(posts,$1) WHERE usr_id = $2;';
-    var innerData = [postID,userID];
+    var query = 'SELECT linked_images FROM posts WHERE post_ID = $1 AND usr_id = $2;'
+    var data = [postID,userID];
 
-    dbclient.query(innerQuery,innerData, (err, res) => {
-      //If no rows updated, assume user doesn't actually have a post with this ID
-      if (err || res.rowCount == 0) {
-        console.log("DB ERROR RemovePostUpdateProfile: \n" + err);
-        callback(false,'Failed to remove post ID from profile.');
+    dbclient.query(query,data, (err, res) => {
+      //Check if post is actually authored by the user
+      if (res.rows.length == 0) {
+        console.log(`User ${userID} tried to delete another users post ${postID}.`);
+        callback(false,'User is not the author of the post.');
         return;
       }
-      //Then remove post from the posts table
-      //Extra check of usr_id to prevent malicious user from deleting another user's post.
-      var innerInQuery = 'DELETE FROM posts WHERE post_ID = $1 AND usr_id = $2;';
-      dbclient.query(innerInQuery,innerData, (err, res) => {
-        if (err) {
-          console.log("DB ERROR RemovePost: \n" + err);
-          callback(false,'Failed to remove post.');
+
+      //Delete all images associated with post
+      var temp;
+      var sizeChange = 0; //MB
+      for (let x = 0; x < res.rows[0].linked_images.length; x++) {
+        temp = res.rows[0].linked_images[x];
+        sizeChange -= fs.statSync(`userimages\\${temp}`).size / 1049000.0;
+        fs.rmSync(`userimages\\${temp}`);
+      }
+
+      //Remove post ID from profile, update used space tally
+      var innerQuery = 'UPDATE profiles SET posts = array_remove(posts,$1), usedspace = usedspace + $3 WHERE usr_id = $2;';
+      var innerData = [postID,userID,sizeChange];
+
+      dbclient.query(innerQuery,innerData, (err, res) => {
+        //If no rows updated, assume user doesn't actually have a post with this ID
+        if (err || res.rowCount == 0) {
+          console.log("DB ERROR RemovePostUpdateProfile: \n" + err);
+          callback(false,'Failed to remove post ID from profile.');
           return;
         }
-
-        //Finally, remove all comments that were on the post.
-        //If a malicious user tries to delete another user's post, server will have thrown a DB ERROR RemovePostUpdateProfile before now.
-        var innerInInQuery = 'DELETE FROM comments WHERE post_ID = $1';
-        var innerInInData = [postID];
-        dbclient.query(innerInInQuery,innerInInData, (err, res) => {
+        //Then remove post from the posts table
+        var innerInQuery = 'DELETE FROM posts WHERE post_ID = $1 AND usr_id = $2;';
+        var innerInData = [postID,userID];
+        dbclient.query(innerInQuery,innerInData, (err, res) => {
           if (err) {
-            console.log("DB ERROR RemovePostComments: \n" + err);
-            callback(false,'Failed to remove post comments.');
+            console.log("DB ERROR RemovePost: \n" + err);
+            callback(false,'Failed to remove post.');
             return;
           }
 
-          if (VERBOSE_DEBUG) console.log('User ' + userID + ' deleted post ' + postID);
-          callback(true,'Post removed successfully.');
+          //Finally, remove all comments that were on the post.
+          var innerInInQuery = 'DELETE FROM comments WHERE post_ID = $1';
+          var innerInInData = [postID];
+          dbclient.query(innerInInQuery,innerInInData, (err, res) => {
+            if (err) {
+              console.log("DB ERROR RemovePostComments: \n" + err);
+              callback(false,'Failed to remove post comments.');
+              return;
+            }
+
+            if (VERBOSE_DEBUG) console.log('User ' + userID + ' deleted post ' + postID);
+            callback(true,'Post removed successfully.');
+          });
         });
       });
     });
   });
 }
 
-function AddPost(session,title,body,callback) {
+function AddPost(session,title,body,linkedImages,callback) {
   GetIDFromSession(session, (userID) => {
-    var innerQuery = "INSERT INTO posts(usr_id,ptitle,pbody,pdate,usr_likes) VALUES($1,$2,$3,now(),'{}') RETURNING post_id;";
-    var innerData = [userID,title,body];
+    var innerQuery = "INSERT INTO posts(usr_id,ptitle,pbody,pdate,usr_likes,linked_images) VALUES($1,$2,$3,now(),'{}',$4) RETURNING post_id;";
+    var innerData = [userID,title,body,linkedImages];
 
     dbclient.query(innerQuery,innerData, (err, res) => {
       if (err || res.rows.length == 0) {
@@ -685,6 +715,41 @@ function FindUsers(search,callback) {
   });
 }
 
+function UploadImage(session,image,callback) {
+  GetIDFromSession(session, (userID) => {
+
+    if (userID == -1) {
+      callback(false,'User not found');
+      return;
+    }
+    //Verify image
+    if (!VerifyImageBase64(image)) {
+      callback(false,'Image format not accepted.');
+      return;
+    }
+
+    //if userimage directory doesn't exist create one
+    if (!fs.existsSync(`userimages`)) fs.mkdirSync(`userimages`);
+
+    //Compress image
+    const img = Buffer.from(image, 'base64');
+    const imgPath = `userimg-${userID}-${ToDateUniqueString(new Date())}-${RandomString(8)}.jpg`;
+    imageThumbnail(img,{percentage: 70,responseType:'buffer',jpegOptions:{force:true,quality:75}}).then(readyImg => {
+      //Image size, in megabytes
+      const imgSize = readyImg.byteLength / 1049000.0;
+
+      //Save image
+      fs.writeFile(`userimages\\${imgPath}`,readyImg,() => {
+        //Update user used space count
+        const query = 'UPDATE profiles SET usedspace = usedspace + $1 WHERE usr_id = $2;';
+        const data = [imgSize,userID];
+        dbclient.query(query,data, (err, res) => {
+          callback(true,imgPath);
+        });
+      });
+    });
+  });
+}
 
 function UpdateProfile(userinfo,callback) {
   //Check data
@@ -696,7 +761,7 @@ function UpdateProfile(userinfo,callback) {
   //Get user ID from session
   GetIDFromSession(userinfo.session, (userID) => {
     if (userinfo.avatar) {
-      var fileext = GetFilenameExtension(userinfo.avatarPath);
+      const fileext = GetFilenameExtension(userinfo.avatarPath);
       //Reject files that are not images, verify by extension then by binary signature
       if (!['png','jpg','jpeg','bmp','gif','tiff','tif'].includes(fileext) || !VerifyImageBase64(userinfo.avatar)) {
         userinfo.avatarPath = '';
@@ -708,8 +773,8 @@ function UpdateProfile(userinfo,callback) {
 
       //Avatar - User ID - Salt (for security) . File extension
       const salt = RandomString(8);
-      var avPath = `avatar-${userID}-${salt}.${fileext}`;
-      var thPath = `thumb-${userID}-${salt}.jpg`;
+      const avPath = `avatar-${userID}-${salt}.${fileext}`;
+      const thPath = `thumb-${userID}-${salt}.jpg`;
 
       //if avatar directory doesn't exist create one
       if (!fs.existsSync(`avatars`)) fs.mkdirSync(`avatars`);
@@ -934,4 +999,8 @@ function RandomString(length) {
 function GetFilenameExtension(filename) {
   if (filename.lastIndexOf('.') == -1) return '';
   return filename.substring(filename.lastIndexOf('.')+1, filename.length) || '';
+}
+
+function ToDateUniqueString(date) {
+  return date.toISOString().replaceAll('-','').replaceAll(':','').replaceAll('.','');
 }

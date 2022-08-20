@@ -8,7 +8,7 @@ CREATE TABLE users(
 	email varchar(256) UNIQUE NOT NULL,
 	created timestamp,
 	salt varchar(8),
-	pepper varchar(8),
+	pepper varchar(8)
 	PRIMARY KEY(usr_id)
 );
 
@@ -24,10 +24,11 @@ CREATE TABLE profiles(
 	description varchar(1024),
 	picture varchar(256),
 	thumb varchar(256),
-	friends bigint[],
-	posts bigint[],
-	blocked bigint[],
-	friendrequests bigint[]
+	friends bigint[] DEFAULT '{}',
+	posts bigint[] DEFAULT '{}',
+	blocked bigint[] DEFAULT '{}',
+	friendrequests bigint[] DEFAULT '{}',
+	usedspace real DEFAULT 0
 );
 
 CREATE TABLE posts(
@@ -36,7 +37,8 @@ CREATE TABLE posts(
 	ptitle varchar(256),
 	pbody varchar(4096),
 	pdate timestamp DEFAULT '2022-01-01 08:00:00',
-	usr_likes bigint[],
+	usr_likes bigint[] DEFAULT '{}',
+	linked_images varchar(256)[] DEFAULT '{}',
 	PRIMARY KEY(post_id)
 );
 
