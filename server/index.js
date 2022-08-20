@@ -315,20 +315,20 @@ function GetConversation(usr1,usr2,callback) {
 
 function ChangeFriend(session,otherID,status,callback) {
   GetIDFromSession(session, (userID) => {
-    //Add to friend list
+    //Add/remove from own friend list
     ChangeArray(userID,otherID,status,'friends','profiles', (success,msg) => {
       if (!success) console.log(msg);
 
-      //Remove friend request (if any)
-      ChangeArray(userID,otherID,false,'friendrequests','profiles', (success,msg) => {
-        if (!success) console.log(msg);
+      //Adding friend
+      if (status) {
+        //Remove friend request from own profile (if any)
+        ChangeArray(userID,otherID,false,'friendrequests','profiles');
 
         //If other user doesn't have us in their friends list, add a friend request
         GetPublicUserInfo(otherID,(success,result) => {
           if (success && !result.friends.includes(userID)) {
             ChangeArray(otherID,userID,true,'friendrequests','profiles', (success,msg) => {
               if (!success) console.log(msg);
-
               if (callback) callback(success);
             });
           }
@@ -336,7 +336,15 @@ function ChangeFriend(session,otherID,status,callback) {
             if (callback) callback(success);
           }
         });
-      });
+      }
+      //Removing friend
+      else {
+        //Remove self from other users friend list
+        ChangeArray(otherID,userID,false,'friends','profiles', (success,msg) => {
+          if (!success) console.log(msg);
+          if (callback) callback(success);
+        });
+      }
     });
   });
 }
@@ -368,11 +376,11 @@ function ChangeArray(userID,otherID,status,column,table,callback) {
   dbclient.query(innerQuery,innerData, (err, res) => {
     if (err) {
       console.log("DB ERROR ChangeProfileArray: \n" + err);
-      callback(false,'Failed to change array.');
+      if (callback) callback(false,'Failed to change array.');
       return;
     }
 
-    callback(true,'Array changed successfully!');
+    if (callback) callback(true,'Array changed successfully!');
   });
 }
 
