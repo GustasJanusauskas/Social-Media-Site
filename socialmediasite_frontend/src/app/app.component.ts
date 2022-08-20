@@ -285,19 +285,22 @@ export class AppComponent {
     }
   }
 
-  selectProfile(profile: UserInfo = {session:''}) {
+  selectProfile(profile?: UserInfo) {
     var tempProfile: UserInfo;
     //If profile not provided, search results array, assume search bar used
-    if (!profile.ID) {
+    if (!profile) {
       tempProfile = this.results.find((res) => {
         return res.username == this.search;
       }) || {session:''};
+      
+      //Clear search bar and results
+      this.search = '';
+      this.results = [];
     }
     else {
       tempProfile = profile;
     }
 
-    console.log(this.profileComponent.first);
     this.setMain('profile',() => {
       this.profileComponent.first.getProfile(tempProfile);
     });
