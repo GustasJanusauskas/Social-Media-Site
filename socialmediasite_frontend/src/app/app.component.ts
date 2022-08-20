@@ -41,6 +41,8 @@ export class AppComponent {
   @ViewChildren(FriendsComponent) friendsComponent!: QueryList<FriendsComponent>;
 
   constructor(private userdataService: UserdataService, private messagingService: MessagingService) {
+    const session = HelperFunctionsService.getCookie('session');
+
     //Setup search input checking
     this.searchInterval = setInterval(() => {
       if (this.lastSearchCharacterInput + 250 < Date.now() && this.search != '') {
@@ -52,7 +54,7 @@ export class AppComponent {
     },125);
 
     this.setMain('feed',() => {
-      if (this.friendsComponent.first) this.friendsComponent.first.connectMsg();
+      if (session != null && session.length >= 64) this.friendsComponent.first.connectMsg();
     },false);
   }
 
@@ -62,7 +64,7 @@ export class AppComponent {
 
   //Gets userinfo, updates friends list
   updateUI(callback?: Function) {
-    var session = HelperFunctionsService.getCookie('session');
+    const session = HelperFunctionsService.getCookie('session');
     if (session == null || session.length < 64 ) {
       //Clear user data if session was deleted/expired
       this.userinfo = {session:''};
@@ -130,7 +132,7 @@ export class AppComponent {
     this.updateUI(() => {
       switch (text) {
         case 'feed':
-          var session = HelperFunctionsService.getCookie('session');
+          const session = HelperFunctionsService.getCookie('session');
           //Not logged in - show new public posts (-1 gets all new posts)
           if (session == null || session.length < 64 ) {
             this.userdataService.getUserPosts(-1).subscribe( data => {
@@ -180,7 +182,7 @@ export class AppComponent {
   }
 
   changeFriendStatus(profile: UserInfo, friend: boolean) {
-    var session = HelperFunctionsService.getCookie('session');
+    const session = HelperFunctionsService.getCookie('session');
     if (session == null || session.length < 64 ) return;
 
     this.userdataService.changeFriendStatus(session,profile.ID || -1,friend).subscribe(data => {
@@ -223,7 +225,7 @@ export class AppComponent {
   }
 
   animateBackground(size: number = 40) { //size in em
-    var session = HelperFunctionsService.getCookie('session');
+    const session = HelperFunctionsService.getCookie('session');
     if (size < 40 && (session != null && session.length >= 64) ) size = 40; //minimum size is 40em (for chat window and navigation when logged in)
 
     this.backgroundDiv.forEach((item) => {
