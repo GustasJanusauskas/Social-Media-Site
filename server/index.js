@@ -530,8 +530,8 @@ function GetPublicUserInfo(ID,callback,resolve = null) {
     result.avatarPath = res.rows[0].picture;
     result.thumbPath = res.rows[0].thumb;
 
-    result.friends = res.rows[0].friends;
-    result.posts = res.rows[0].posts;
+    result.friends = res.rows[0].friends || [];
+    result.posts = res.rows[0].posts || [];
 
     result.ID = userID;
 
@@ -567,7 +567,7 @@ function GetIDFromSession(session,callback) {
 
 function GetUserInfo(session, callback) {
   GetIDFromSession(session, (userID) => {
-    var innerQuery = 'SELECT username, password, email, created, salt, pepper, firstname, lastname, description, picture, thumb, friends, posts FROM users, profiles WHERE profiles.usr_id = users.usr_id AND users.usr_id = $1;';
+    var innerQuery = 'SELECT username, password, email, created, salt, pepper, firstname, lastname, description, picture, thumb, friends, posts, blocked, friendrequests FROM users, profiles WHERE profiles.usr_id = users.usr_id AND users.usr_id = $1;';
     var innerData = [userID];
     var result = new UserInfo();
 
@@ -589,8 +589,10 @@ function GetUserInfo(session, callback) {
       result.avatarPath = res.rows[0].picture;
       result.thumbPath = res.rows[0].thumb;
 
-      result.friends = res.rows[0].friends;
-      result.posts = res.rows[0].posts;
+      result.friends = res.rows[0].friends || [];
+      result.posts = res.rows[0].posts || [];
+      result.blocked = res.rows[0].blocked || [];
+      result.friendRequests = res.rows[0].friendrequests || [];
 
       result.online = wsUsers.find((user => {return user.id == userID;})) != undefined;
 

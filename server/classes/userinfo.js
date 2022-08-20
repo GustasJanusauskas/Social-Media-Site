@@ -17,6 +17,8 @@ class UserInfo {
     avatar = "";
     friends = [0,0];
     posts = [0,0];
+    blocked = [0,0];
+    friendRequests = [0,0];
 
     online = false;
     ID = -1;

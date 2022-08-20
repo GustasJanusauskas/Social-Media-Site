@@ -17,13 +17,17 @@
                         <mat-icon class="BodyIcon">account_circle</mat-icon>
                         Show Profile
                     </button>
-                    <button (click)="openChat(friend);" mat-menu-item>
+                    <button *ngIf="userinfo.blocked && userinfo.blocked.indexOf(friend.ID || -1) == -1" (click)="openChat(friend);" mat-menu-item>
                         <mat-icon class="BodyIcon">chat</mat-icon>
                         Message
                     </button>
                     <button (click)="rootComponent.changeFriendStatus(friend,false);" mat-menu-item>
                         <mat-icon class="BodyIcon">person_remove</mat-icon>
                         Remove Friend
+                    </button>
+                    <button *ngIf="userinfo.blocked && friend.ID" (click)="rootComponent.changeBlockStatus(friend,userinfo.blocked.indexOf(friend.ID) == -1);" mat-menu-item>
+                        <mat-icon [class]="userinfo.blocked.indexOf(friend.ID) != -1 ? 'material-icons' : 'material-icons-outlined'">block</mat-icon>
+                        {{userinfo.blocked.indexOf(friend.ID) == -1 ? 'Block' : 'Unblock'}}
                     </button>
                 </mat-menu>
 

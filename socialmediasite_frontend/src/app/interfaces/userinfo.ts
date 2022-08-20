@@ -14,7 +14,9 @@ export interface UserInfo {
     thumbPath?: string;
     avatar?: string;
     friends?: number[];
-    posts?: string[];
+    posts?: number[];
+    blocked?: number[];
+    friendRequests?: number[];
 
     online?: boolean;
     ID?: number;

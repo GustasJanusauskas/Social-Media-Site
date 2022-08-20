@@ -7,6 +7,10 @@
         <mat-icon class="BodyIcon">person_add</mat-icon>
         Add to friend list
     </button>
+    <button *ngIf="userinfo.blocked && selectedProfile.ID" class="TopbarButton" (click)="rootComponent.changeBlockStatus(selectedProfile,userinfo.blocked.indexOf(selectedProfile.ID) == -1);" >
+        <mat-icon [class]="userinfo.blocked.indexOf(selectedProfile.ID) != -1 ? 'material-icons' : 'material-icons-outlined'">block</mat-icon>
+        {{userinfo.blocked.indexOf(selectedProfile.ID) == -1 ? 'Block' : 'Unblock'}}
+    </button>
     <h2>Posts</h2>
     <mat-paginator [length]="postList.length" [pageSize]="1" hidePageSize="true" (page)="pageEvent = $event" aria-label="Select page">
     </mat-paginator>

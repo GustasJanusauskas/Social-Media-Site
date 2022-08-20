@@ -194,9 +194,12 @@ export class AppComponent {
     this.setMain('feed');
   }
 
-  changeFriendStatus(profile: UserInfo, friend: boolean) {
+  changeFriendStatus(profile: UserInfo, friend: boolean, callback?: Function) {
     const session = HelperFunctionsService.getCookie('session');
-    if (session == null || session.length < 64 ) return;
+    if (session == null || session.length < 64 ) {
+      if (callback) callback();
+      return;
+    }
 
     this.userdataService.changeFriendStatus(session,profile.ID || -1,friend).subscribe(data => {
       if (data.success) {
@@ -214,7 +217,40 @@ export class AppComponent {
       else {
         if (VERBOSE_DEBUG) console.log('Error, removing friend failed.');
       }
+
+      if (callback) callback();
     });
+  }
+
+  changeBlockStatus(profile: UserInfo, block: boolean) {
+    const session = HelperFunctionsService.getCookie('session');
+    if (session == null || session.length < 64 ) return;
+
+    //Block
+    if (block) {
+      //Remove friend
+      this.changeFriendStatus(profile,false, () => {
+        //Add to block list
+        this.userdataService.changeBlockStatus(session,profile.ID || -1,true).subscribe(data => {
+          if (data.success) {
+            this.updateUI();
+
+            if (VERBOSE_DEBUG) console.log('Friend blocked.');
+          }
+          else {
+            if (VERBOSE_DEBUG) console.log('Error, blocking friend failed.');
+          }
+        });
+      });
+    }
+    //Unblock
+    else {
+      this.userdataService.changeBlockStatus(session,profile.ID || -1,false).subscribe(data => {
+        if (data.success) {
+          this.updateUI();
+        }
+      });
+    }
   }
 
   selectProfile(profile: UserInfo = {session:''}) {
