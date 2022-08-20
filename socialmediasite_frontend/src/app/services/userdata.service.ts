@@ -28,14 +28,19 @@ export class UserdataService {
     return this.http.put<UserInfo[]>('/findusers',data,httpOptions);
   }
 
-  getFriendPosts(userID: number): Observable<Post[]> {
-    var data: Post = {authorID:userID};
+  getFriendPosts(userID: number, usePopularity: boolean = true): Observable<Post[]> {
+    var data = {userID,usePopularity};
     return this.http.put<Post[]>('/friendposts',data,httpOptions);
   }
 
-  getUserPosts(userID: number): Observable<Post[]> {
-    var data: Post = {authorID:userID};
+  getUserPosts(userID: number, usePopularity: boolean = true): Observable<Post[]> {
+    var data = {userID,usePopularity};
     return this.http.put<Post[]>('/userposts',data,httpOptions);
+  }
+
+  getPublicPosts(userID: number, usePopularity: boolean = true): Observable<Post[]> {
+    var data = {userID,usePopularity};
+    return this.http.put<Post[]>('/publicposts',data,httpOptions);
   }
 
   getPublicUserInfo(userID: number): Observable<UserInfo> {

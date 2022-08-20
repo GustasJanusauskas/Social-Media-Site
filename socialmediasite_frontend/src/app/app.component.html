@@ -19,9 +19,14 @@
 	<div id="Bottom">
 		<div id="SidebarMain" class="BackgroundElement" style="height: 1000em;" #backgroundDiv>
 			<h2>Navigation</h2>
-			<button class="SidebarButton" id="FirstButton" (click)="setMain('feed');">
+			<button class="SidebarButton" id="FirstButton" (click)="setMain('feed',undefined,true,true);">
 				<mat-icon class="SidebarIcon">home</mat-icon>
-				Feed
+				Public Feed
+			</button>
+
+			<button *ngIf="userinfo.session != ''" class="SidebarButton" (click)="setMain('feed');">
+				<mat-icon class="SidebarIcon">home</mat-icon>
+				Personal Feed
 			</button>
 
 			<button *ngIf="userinfo.session != ''" class="SidebarButton" (click)="setMain('post');">
@@ -45,7 +50,7 @@
 			<app-edit-profile *ngIf="bodyHTML=='ownprofile'" [userinfo]="userinfo" [rootComponent]="this"></app-edit-profile>
 			<app-profile *ngIf="bodyHTML=='profile'" [selectedProfile]="selectedProfile" [userinfo]="userinfo" [rootComponent]="this"></app-profile>
 			<div *ngIf="bodyHTML=='feed'" id="Feed">
-				<h2>{{userinfo.session == '' ? 'Feed' : 'Your Feed'}}</h2>
+				<h2>{{publicFeed ? 'Public Feed' : 'Personal Feed'}}</h2>
 				<div id="FeedInner">
 					<h3 *ngIf="postList.length == 0">Your feed is empty, add some friends to see their posts here!</h3>
 					<app-post *ngFor="let post of postList;" [post]="post" [userinfo]="userinfo" [rootComponent]="this"></app-post>

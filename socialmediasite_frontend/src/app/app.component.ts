@@ -27,9 +27,10 @@ export class AppComponent {
   selectedProfile!: UserInfo;
   selectedPost: Post = {authorID:-1};
 
-  //Main Body
+  //Main Body/Feed
   bodyHTML: string = '';
   postList: Post[] = [];
+  publicFeed: boolean = true;
 
   //Search
   search: string = '';
@@ -127,24 +128,32 @@ export class AppComponent {
     });
   }
 
-  setMain(text: string, callback?: Function, animate: boolean = true) {
+  setMain(text: string, callback?: Function, animate: boolean = true, publicPosts: boolean = false) {
     this.bodyHTML = text;
     this.updateUI(() => {
       switch (text) {
         case 'feed':
           const session = HelperFunctionsService.getCookie('session');
-          //Not logged in - show new public posts (-1 gets all new posts)
-          if (session == null || session.length < 64 ) {
-            this.userdataService.getUserPosts(-1).subscribe( data => {
+          this.publicFeed = publicPosts;
+          //Not logged in - show popular new public posts
+          if (session == null || session.length < 64) {
+            this.userdataService.getPublicPosts(-1).subscribe( data => {
               this.postList = data;
             });
           }
-          //Logged in - show friend posts
+          //Logged in - show friend or public posts
           else {
             if (this.userinfo.friends != undefined && this.userinfo.ID != undefined) {
-              this.userdataService.getFriendPosts(this.userinfo.ID).subscribe(data => {
-                this.postList = data;
-              });
+              if (publicPosts) {
+                this.userdataService.getPublicPosts(this.userinfo.ID).subscribe(data => {
+                  this.postList = data;
+                });
+              }
+              else {
+                this.userdataService.getFriendPosts(this.userinfo.ID).subscribe(data => {
+                  this.postList = data;
+                });
+              }
             }
           }
           if (animate) this.animateBackground(45.75);

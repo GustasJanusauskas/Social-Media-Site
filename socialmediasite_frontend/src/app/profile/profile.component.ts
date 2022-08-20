@@ -35,9 +35,9 @@ export class ProfileComponent implements OnInit {
   }
 
   getProfile(profile: UserInfo) {
-    //Get user's posts
+    //Get user's posts, order chronologically
     if (profile.ID) {
-      this.userdataService.getUserPosts(profile.ID).subscribe( data => {
+      this.userdataService.getUserPosts(profile.ID,false).subscribe( data => {
         this.postList = data;
         this.selectedProfile = profile;
       });

@@ -97,13 +97,19 @@ app.get("/", (req, res) => {
 
 //API
 app.put("/friendposts", (req, res) => {
-  GetFriendPosts(req.body.authorID,(success,inf) => {
+  GetPosts(req.body.userID,'friend',req.body.usePopularity,(success,inf) => {
     res.json(inf);
   });
 });
 
 app.put("/userposts", (req, res) => {
-  GetUserPosts(req.body.authorID,(success,inf) => {
+  GetPosts(req.body.userID,'user',req.body.usePopularity,(success,inf) => {
+    res.json(inf);
+  });
+});
+
+app.put("/publicposts", (req, res) => {
+  GetPosts(req.body.userID,'public',req.body.usePopularity,(success,inf) => {
     res.json(inf);
   });
 });
@@ -466,50 +472,33 @@ function GetComments(postID,callback) {
   });
 }
 
-function GetFriendPosts(userID,callback) {
-  var innerQuery = "SELECT posts.ptitle, posts.pbody, to_char(posts.pdate, 'YYYY-MM-DD at HH12:MIam') AS pdate, posts.usr_id, posts.post_id, array_length(posts.usr_likes,1) AS likes, CONCAT(profiles.firstname,' ',profiles.lastname) AS author, $1 = ANY(posts.usr_likes) as userliked FROM posts, profiles WHERE posts.usr_id = ANY(array(SELECT friends FROM profiles WHERE usr_id = $1 )) AND posts.usr_id = profiles.usr_id ORDER BY posts.pdate DESC LIMIT 50;";
-  var innerData = [userID];
-
-  var result = [];
-  dbclient.query(innerQuery,innerData, (err, res) => {
-    if (err || res.rows.length == 0) {
-      if (err) console.log("DB ERROR GetFriendPosts: \n" + err);
-      callback(false,result);
-      return;
-    }
-
-    for (var x = 0; x < res.rowCount; x++) {
-      var temp = new PostInfo(res.rows[x].usr_id);
-
-      temp.title = res.rows[x].ptitle;
-      temp.body = res.rows[x].pbody;
-      temp.date = res.rows[x].pdate;
-      temp.author = res.rows[x].author;
-      temp.likes = res.rows[x].likes || 0;
-      temp.userLiked = res.rows[x].userliked;
-
-      temp.authorID = res.rows[x].usr_id;
-      temp.postID = res.rows[x].post_id;
-
-      result.push(temp);
-    }
-
-    callback(true,result);
-  });
-}
-
-function GetUserPosts(ID,callback) {
+function GetPosts(ID,postType,usePopularity,callback) {
   var innerQuery;
-  var innerData;
+  var innerData = [ID];
 
-  //ID of -1 gets newest posts, regardless of user
-  if (ID == -1) {
-    innerQuery = "SELECT posts.ptitle, posts.pbody, to_char(posts.pdate, 'YYYY-MM-DD at HH12:MIam') AS pdate, posts.usr_id, posts.post_id, array_length(posts.usr_likes,1) AS likes, CONCAT(profiles.firstname,' ',profiles.lastname) AS author FROM posts,profiles WHERE profiles.usr_id = posts.usr_id ORDER BY posts.pdate DESC LIMIT 50;";
-    innerData = [];
+  if (postType == 'public') {
+    //Gets newest posts by all users
+    if (usePopularity) {
+      //Popularity = 3 * likes - age (in hours);
+      innerQuery = "SELECT posts.ptitle, posts.pbody, to_char(posts.pdate, 'YYYY-MM-DD at HH12:MIam') AS pdate, posts.usr_id, posts.post_id, array_length(posts.usr_likes,1) AS likes, CONCAT(profiles.firstname,' ',profiles.lastname) AS author, $1 = ANY(posts.usr_likes) as userliked, COALESCE(array_length(posts.usr_likes,1),0) * 3 - (EXTRACT(EPOCH FROM (NOW() - posts.pdate) ) / 3600) as popularity FROM posts,profiles WHERE profiles.usr_id = posts.usr_id ORDER BY popularity DESC LIMIT 100;";
+    }
+    else {
+      innerQuery = "SELECT posts.ptitle, posts.pbody, to_char(posts.pdate, 'YYYY-MM-DD at HH12:MIam') AS pdate, posts.usr_id, posts.post_id, array_length(posts.usr_likes,1) AS likes, CONCAT(profiles.firstname,' ',profiles.lastname) AS author, $1 = ANY(posts.usr_likes) as userliked FROM posts,profiles WHERE profiles.usr_id = posts.usr_id ORDER BY posts.pdate DESC LIMIT 100;";
+    }
   }
-  else {
+  else if (postType == 'user') {
+    //Get one users posts, ordered chronologically
     innerQuery = "SELECT posts.ptitle, posts.pbody, to_char(posts.pdate, 'YYYY-MM-DD at HH12:MIam') AS pdate, posts.usr_id, posts.post_id, array_length(posts.usr_likes,1) AS likes, CONCAT(profiles.firstname,' ',profiles.lastname) AS author, $1 = ANY(posts.usr_likes) as userliked FROM posts, profiles WHERE posts.usr_id = $1 AND posts.usr_id = profiles.usr_id ORDER BY posts.pdate DESC;";
-    innerData = [ID];
+  }
+  else if (postType == 'friend') {
+    //Gets the users friends posts
+    if (usePopularity) {
+      //Popularity = 3 * likes - age (in hours);
+      innerQuery = "SELECT posts.ptitle, posts.pbody, to_char(posts.pdate, 'YYYY-MM-DD at HH12:MIam') AS pdate, posts.usr_id, posts.post_id, array_length(posts.usr_likes,1) AS likes, CONCAT(profiles.firstname,' ',profiles.lastname) AS author, $1 = ANY(posts.usr_likes) as userliked, COALESCE(array_length(posts.usr_likes,1),0) * 3 - (EXTRACT(EPOCH FROM (NOW() - posts.pdate) ) / 3600) as popularity FROM posts, profiles WHERE posts.usr_id = ANY(array(SELECT friends FROM profiles WHERE usr_id = $1 )) AND posts.usr_id = profiles.usr_id ORDER BY popularity DESC LIMIT 100;";
+    }
+    else {
+      innerQuery = "SELECT posts.ptitle, posts.pbody, to_char(posts.pdate, 'YYYY-MM-DD at HH12:MIam') AS pdate, posts.usr_id, posts.post_id, array_length(posts.usr_likes,1) AS likes, CONCAT(profiles.firstname,' ',profiles.lastname) AS author, $1 = ANY(posts.usr_likes) as userliked FROM posts, profiles WHERE posts.usr_id = ANY(array(SELECT friends FROM profiles WHERE usr_id = $1 )) AND posts.usr_id = profiles.usr_id ORDER BY posts.pdate DESC LIMIT 100;";
+    }
   }
 
   var result = [];
