@@ -14,6 +14,10 @@
         <mat-icon [class]="post.likes && post.userLiked ? 'material-icons' : 'material-icons-outlined'">thumb_up</mat-icon>
         {{post.likes && post.userLiked ? 'Remove like' : 'Like'}}
     </button>
+    <button class="TopbarButton" (click)="getPostProfile(post.authorID);" >
+        <mat-icon class="BodyIcon">account_circle</mat-icon>
+        Show Profile
+    </button>
 
     <div class="PostedDateText">{{post.likes ? post.likes : 0}} {{post.likes && post.likes == 1 ? 'like.' : 'likes.'}}</div>
     <div class="PostedDateText">Posted {{post.date}}</div>

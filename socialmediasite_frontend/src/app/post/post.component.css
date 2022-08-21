@@ -19,7 +19,8 @@
 }
 
 .PostBody, .PostTitle {
-	text-align:justify;
+	text-align: justify;
+	word-break: break-all;
 }
 
 .PostedDateText {

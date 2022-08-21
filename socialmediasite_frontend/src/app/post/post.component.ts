@@ -29,6 +29,14 @@ export class PostComponent implements OnInit {
 
   ngOnInit(): void {
     this.post.body = this.parsePost(this.post.body || '');
+
+    if (this.profilePost) {
+      setInterval(() => {
+        if (this.post && this.post.body?.includes('[img]')) {
+          this.post.body = this.parsePost(this.post.body || '');
+        }
+      },125);
+    }
   }
 
   removePost(postID: number, showProfile: boolean = false) {
@@ -40,6 +48,13 @@ export class PostComponent implements OnInit {
         if (showProfile) this.rootComponent.selectProfile(this.userinfo);
         else this.rootComponent.setMain('feed');
       }
+    });
+  }
+
+  getPostProfile(profileID: number, callback?: Function) {
+    this.userdataService.getPublicUserInfo(profileID).subscribe(data => {
+      this.rootComponent.selectProfile(data);
+      if (callback) callback(data);
     });
   }
 
