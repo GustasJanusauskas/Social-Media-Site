@@ -412,8 +412,16 @@ function RemovePost(session,postID,callback) {
       var sizeChange = 0; //MB
       for (let x = 0; x < res.rows[0].linked_images.length; x++) {
         temp = res.rows[0].linked_images[x];
-        sizeChange -= fs.statSync(`userimages\\${temp}`).size / 1049000.0;
-        fs.rmSync(`userimages\\${temp}`);
+        try {
+          sizeChange -= fs.statSync(`userimages\\${temp}`).size / 1049000.0;
+          fs.rmSync(`userimages\\${temp}`);
+        }
+        catch (err) {
+          if (err.code == 'ENOENT') {
+            console.log(`File ${temp} not found, ignoring..`);
+          }
+          else throw err;
+        }
       }
 
       //Remove post ID from profile, update used space tally
