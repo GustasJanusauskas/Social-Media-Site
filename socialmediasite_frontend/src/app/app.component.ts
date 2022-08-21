@@ -198,6 +198,9 @@ export class AppComponent {
         case 'comments':
           if (animate) this.animateBackground(62.125);
           break;
+        case 'about':
+          if (animate) this.animateBackground(35);
+          break;
       }
 
       if (callback) callback();

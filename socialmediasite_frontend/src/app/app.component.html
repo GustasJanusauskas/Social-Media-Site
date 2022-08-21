@@ -38,9 +38,15 @@
 				<mat-icon class="SidebarIcon">account_circle</mat-icon>
 				My profile
 			</button>
+
 			<button *ngIf="userinfo.session != ''" class="SidebarButton" (click)="setMain('ownprofile');">
 				<mat-icon class="SidebarIcon">edit</mat-icon>
 				Edit profile
+			</button>
+
+			<button class="SidebarButton" (click)="setMain('about');">
+				<mat-icon class="SidebarIcon">help</mat-icon>
+				About/Contacts
 			</button>
 		</div>
 		<div id="BodyMain" class="BackgroundElement" style="height: 1000em;" #backgroundDiv>
@@ -49,6 +55,7 @@
 			<app-new-post *ngIf="bodyHTML=='post'"></app-new-post>
 			<app-edit-profile *ngIf="bodyHTML=='ownprofile'" [userinfo]="userinfo" [rootComponent]="this"></app-edit-profile>
 			<app-profile *ngIf="bodyHTML=='profile'" [userinfo]="userinfo" [rootComponent]="this"></app-profile>
+			<app-comments *ngIf="bodyHTML=='comments'" [post]="selectedPost" [userinfo]="userinfo" [rootComponent]="this"></app-comments>
 			<div *ngIf="bodyHTML=='feed'" id="Feed">
 				<h2>{{publicFeed ? 'Public Feed' : 'Personal Feed'}}</h2>
 				<div id="FeedInner">
@@ -56,7 +63,17 @@
 					<app-post *ngFor="let post of postList;" [post]="post" [userinfo]="userinfo" [rootComponent]="this"></app-post>
 				</div>
 			</div>
-			<app-comments *ngIf="bodyHTML=='comments'" [post]="selectedPost" [userinfo]="userinfo" [rootComponent]="this"></app-comments>
+			<div *ngIf="bodyHTML=='about'" id="About">
+				<h2>About</h2>
+				<p>
+					Social media site webapp, created by Gustas Janušauskas.<br>
+					Contact me at <a href="mailto:gustasjanusauskas@gmail.com">gustasjanusauskas@gmail.com</a><br>
+					Gitlab: <a href="https://gitlab.com/GustasJanusauskas">https://gitlab.com/GustasJanusauskas</a><br>
+					<br>
+					Project repo: <a href="https://gitlab.com/GustasJanusauskas/social-media-site">https://gitlab.com/GustasJanusauskas/social-media-site</a><br>
+					
+				</p>
+			</div>
 		</div>
 		<div id="FriendbarMain" class="BackgroundElement" style="height: 1000em;" #backgroundDiv>
 			<app-friends [userinfo]="userinfo" [rootComponent]="this"></app-friends>

@@ -87,10 +87,6 @@ textarea {
 	border-radius: 0.75em;
 }
 
-#Feed {
-	text-align:center;
-}
-
 #EmailInput, #UserInput, #PassInput, #ProfileInput {
 	height: 2em;
 	width: 16em;
@@ -98,7 +94,7 @@ textarea {
 	margin-bottom: 0.75em;
 }
 
-#Login, #Register, #AddPost, #Profile, #EditProfile, #Settings {
+#Login, #Register, #AddPost, #Profile, #EditProfile, #Settings, #About, #Feed {
 	text-align: center;
 }
 
@@ -141,23 +137,6 @@ textarea {
 	padding-right: 1em;
 
 	margin-top: 0.75em;
-}
-
-#SearchInput {
-	height: 2em;
-	width: 24em;
-
-	background: url('images/Search.png') no-repeat 0.35em 0.35em;
-	background-color: azure;
-	background-size: 1.5em;
-	padding-left: 2em;
-	
-	margin-left: 2em;
-
-	border-style: solid;
-	border-color: var(--textClr);
-	border-width: 1px;
-	border-radius: 0.75em;
 }
 
 .ProfilePic {
@@ -229,32 +208,4 @@ textarea {
 	font-size: 24px;
 	padding: 0.5em;
 	margin-top: 0.75em;
-}
-
-.ChatTab {
-	overflow-y: scroll;
-	overflow-x: hidden;
-
-	height: 25em;
-}
-
-.MessageInputTextArea:focus {
-	outline: none;
-}
-
-.MessageInputField {
-	margin-top: 0.75em;
-	width: 100%;
-}
-
-.CloseChatButton {
-	background: url('images/Close.png') no-repeat;
-	background-color: var(--backgroundClr);
-
-	width: 2em;
-	height: 2em;
-
-	position: absolute;
-	right: 0;
-	z-index: 10;
 }

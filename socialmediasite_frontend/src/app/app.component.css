@@ -1,0 +1,16 @@
+#SearchInput {
+	height: 2em;
+	width: 24em;
+
+	background: url('images/Search.png') no-repeat 0.35em 0.35em;
+	background-color: azure;
+	background-size: 1.5em;
+	padding-left: 2em;
+	
+	margin-left: 2em;
+
+	border-style: solid;
+	border-color: var(--textClr);
+	border-width: 1px;
+	border-radius: 0.75em;
+}
