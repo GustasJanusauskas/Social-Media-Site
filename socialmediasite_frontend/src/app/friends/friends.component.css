@@ -15,7 +15,7 @@
 }
 
 .CloseChatButton {
-	background: url('images/Close.png') no-repeat;
+	background: url('../../images/Close.png') no-repeat;
 	background-color: var(--backgroundClr);
 
 	width: 2em;
