@@ -3,9 +3,9 @@
     <h2>{{toTitleCase(selectedProfile.firstName || "") + " " + toTitleCase(selectedProfile.lastName || "")}}</h2>
     <p>{{selectedProfile.profileDesc || "No profile description."}}</p>
     <br>
-    <button *ngIf="userinfo.friends && !userinfo.friends.includes(selectedProfile.ID || -1)" class="TopbarButton" (click)="rootComponent.changeFriendStatus(selectedProfile,true);" >
-        <mat-icon class="BodyIcon">person_add</mat-icon>
-        Add to friend list
+    <button *ngIf="userinfo.friends" class="TopbarButton" (click)="rootComponent.changeFriendStatus(selectedProfile,!userinfo.friends.includes(selectedProfile.ID || -1));" >
+        <mat-icon class="BodyIcon">{{userinfo.friends.includes(selectedProfile.ID || -1) ? 'person_remove' : 'person_add'}}</mat-icon>
+        {{userinfo.friends.includes(selectedProfile.ID || -1) ? 'Remove friend' : 'Add friend'}}
     </button>
     <button *ngIf="userinfo.blocked && selectedProfile.ID" class="TopbarButton" (click)="rootComponent.changeBlockStatus(selectedProfile,userinfo.blocked.indexOf(selectedProfile.ID) == -1);" >
         <mat-icon [class]="userinfo.blocked.indexOf(selectedProfile.ID) != -1 ? 'material-icons' : 'material-icons-outlined'">block</mat-icon>

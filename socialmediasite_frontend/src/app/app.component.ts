@@ -199,7 +199,7 @@ export class AppComponent {
           if (animate) this.animateBackground(62.125);
           break;
         case 'about':
-          if (animate) this.animateBackground(35);
+          if (animate) this.animateBackground(18);
           break;
       }
 
