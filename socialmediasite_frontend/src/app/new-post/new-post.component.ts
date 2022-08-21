@@ -40,8 +40,14 @@ export class NewPostComponent implements OnInit {
         if (!image) return;
 
         this.userdataService.uploadImage(session!,image).subscribe( (data) => {
+          if (!data.success) {
+            this.formError = data.filename;
+            return;
+          }
+
           this.postLinkedImages.push(data.filename);
           this.postBody += `[img]${data.filename}[/img]`;
+          this.formError = `Image uploaded, ${(256 - data.usedspace).toFixed(2)}MB of user space left.`;
         });
       }
     }

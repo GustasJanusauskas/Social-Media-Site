@@ -10,7 +10,7 @@
     <label class="LogLabel">Last name:</label> <input type="text" placeholder="Edit your last name" id="ProfileInput" [(ngModel)]="userinfo.lastName" (keypress)="lettersOnly($event)" autocomplete="off">
 
     <h3>Profile description</h3>
-    <textarea placeholder="Enter your profile description" id="PostBodyInput" [(ngModel)]="userinfo.profileDesc" (ngModelChange)="updateCharCounter()" autocomplete="off"> </textarea>
+    <textarea placeholder="Enter your profile description" id="ProfileDescriptionInput" [(ngModel)]="userinfo.profileDesc" (ngModelChange)="updateCharCounter()" autocomplete="off"> </textarea>
     <br>
     Characters left: {{profileDescCharLeft}}
     <br>

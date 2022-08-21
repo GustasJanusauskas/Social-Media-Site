@@ -24,6 +24,7 @@ const emailRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+")
 
 //Enables extra debug messages
 const VERBOSE_DEBUG = true;
+const MAX_SPACE_PER_ACCOUNT = 256; //in megabytes
 
 //CONFIG
 const dbclient = new Client({
@@ -143,10 +144,11 @@ app.put("/updateprofile", (req, res) => {
 });
 
 app.put("/uploadimage", (req, res) => {
-  UploadImage( req.body.session,req.body.image,(success,filename) => {
+  UploadImage( req.body.session,req.body.image,(success,filename,usedspace) => {
     res.json({
       success: success,
-      filename: filename
+      filename: filename,
+      usedspace:usedspace
     });
   });
 });
@@ -727,12 +729,12 @@ function UploadImage(session,image,callback) {
   GetIDFromSession(session, (userID) => {
 
     if (userID == -1) {
-      callback(false,'User not found');
+      callback(false,'User not found',-1);
       return;
     }
     //Verify image
     if (!VerifyImageBase64(image)) {
-      callback(false,'Image format not accepted.');
+      callback(false,'Image format not accepted.',-1);
       return;
     }
 
@@ -746,13 +748,23 @@ function UploadImage(session,image,callback) {
       //Image size, in megabytes
       const imgSize = readyImg.byteLength / 1049000.0;
 
-      //Save image
-      fs.writeFile(`userimages\\${imgPath}`,readyImg,() => {
-        //Update user used space count
-        const query = 'UPDATE profiles SET usedspace = usedspace + $1 WHERE usr_id = $2;';
-        const data = [imgSize,userID];
-        dbclient.query(query,data, (err, res) => {
-          callback(true,imgPath);
+      const queryOuter = 'SELECT usedspace FROM profiles WHERE usr_id = $1;';
+      const dataOuter = [userID];
+      dbclient.query(queryOuter,dataOuter, (err, res) => {
+        //If user is over used data limit, reject image
+        if (res.rows[0].usedspace + imgSize > MAX_SPACE_PER_ACCOUNT) {
+          callback(false,'User over data limit, delete posts to make space.',-1);
+          return;
+        }
+
+        //Save image
+        fs.writeFile(`userimages\\${imgPath}`,readyImg,() => {
+          //Update user used space count
+          const query = 'UPDATE profiles SET usedspace = usedspace + $1 WHERE usr_id = $2 RETURNING usedspace;';
+          const data = [imgSize,userID];
+          dbclient.query(query,data, (err, res) => {
+            callback(true,imgPath,res.rows[0].usedspace);
+          });
         });
       });
     });
