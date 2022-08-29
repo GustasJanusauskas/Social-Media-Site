@@ -1,4 +1,4 @@
-import { Component, Injectable, Input, OnInit } from '@angular/core';
+import { Component, Injectable, Input, OnInit, ViewEncapsulation } from '@angular/core';
 
 import { HelperFunctionsService } from "../services/helper-functions.service";
 import { UserdataService } from "../services/userdata.service";
@@ -10,7 +10,8 @@ import { AppComponent } from '../app.component';
 @Component({
   selector: 'app-post',
   templateUrl: './post.component.html',
-  styleUrls: ['./post.component.css']
+  styleUrls: ['./post.component.css'],
+  encapsulation: ViewEncapsulation.None
 })
 export class PostComponent implements OnInit {
   @Input() post!: Post;
@@ -72,7 +73,7 @@ export class PostComponent implements OnInit {
     var temp: string;
     for (let x = 0; x < matches.length; x++) {
       temp = matches[x][0].replace('[img]','').replace('[/img]','');
-      result += post.slice(lastInd,matches[x].index) + `<img class='PostImage' src='${temp}'>`;
+      result += post.slice(lastInd,matches[x].index) + `<img class="PostImage" src="${temp}">`;
       lastInd = matches[x].index! + matches[x][0].length;
     }
 
