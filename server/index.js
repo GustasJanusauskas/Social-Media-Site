@@ -172,6 +172,7 @@ app.put("/register", (req, res) => {
 });
 
 app.put("/addpost", (req, res) => {
+  console.log(req.body);
   AddPost( req.body.session, sanitizeHtml( req.body.title ), sanitizeHtml( req.body.body ), req.body.postLinkedImages, (success,msg) => {
     if (!success) console.log(msg);
     res.json({

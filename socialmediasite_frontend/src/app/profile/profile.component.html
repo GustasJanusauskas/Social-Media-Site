@@ -1,7 +1,7 @@
 <div id="Profile">
     <img [src]="selectedProfile.avatarPath || 'assets/defaultProfile.png'" class="ProfilePic">
     <h2>{{toTitleCase(selectedProfile.firstName || "") + " " + toTitleCase(selectedProfile.lastName || "")}}</h2>
-    <p>{{selectedProfile.profileDesc || "No profile description."}}</p>
+    <div class="ProfileDescription" [innerHTML]="selectedProfile.profileDesc || 'No profile description.'"></div>
     <br>
     <button *ngIf="userinfo.friends" class="TopbarButton" (click)="rootComponent.changeFriendStatus(selectedProfile,!userinfo.friends.includes(selectedProfile.ID || -1));" >
         <mat-icon class="BodyIcon">{{userinfo.friends.includes(selectedProfile.ID || -1) ? 'person_remove' : 'person_add'}}</mat-icon>

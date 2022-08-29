@@ -31,10 +31,12 @@ export class ProfileComponent implements OnInit {
   }
 
   ngOnInit(): void {
-
   }
 
   getProfile(profile: UserInfo) {
+    //Update profile description to included <br>
+    profile.profileDesc = profile.profileDesc?.replace(/\n/g,"<br>");
+
     //Get user's posts, order chronologically
     if (profile.ID) {
       this.userdataService.getUserPosts(profile.ID,false).subscribe( data => {
