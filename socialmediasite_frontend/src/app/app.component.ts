@@ -48,7 +48,7 @@ export class AppComponent {
 
     //Setup search input checking
     this.searchInterval = setInterval(() => {
-      if (this.lastSearchCharacterInput + 250 < Date.now() && this.search != '') {
+      if (this.lastSearchCharacterInput + 250 < Date.now() && this.search.length > 2) {
         this.userdataService.findUsers(this.search.toLowerCase()).subscribe(data => {
           this.results = data;
         });

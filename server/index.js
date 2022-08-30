@@ -23,8 +23,8 @@ const base64Regex = new RegExp(String.raw`^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]
 const emailRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 
 //Enables extra debug messages
-const VERBOSE_DEBUG = true;
-const MAX_SPACE_PER_ACCOUNT = 256; //in megabytes
+const VERBOSE_DEBUG = false;
+const MAX_SPACE_PER_ACCOUNT = 16; //in megabytes
 
 //CONFIG
 const dbclient = new Client({
@@ -172,7 +172,6 @@ app.put("/register", (req, res) => {
 });
 
 app.put("/addpost", (req, res) => {
-  console.log(req.body);
   AddPost( req.body.session, sanitizeHtml( req.body.title ), sanitizeHtml( req.body.body ), req.body.postLinkedImages, (success,msg) => {
     if (!success) console.log(msg);
     res.json({
@@ -549,10 +548,10 @@ function GetPosts(ID,postType,usePopularity,callback) {
     //Gets newest posts by all users
     if (usePopularity) {
       //Popularity = 3 * likes - age (in hours);
-      innerQuery = "SELECT posts.ptitle, posts.pbody, to_char(posts.pdate, 'YYYY-MM-DD at HH12:MIam') AS pdate, posts.usr_id, posts.post_id, array_length(posts.usr_likes,1) AS likes, CONCAT(profiles.firstname,' ',profiles.lastname) AS author, $1 = ANY(posts.usr_likes) as userliked, COALESCE(array_length(posts.usr_likes,1),0) * 3 - (EXTRACT(EPOCH FROM (NOW() - posts.pdate) ) / 3600) as popularity FROM posts,profiles WHERE profiles.usr_id = posts.usr_id AND NOT posts.usr_id = ANY( COALESCE( (SELECT blocked FROM profiles WHERE usr_id = $1),'{}') ) ORDER BY popularity DESC LIMIT 100;";
+      innerQuery = "SELECT posts.ptitle, posts.pbody, to_char(posts.pdate, 'YYYY-MM-DD at HH12:MIam') AS pdate, posts.usr_id, posts.post_id, array_length(posts.usr_likes,1) AS likes, CONCAT(profiles.firstname,' ',profiles.lastname) AS author, $1 = ANY(posts.usr_likes) as userliked, COALESCE(array_length(posts.usr_likes,1),0) * 3 - (EXTRACT(EPOCH FROM (NOW() - posts.pdate) ) / 3600) as popularity FROM posts,profiles WHERE profiles.usr_id = posts.usr_id AND NOT posts.usr_id = ANY( COALESCE( (SELECT blocked FROM profiles WHERE usr_id = $1),'{}') ) ORDER BY popularity DESC LIMIT 60;";
     }
     else {
-      innerQuery = "SELECT posts.ptitle, posts.pbody, to_char(posts.pdate, 'YYYY-MM-DD at HH12:MIam') AS pdate, posts.usr_id, posts.post_id, array_length(posts.usr_likes,1) AS likes, CONCAT(profiles.firstname,' ',profiles.lastname) AS author, $1 = ANY(posts.usr_likes) as userliked FROM posts,profiles WHERE profiles.usr_id = posts.usr_id AND NOT posts.usr_id = ANY( COALESCE( (SELECT blocked FROM profiles WHERE usr_id = $1),'{}') ) ORDER BY posts.pdate DESC LIMIT 100;";
+      innerQuery = "SELECT posts.ptitle, posts.pbody, to_char(posts.pdate, 'YYYY-MM-DD at HH12:MIam') AS pdate, posts.usr_id, posts.post_id, array_length(posts.usr_likes,1) AS likes, CONCAT(profiles.firstname,' ',profiles.lastname) AS author, $1 = ANY(posts.usr_likes) as userliked FROM posts,profiles WHERE profiles.usr_id = posts.usr_id AND NOT posts.usr_id = ANY( COALESCE( (SELECT blocked FROM profiles WHERE usr_id = $1),'{}') ) ORDER BY posts.pdate DESC LIMIT 60;";
     }
   }
   else if (postType == 'user') {
@@ -563,10 +562,10 @@ function GetPosts(ID,postType,usePopularity,callback) {
     //Gets the users friends posts
     if (usePopularity) {
       //Popularity = 3 * likes - age (in hours);
-      innerQuery = "SELECT posts.ptitle, posts.pbody, to_char(posts.pdate, 'YYYY-MM-DD at HH12:MIam') AS pdate, posts.usr_id, posts.post_id, array_length(posts.usr_likes,1) AS likes, CONCAT(profiles.firstname,' ',profiles.lastname) AS author, $1 = ANY(posts.usr_likes) as userliked, COALESCE(array_length(posts.usr_likes,1),0) * 3 - (EXTRACT(EPOCH FROM (NOW() - posts.pdate) ) / 3600) as popularity FROM posts, profiles WHERE posts.usr_id = ANY(array(SELECT friends FROM profiles WHERE usr_id = $1 )) AND posts.usr_id = profiles.usr_id AND NOT posts.usr_id = ANY( COALESCE( (SELECT blocked FROM profiles WHERE usr_id = $1),'{}') ) ORDER BY popularity DESC LIMIT 100;";
+      innerQuery = "SELECT posts.ptitle, posts.pbody, to_char(posts.pdate, 'YYYY-MM-DD at HH12:MIam') AS pdate, posts.usr_id, posts.post_id, array_length(posts.usr_likes,1) AS likes, CONCAT(profiles.firstname,' ',profiles.lastname) AS author, $1 = ANY(posts.usr_likes) as userliked, COALESCE(array_length(posts.usr_likes,1),0) * 3 - (EXTRACT(EPOCH FROM (NOW() - posts.pdate) ) / 3600) as popularity FROM posts, profiles WHERE posts.usr_id = ANY(array(SELECT friends FROM profiles WHERE usr_id = $1 )) AND posts.usr_id = profiles.usr_id AND NOT posts.usr_id = ANY( COALESCE( (SELECT blocked FROM profiles WHERE usr_id = $1),'{}') ) ORDER BY popularity DESC LIMIT 60;";
     }
     else {
-      innerQuery = "SELECT posts.ptitle, posts.pbody, to_char(posts.pdate, 'YYYY-MM-DD at HH12:MIam') AS pdate, posts.usr_id, posts.post_id, array_length(posts.usr_likes,1) AS likes, CONCAT(profiles.firstname,' ',profiles.lastname) AS author, $1 = ANY(posts.usr_likes) as userliked FROM posts, profiles WHERE posts.usr_id = ANY(array(SELECT friends FROM profiles WHERE usr_id = $1 )) AND posts.usr_id = profiles.usr_id AND NOT posts.usr_id = ANY( COALESCE( (SELECT blocked FROM profiles WHERE usr_id = $1),'{}') ) ORDER BY posts.pdate DESC LIMIT 100;";
+      innerQuery = "SELECT posts.ptitle, posts.pbody, to_char(posts.pdate, 'YYYY-MM-DD at HH12:MIam') AS pdate, posts.usr_id, posts.post_id, array_length(posts.usr_likes,1) AS likes, CONCAT(profiles.firstname,' ',profiles.lastname) AS author, $1 = ANY(posts.usr_likes) as userliked FROM posts, profiles WHERE posts.usr_id = ANY(array(SELECT friends FROM profiles WHERE usr_id = $1 )) AND posts.usr_id = profiles.usr_id AND NOT posts.usr_id = ANY( COALESCE( (SELECT blocked FROM profiles WHERE usr_id = $1),'{}') ) ORDER BY posts.pdate DESC LIMIT 60;";
     }
   }
 
@@ -700,7 +699,7 @@ function FindUsers(search,callback) {
   search = search.replace('%','');
   search += '%';
 
-  var query = "SELECT users.usr_id FROM users,profiles WHERE (LOWER(CONCAT(profiles.firstname,' ',profiles.lastname)) LIKE $1 OR LOWER(profiles.firstname) LIKE $1 OR LOWER(profiles.lastname) LIKE $1 OR LOWER(users.username) LIKE $1) AND users.usr_id = profiles.usr_id LIMIT 50;";
+  var query = "SELECT users.usr_id FROM users,profiles WHERE (LOWER(CONCAT(profiles.firstname,' ',profiles.lastname)) LIKE $1 OR LOWER(profiles.firstname) LIKE $1 OR LOWER(profiles.lastname) LIKE $1 OR LOWER(users.username) LIKE $1) AND users.usr_id = profiles.usr_id LIMIT 20;";
   var data = [search];
 
   var result = [];
@@ -804,19 +803,22 @@ function UpdateProfile(userinfo,callback) {
       GetPublicUserInfo(userID, (success,result) => {
         if(success && result.avatarPath) fs.rmSync(`avatars\\${result.avatarPath}`);
 
-        //Save new image
+        //Get new image
         var img = Buffer.from(userinfo.avatar, 'base64');
-        fs.writeFile(`avatars\\${avPath}`,img,() => {
-          //Generate image thumbnail
-          imageThumbnail(img,{percentage: 20,responseType:'buffer',jpegOptions:{force:true,quality:80}}).then(thumbnail => {
-            //Save thumbnail
-            fs.writeFile(`avatars\\${thPath}`,thumbnail,() => {
-              //Set save paths
-              userinfo.avatarPath = avPath;
-              userinfo.thumbPath = thPath;
-              //Finally, update profile row
-              UpdateProfileText(userID,userinfo, (success,msg) => {
-                callback(success,msg);
+        imageThumbnail(img,{percentage: 70,responseType:'buffer',jpegOptions:{force:true,quality:80}}).then(compressedImg => {
+          //Compress and save new profile image
+          fs.writeFile(`avatars\\${avPath}`,compressedImg,() => {
+            //Generate image thumbnail
+            imageThumbnail(img,{percentage: 20,responseType:'buffer',jpegOptions:{force:true,quality:65}}).then(thumbnail => {
+              //Save thumbnail
+              fs.writeFile(`avatars\\${thPath}`,thumbnail,() => {
+                //Set save paths
+                userinfo.avatarPath = avPath;
+                userinfo.thumbPath = thPath;
+                //Finally, update profile row
+                UpdateProfileText(userID,userinfo, (success,msg) => {
+                  callback(success,msg);
+                });
               });
             });
           });

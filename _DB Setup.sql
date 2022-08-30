@@ -8,7 +8,7 @@ CREATE TABLE users(
 	email varchar(256) UNIQUE NOT NULL,
 	created timestamp,
 	salt varchar(8),
-	pepper varchar(8)
+	pepper varchar(8),
 	PRIMARY KEY(usr_id)
 );
 
