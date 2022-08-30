@@ -154,7 +154,7 @@ app.post("/uploadimage", (req, res) => {
 });
 
 app.post("/login", (req, res) => {
-  LoginUser( sanitizeHtml( req.body.username ),req.body.password,req.headers.host,(success,msg) => {
+  LoginUser( sanitizeHtml( req.body.username, {allowedTags: [], allowedAttributes: {}} ),req.body.password,req.headers.host,(success,msg) => {
     res.json({
       success: success,
       session: msg
@@ -163,7 +163,7 @@ app.post("/login", (req, res) => {
 });
 
 app.post("/register", (req, res) => {
-  RegisterUser( sanitizeHtml( req.body.username ),req.body.password,req.body.email,(success,msg) => {
+  RegisterUser( sanitizeHtml( req.body.username, {allowedTags: [], allowedAttributes: {}} ),req.body.password,req.body.email,(success,msg) => {
     res.json({
       success: success,
       session: msg
@@ -172,7 +172,7 @@ app.post("/register", (req, res) => {
 });
 
 app.post("/addpost", (req, res) => {
-  AddPost( req.body.session, sanitizeHtml( req.body.title ), sanitizeHtml( req.body.body ), req.body.postLinkedImages, (success,msg) => {
+  AddPost( req.body.session, sanitizeHtml( req.body.title, {allowedTags: [], allowedAttributes: {}} ), sanitizeHtml( req.body.body, {allowedTags: [], allowedAttributes: {}} ), req.body.postLinkedImages, (success,msg) => {
     if (!success) console.log(msg);
     res.json({
       success:success
@@ -198,7 +198,7 @@ app.post("/getcomments", (req, res) => {
 });
 
 app.post("/addcomment", (req, res) => {
-  AddComment( req.body.session, sanitizeHtml( req.body.content ), req.body.postID , (cid,msg) => {
+  AddComment( req.body.session, sanitizeHtml( req.body.content, {allowedTags: [], allowedAttributes: {}} ), req.body.postID , (cid,msg) => {
     if (cid == -1) console.log(msg);
     res.json({
       comment_id: cid,
@@ -837,11 +837,11 @@ function UpdateProfileText(userID,userinfo,callback) {
   if (userinfo.avatarPath == '') {
     //New profile image rejected, do not update path
     innerQuery = 'UPDATE profiles SET firstname = $2, lastname = $3, description = $4 WHERE usr_id = $1;';
-    innerData = [userID,userinfo.firstName,userinfo.lastName,userinfo.profileDesc];
+    innerData = [userID,userinfo.firstName,userinfo.lastName,sanitizeHtml(userinfo.profileDesc,{allowedTags: [], allowedAttributes: {}})];
   }
   else {
     innerQuery = 'UPDATE profiles SET firstname = $2, lastname = $3, description = $4, picture = $5, thumb = $6 WHERE usr_id = $1;';
-    innerData = [userID,userinfo.firstName,userinfo.lastName,userinfo.profileDesc,userinfo.avatarPath,userinfo.thumbPath];
+    innerData = [userID,userinfo.firstName,userinfo.lastName,sanitizeHtml(userinfo.profileDesc,{allowedTags: [], allowedAttributes: {}}),userinfo.avatarPath,userinfo.thumbPath];
   }
 
   dbclient.query(innerQuery,innerData, (err, res) => {
