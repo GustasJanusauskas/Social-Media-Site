@@ -98,43 +98,43 @@ app.get("/", (req, res) => {
 });
 
 //API
-app.put("/friendposts", (req, res) => {
+app.post("/friendposts", (req, res) => {
   GetPosts(req.body.userID,'friend',req.body.usePopularity,(success,inf) => {
     res.json(inf);
   });
 });
 
-app.put("/userposts", (req, res) => {
+app.post("/userposts", (req, res) => {
   GetPosts(req.body.userID,'user',req.body.usePopularity,(success,inf) => {
     res.json(inf);
   });
 });
 
-app.put("/publicposts", (req, res) => {
+app.post("/publicposts", (req, res) => {
   GetPosts(req.body.userID,'public',req.body.usePopularity,(success,inf) => {
     res.json(inf);
   });
 });
 
-app.put("/publicuserinfo", (req, res) => {
+app.post("/publicuserinfo", (req, res) => {
   GetPublicUserInfo(req.body.ID,(success,inf) => {
     res.json(inf);
   });
 });
 
-app.put("/userinfo", (req, res) => {
+app.post("/userinfo", (req, res) => {
   GetUserInfo(req.body.session,(success,inf) => {
     res.json(inf);
   });
 });
 
-app.put("/findusers", (req, res) => {
+app.post("/findusers", (req, res) => {
   FindUsers(req.body.search,(success,inf) => {
     res.json(inf);
   });
 });
 
-app.put("/updateprofile", (req, res) => {
+app.post("/updateprofile", (req, res) => {
   UpdateProfile( req.body,(success,msg) => {
     res.json({
       success: success,
@@ -143,7 +143,7 @@ app.put("/updateprofile", (req, res) => {
   });
 });
 
-app.put("/uploadimage", (req, res) => {
+app.post("/uploadimage", (req, res) => {
   UploadImage( req.body.session,req.body.image,(success,filename,usedspace) => {
     res.json({
       success: success,
@@ -153,7 +153,7 @@ app.put("/uploadimage", (req, res) => {
   });
 });
 
-app.put("/login", (req, res) => {
+app.post("/login", (req, res) => {
   LoginUser( sanitizeHtml( req.body.username ),req.body.password,req.headers.host,(success,msg) => {
     res.json({
       success: success,
@@ -162,7 +162,7 @@ app.put("/login", (req, res) => {
   });
 });
 
-app.put("/register", (req, res) => {
+app.post("/register", (req, res) => {
   RegisterUser( sanitizeHtml( req.body.username ),req.body.password,req.body.email,(success,msg) => {
     res.json({
       success: success,
@@ -171,7 +171,7 @@ app.put("/register", (req, res) => {
   });
 });
 
-app.put("/addpost", (req, res) => {
+app.post("/addpost", (req, res) => {
   AddPost( req.body.session, sanitizeHtml( req.body.title ), sanitizeHtml( req.body.body ), req.body.postLinkedImages, (success,msg) => {
     if (!success) console.log(msg);
     res.json({
@@ -180,7 +180,7 @@ app.put("/addpost", (req, res) => {
   });
 });
 
-app.put("/removepost", (req, res) => {
+app.post("/removepost", (req, res) => {
   RemovePost( req.body.session, req.body.postID, (success,msg) => {
     if (!success) console.log(msg);
     res.json({
@@ -189,7 +189,7 @@ app.put("/removepost", (req, res) => {
   });
 });
 
-app.put("/getcomments", (req, res) => {
+app.post("/getcomments", (req, res) => {
   GetIDFromSession(req.body.session, (ID) => {
     GetComments(req.body.postID,ID,(success,inf) => {
       res.json(inf);
@@ -197,7 +197,7 @@ app.put("/getcomments", (req, res) => {
   });
 });
 
-app.put("/addcomment", (req, res) => {
+app.post("/addcomment", (req, res) => {
   AddComment( req.body.session, sanitizeHtml( req.body.content ), req.body.postID , (cid,msg) => {
     if (cid == -1) console.log(msg);
     res.json({
@@ -207,7 +207,7 @@ app.put("/addcomment", (req, res) => {
   });
 });
 
-app.put("/changefriendstatus", (req,res) => {
+app.post("/changefriendstatus", (req,res) => {
   ChangeFriend(req.body.session,req.body.friendID,req.body.status, (success) => {
     if (!success) console.log(msg);
 
@@ -217,7 +217,7 @@ app.put("/changefriendstatus", (req,res) => {
   });
 });
 
-app.put("/ignorefriendrequest", (req,res) => {
+app.post("/ignorefriendrequest", (req,res) => {
   GetIDFromSession(req.body.session, (userID) => {
     ChangeArray(userID,req.body.friendID,false,'friendrequests','profiles', (success,msg) => {
       if (!success) console.log(msg);
@@ -228,7 +228,7 @@ app.put("/ignorefriendrequest", (req,res) => {
   });
 });
 
-app.put("/changeblockstatus", (req,res) => {
+app.post("/changeblockstatus", (req,res) => {
   GetIDFromSession(req.body.session, (userID) => {
     ChangeArray(userID,req.body.friendID,req.body.status,'blocked','profiles', (success,msg) => {
       if (!success) console.log(msg);
@@ -239,7 +239,7 @@ app.put("/changeblockstatus", (req,res) => {
   });
 });
 
-app.put("/changelikestatus", (req,res) => {
+app.post("/changelikestatus", (req,res) => {
   GetIDFromSession(req.body.session, (userID) => {
     ChangeArray(userID,req.body.postID,req.body.status,'usr_likes','posts', (success,msg) => {
       if (!success) console.log(msg);
@@ -250,7 +250,7 @@ app.put("/changelikestatus", (req,res) => {
   });
 });
 
-app.put("/messagehistory", (req, res) => {
+app.post("/messagehistory", (req, res) => {
   GetIDFromSession(req.body.session, (userID) => {
     GetConversation(userID,req.body.recipientID,(success,inf) => {
       res.json(inf);
