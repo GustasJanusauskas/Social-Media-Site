@@ -1,6 +1,6 @@
 <div [class]="postClass">
     <h3 class="PostTitle">{{post.title}} by {{post.author}}</h3>
-    <div class="PostBody" [innerHTML]="post.body"></div>
+    <div class="PostBody" [innerHTML]="postContent || 'Loading post..'"></div>
 
     <button *ngIf="post.authorID && userinfo.ID && post.authorID == userinfo.ID" class="TopbarButton" (click)="removePost(post.postID || -1,profilePost)">
         <mat-icon class="BodyIcon">delete</mat-icon>

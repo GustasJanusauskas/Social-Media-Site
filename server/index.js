@@ -468,28 +468,57 @@ function RemovePost(session,postID,callback) {
 
 function AddPost(session,title,body,linkedImages,callback) {
   GetIDFromSession(session, (userID) => {
-    var innerQuery = "INSERT INTO posts(usr_id,ptitle,pbody,pdate,usr_likes,linked_images) VALUES($1,$2,$3,now(),'{}',$4) RETURNING post_id;";
-    var innerData = [userID,title,body,linkedImages];
+    //Check linked images one by one, detecting images that have already been uploaded to previous posts,
+    //these images are removed from the array before the new post is added, to prevent a user from being able to
+    //delete any other users (or their own) uploaded images.
 
-    dbclient.query(innerQuery,innerData, (err, res) => {
-      if (err || res.rows.length == 0) {
-        if (err) console.log("DB ERROR AddPost: \n" + err);
-        callback(false,'Failed to add post.');
-        return;
-      }
+    //One query version to check all images at once:
+    //"SELECT DISTINCT ON(usr_id) usr_id FROM posts WHERE $1 && linked_images;"
+    var query = "SELECT DISTINCT ON(usr_id) usr_id FROM posts WHERE $1 = ANY( linked_images );"
+    var detections = [];
+    var promises = [];
+    //Detect all images already in DB
+    linkedImages.forEach(element => {
+      promises.push(new Promise( (resolve,reject) => {
+        var data = [element];
+        dbclient.query(query,data, (err, res) => {
+          if (res.rows.length > 0) detections.push(data[0]);
+          resolve();
+        });
+      }));
+    });
 
-      //Add post ID to user profile
-      var innerInQuery = 'UPDATE profiles SET posts = array_append(posts,$2) WHERE usr_id = $1;';
-      var innerInData = [userID,res.rows[0].post_id];
+    Promise.allSettled(promises).then( () => {
+      //Construct new, clean list
+      var newImages = [];
+      linkedImages.forEach(element => {
+        if ( !(element in detections) ) newImages.push(element);
+      });
 
-      dbclient.query(innerInQuery,innerInData, (err, res) => {
-        if (err) {
-          if (err) console.log("DB ERROR RegPost: \n" + err);
-          callback(false,'Failed to register post.');
+      //Then, insert post
+      var innerQuery = "INSERT INTO posts(usr_id,ptitle,pbody,pdate,usr_likes,linked_images) VALUES($1,$2,$3,now(),'{}',$4) RETURNING post_id;";
+      var innerData = [userID,title,body,newImages];
+
+      dbclient.query(innerQuery,innerData, (err, res) => {
+        if (err || res.rows.length == 0) {
+          if (err) console.log("DB ERROR AddPost: \n" + err);
+          callback(false,'Failed to add post.');
           return;
         }
 
-        callback(true,'Post registered successfully.');
+        //Finally, add post ID to user profile
+        var innerInQuery = 'UPDATE profiles SET posts = array_append(posts,$2) WHERE usr_id = $1;';
+        var innerInData = [userID,res.rows[0].post_id];
+
+        dbclient.query(innerInQuery,innerInData, (err, res) => {
+          if (err) {
+            if (err) console.log("DB ERROR RegPost: \n" + err);
+            callback(false,'Failed to register post.');
+            return;
+          }
+
+          callback(true,'Post registered successfully.');
+        });
       });
     });
   });

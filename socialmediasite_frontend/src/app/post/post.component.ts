@@ -1,4 +1,6 @@
-import { Component, Injectable, Input, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, Injectable, Input, OnInit, ViewEncapsulation, ViewChildren, QueryList, ElementRef, SimpleChanges } from '@angular/core';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { interval } from 'rxjs';
 
 import { HelperFunctionsService } from "../services/helper-functions.service";
 import { UserdataService } from "../services/userdata.service";
@@ -22,22 +24,21 @@ export class PostComponent implements OnInit {
   @Input() profilePost: boolean;
   @Input() postClass: string;
 
-  constructor(private userdataService: UserdataService) { 
+  postContent?: SafeHtml = undefined;
+
+  constructor(private userdataService: UserdataService, private domSanitizer: DomSanitizer) { 
     this.commentsEnabled = true;
-    this.profilePost = false;
+    this.profilePost = false; //obsolete
     this.postClass = 'FeedPost';
   }
 
-  ngOnInit(): void {
+  ngOnChanges(changes: SimpleChanges) {
     this.post.body = this.parsePost(this.post.body || '');
+    this.postContent = this.domSanitizer.bypassSecurityTrustHtml(this.post.body);
+  }
 
-    if (this.profilePost) {
-      setInterval(() => {
-        if (this.post && this.post.body?.includes('[img]')) {
-          this.post.body = this.parsePost(this.post.body || '');
-        }
-      },125);
-    }
+  ngOnInit(): void {
+    
   }
 
   removePost(postID: number, showProfile: boolean = false) {
@@ -73,7 +74,7 @@ export class PostComponent implements OnInit {
     var temp: string;
     for (let x = 0; x < matches.length; x++) {
       temp = matches[x][0].replace('[img]','').replace('[/img]','');
-      result += post.slice(lastInd,matches[x].index) + `<img class="PostImage" src="${temp}">`;
+      result += post.slice(lastInd,matches[x].index) + `<img class="PostImage" src="${temp}" onerror="this.src='assets/imageMissing.png'; this.onerror=null">`;
       lastInd = matches[x].index! + matches[x][0].length;
     }
 
