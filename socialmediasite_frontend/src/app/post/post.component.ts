@@ -28,7 +28,7 @@ export class PostComponent implements OnInit {
 
   constructor(private userdataService: UserdataService, private domSanitizer: DomSanitizer) { 
     this.commentsEnabled = true;
-    this.profilePost = false; //obsolete
+    this.profilePost = false;
     this.postClass = 'FeedPost';
   }
 

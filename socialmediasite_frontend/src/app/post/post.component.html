@@ -14,7 +14,7 @@
         <mat-icon [class]="post.likes && post.userLiked ? 'material-icons' : 'material-icons-outlined'">thumb_up</mat-icon>
         {{post.likes && post.userLiked ? 'Remove like' : 'Like'}}
     </button>
-    <button class="TopbarButton" (click)="getPostProfile(post.authorID);" >
+    <button class="TopbarButton" *ngIf="!profilePost" (click)="getPostProfile(post.authorID);" >
         <mat-icon class="BodyIcon">account_circle</mat-icon>
         Show Profile
     </button>
