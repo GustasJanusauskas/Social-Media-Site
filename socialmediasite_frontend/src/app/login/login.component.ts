@@ -44,7 +44,7 @@ export class LoginComponent implements OnInit {
       if (data.success) {
         //Set session string, update UI
         this.formError = 'Logged in succesfully.';
-        HelperFunctionsService.setCookie('session','' + data.session,30);
+        HelperFunctionsService.setCookie('session','' + data.session,-1);
 
         //Clear login form
         this.username = '';

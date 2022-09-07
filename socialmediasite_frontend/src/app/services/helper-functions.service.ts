@@ -44,10 +44,15 @@ export class HelperFunctionsService {
     );
   }
 
-  static setCookie(cname: string, cvalue: string, exdays: number) {
-    const d = new Date();
-    d.setTime(d.getTime() + (exdays*24*60*60*1000));
-    let expires = 'expires='+ d.toUTCString();
+  static setCookie(cname: string, cvalue: string, exdays: number = -1) {
+    var expires;
+    if (exdays != -1) {
+      const d = new Date();
+      d.setTime(d.getTime() + (exdays*24*60*60*1000));
+      expires = 'expires='+ d.toUTCString();
+    }
+    else expires = 'expires=Session';
+
     document.cookie = cname + '=' + cvalue + ';' + expires + ';path=/;SameSite=Strict;';
   }
 
