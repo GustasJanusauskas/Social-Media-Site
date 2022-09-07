@@ -204,7 +204,7 @@ export class FriendsComponent implements OnInit {
 
   scrollDivs(scrollAllowList?: boolean[]) {
     this.chatDiv.forEach( (item, index, arr) => {
-      if ( ( scrollAllowList && scrollAllowList[index] ) || !scrollAllowList) setTimeout( () => {item.nativeElement.scrollTop = item.nativeElement.scrollHeight}, 10);
+      if ( ( scrollAllowList && scrollAllowList[index] ) || !scrollAllowList) setTimeout( () => {item.nativeElement.scrollTop = item.nativeElement.scrollHeight}, 0);
     });
   }
 }

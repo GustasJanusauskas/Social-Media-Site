@@ -72,6 +72,7 @@ export class AppComponent {
       //Clear user data if session was deleted/expired
       this.userinfo = {session:''};
       this.friendList = [];
+      this.friendRequestList = [];
 
       if (callback) callback();
       return;
@@ -79,7 +80,7 @@ export class AppComponent {
 
     this.userdataService.getUserInfo(session).subscribe(data => {
       if (!data.success) {
-        console.log(data.error);
+        if (VERBOSE_DEBUG) console.log(data.error);
         return;
       }
 
@@ -305,7 +306,9 @@ export class AppComponent {
     }
 
     this.setMain('profile',() => {
+      setTimeout( () => {
       this.profileComponent.first.getProfile(tempProfile);
+      },0);
     });
   }
 
