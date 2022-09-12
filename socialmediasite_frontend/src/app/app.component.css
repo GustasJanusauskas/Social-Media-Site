@@ -17,7 +17,7 @@
 
 @media only screen and (max-width: 900px) {
 	#SearchInput {
-		width: 50%;
+		width: calc(100% - 2.25em);
 		margin-left: 0em;
 	}
 }

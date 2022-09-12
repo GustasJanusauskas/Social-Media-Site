@@ -1,4 +1,5 @@
 #ProfileDescriptionInput {
+    max-width: calc(100% - 2.25em);
     width: 24em;
     height: 15em;
 	padding-left: 0.5em;

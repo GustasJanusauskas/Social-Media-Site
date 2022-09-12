@@ -7,6 +7,7 @@
 }
 
 #PostBodyForm, #PostTitleForm {
+	max-width: calc(100% - 2.25em);
 	width: 35em;
 	padding-left: 0.5em;
 	margin-bottom: 0.75em;

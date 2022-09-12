@@ -1,8 +1,8 @@
 <div class="Main">
 	<div id="Top">
 		<div id="Topbar" class="BackgroundElement">
-			<button type="button" class="TopbarButton" id="MenuPanelButton" (click)="menudrawer.toggle(); frienddrawer.close()"> <mat-icon>menu</mat-icon> </button>
-			<button type="button" class="TopbarButton" id="FriendsPanelButton" (click)="frienddrawer.toggle(); menudrawer.close()"> <mat-icon>group</mat-icon> </button>
+			<button  class="TopbarButton" id="MenuPanelButton" (click)="menudrawer.toggle(); frienddrawer.close()"> <mat-icon>menu</mat-icon> </button>
+			<button *ngIf="userinfo.session != ''" class="TopbarButton" id="FriendsPanelButton" (click)="frienddrawer.toggle(); menudrawer.close()"> <mat-icon>group</mat-icon> </button>
 
 			<button *ngIf="userinfo.session == ''" class="TopbarButton" id="LoginButton" (click)="setMain('login');">Login</button>
 			<button *ngIf="userinfo.session == ''" class="TopbarButton" id="RegisterButton" (click)="setMain('register');">Register</button>

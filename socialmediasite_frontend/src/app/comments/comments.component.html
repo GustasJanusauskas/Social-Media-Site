@@ -24,6 +24,6 @@
     </mat-form-field>
     <button class="FriendButton" (click)="postComment()">
         <mat-icon class="BodyIcon">send</mat-icon>
-        Add comment
+        {{userinfo.session == '' ? 'Login to comment' : 'Add comment'}}
     </button>
 </div>
