@@ -38,6 +38,9 @@ export class AppComponent {
   results: UserInfo[] = [];
   lastSearchCharacterInput: number = Number.NaN;
   searchInterval;
+
+  //Transitions
+  smoothTransitionsEnabled: boolean = true;
   
   @ViewChildren('backgroundDiv') backgroundDiv!: QueryList<any>;
   @ViewChildren(FriendsComponent) friendsComponent!: QueryList<FriendsComponent>;
@@ -59,6 +62,11 @@ export class AppComponent {
     this.setMain('feed',() => {
       if (session != null && session.length >= 64) this.friendsComponent.first.connectMsg();
     },false);
+  }
+
+  async ngOnInit() {
+    //Disable smooth transitions on mobile by default
+    this.smoothTransitionsEnabled = window.innerWidth > 900;
   }
 
   async ngOnDestroy() {
@@ -317,6 +325,13 @@ export class AppComponent {
   }
 
   animateBackground(size: number = 40) { //size in em
+    if (!this.smoothTransitionsEnabled) {
+      this.backgroundDiv.forEach((item) => {
+        item.nativeElement.style = ``;
+      });
+      return;
+    }
+
     const session = HelperFunctionsService.getCookie('session');
     if (size < 40 && (session != null && session.length >= 64) ) size = 40; //minimum size is 40em (for chat window and navigation when logged in)
 

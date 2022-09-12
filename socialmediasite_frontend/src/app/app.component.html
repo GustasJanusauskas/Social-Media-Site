@@ -32,10 +32,10 @@
 				</div>
 			</mat-drawer>
 		  
-		<div id="SidebarMain" class="BackgroundElement" style="height: 1000em;" #backgroundDiv>
+		<div id="SidebarMain" class="BackgroundElement" style="height:1000em" #backgroundDiv>
 			<app-sidebar [userinfo]="userinfo" [rootComponent]="this"></app-sidebar>
 		</div>
-		<div id="BodyMain" class="BackgroundElement" style="height: 1000em;" #backgroundDiv>
+		<div id="BodyMain" class="BackgroundElement" style="height:1000em" #backgroundDiv>
 			<app-login *ngIf="bodyHTML=='login'" [rootComponent]="this" [friendsComponent]="friendsComponent.first"></app-login>
 			<app-register *ngIf="bodyHTML=='register'"></app-register>
 			<app-new-post *ngIf="bodyHTML=='post'"></app-new-post>
@@ -57,11 +57,11 @@
 					Gitlab: <a href="https://gitlab.com/GustasJanusauskas">https://gitlab.com/GustasJanusauskas</a><br>
 					<br>
 					Project repo: <a href="https://gitlab.com/GustasJanusauskas/social-media-site">https://gitlab.com/GustasJanusauskas/social-media-site</a><br>
-					
 				</p>
+				<mat-checkbox [(ngModel)]="smoothTransitionsEnabled" (click)="animateBackground(18)">Use animated transitions</mat-checkbox>
 			</div>
 		</div>
-		<div id="FriendbarMain" class="BackgroundElement" style="height: 1000em;" #backgroundDiv>
+		<div id="FriendbarMain" class="BackgroundElement" style="height:1000em" #backgroundDiv>
 			<app-friends [userinfo]="userinfo" [rootComponent]="this"></app-friends>
 		</div>
 	</div>

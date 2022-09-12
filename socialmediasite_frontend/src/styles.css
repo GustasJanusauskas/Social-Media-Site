@@ -14,6 +14,7 @@
 :root {
 	--textClr: #414d61;
 	--backgroundClr: #e2eaf3;
+	--checkedClr: #5689c4;
 }
 
 body {
