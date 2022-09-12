@@ -31,6 +31,7 @@ export class ProfileComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    
   }
 
   getProfile(profile: UserInfo) {

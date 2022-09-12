@@ -2185,17 +2185,18 @@ color:rgba(0,0,0,.38);
 }
 
 .mat-drawer-container {
-background-color:#fafafa;
-color:rgba(0,0,0,.87);
 }
 
 .mat-drawer {
-background-color:#fff;
+border-radius: 0.75em;
+border: solid 1px #414d61;
+background-color:#e2eaf3;
+
 color:rgba(0,0,0,.87);
 }
 
 .mat-drawer.mat-drawer-push {
-background-color:#fff;
+background-color:#e2eaf3;
 }
 
 .mat-drawer:not(.mat-drawer-side) {
@@ -2491,11 +2492,11 @@ border-top:none;
 }
 
 .mat-tab-group.mat-primary .mat-tab-label.cdk-keyboard-focused:not(.mat-tab-disabled),.mat-tab-group.mat-primary .mat-tab-label.cdk-program-focused:not(.mat-tab-disabled),.mat-tab-group.mat-primary .mat-tab-link.cdk-keyboard-focused:not(.mat-tab-disabled),.mat-tab-group.mat-primary .mat-tab-link.cdk-program-focused:not(.mat-tab-disabled),.mat-tab-nav-bar.mat-primary .mat-tab-label.cdk-keyboard-focused:not(.mat-tab-disabled),.mat-tab-nav-bar.mat-primary .mat-tab-label.cdk-program-focused:not(.mat-tab-disabled),.mat-tab-nav-bar.mat-primary .mat-tab-link.cdk-keyboard-focused:not(.mat-tab-disabled),.mat-tab-nav-bar.mat-primary .mat-tab-link.cdk-program-focused:not(.mat-tab-disabled) {
-background-color:rgba(209,196,233,.3);
+/* background-color:rgba(209,196,233,.3); */
 }
 
 .mat-tab-group.mat-primary .mat-ink-bar,.mat-tab-nav-bar.mat-primary .mat-ink-bar {
-background-color:#6f617e;
+ background-color:#6f617e; 
 }
 
 .mat-tab-group.mat-primary.mat-background-primary>.mat-tab-header .mat-ink-bar,.mat-tab-group.mat-primary.mat-background-primary>.mat-tab-link-container .mat-ink-bar,.mat-tab-nav-bar.mat-primary.mat-background-primary>.mat-tab-header .mat-ink-bar,.mat-tab-nav-bar.mat-primary.mat-background-primary>.mat-tab-link-container .mat-ink-bar {
@@ -2503,7 +2504,7 @@ background-color:#fff;
 }
 
 .mat-tab-group.mat-accent .mat-tab-label.cdk-keyboard-focused:not(.mat-tab-disabled),.mat-tab-group.mat-accent .mat-tab-label.cdk-program-focused:not(.mat-tab-disabled),.mat-tab-group.mat-accent .mat-tab-link.cdk-keyboard-focused:not(.mat-tab-disabled),.mat-tab-group.mat-accent .mat-tab-link.cdk-program-focused:not(.mat-tab-disabled),.mat-tab-nav-bar.mat-accent .mat-tab-label.cdk-keyboard-focused:not(.mat-tab-disabled),.mat-tab-nav-bar.mat-accent .mat-tab-label.cdk-program-focused:not(.mat-tab-disabled),.mat-tab-nav-bar.mat-accent .mat-tab-link.cdk-keyboard-focused:not(.mat-tab-disabled),.mat-tab-nav-bar.mat-accent .mat-tab-link.cdk-program-focused:not(.mat-tab-disabled) {
-background-color:rgba(255,229,127,.3);
+/* background-color:rgba(255,229,127,.3); */
 }
 
 .mat-tab-group.mat-accent .mat-ink-bar,.mat-tab-nav-bar.mat-accent .mat-ink-bar {
@@ -2515,7 +2516,7 @@ background-color:rgba(0,0,0,.87);
 }
 
 .mat-tab-group.mat-warn .mat-tab-label.cdk-keyboard-focused:not(.mat-tab-disabled),.mat-tab-group.mat-warn .mat-tab-label.cdk-program-focused:not(.mat-tab-disabled),.mat-tab-group.mat-warn .mat-tab-link.cdk-keyboard-focused:not(.mat-tab-disabled),.mat-tab-group.mat-warn .mat-tab-link.cdk-program-focused:not(.mat-tab-disabled),.mat-tab-nav-bar.mat-warn .mat-tab-label.cdk-keyboard-focused:not(.mat-tab-disabled),.mat-tab-nav-bar.mat-warn .mat-tab-label.cdk-program-focused:not(.mat-tab-disabled),.mat-tab-nav-bar.mat-warn .mat-tab-link.cdk-keyboard-focused:not(.mat-tab-disabled),.mat-tab-nav-bar.mat-warn .mat-tab-link.cdk-program-focused:not(.mat-tab-disabled) {
-background-color:rgba(255,205,210,.3);
+/* background-color:rgba(255,205,210,.3); */
 }
 
 .mat-tab-group.mat-warn .mat-ink-bar,.mat-tab-nav-bar.mat-warn .mat-ink-bar {
@@ -2527,7 +2528,7 @@ background-color:#fff;
 }
 
 .mat-tab-group.mat-background-primary .mat-tab-label.cdk-keyboard-focused:not(.mat-tab-disabled),.mat-tab-group.mat-background-primary .mat-tab-label.cdk-program-focused:not(.mat-tab-disabled),.mat-tab-group.mat-background-primary .mat-tab-link.cdk-keyboard-focused:not(.mat-tab-disabled),.mat-tab-group.mat-background-primary .mat-tab-link.cdk-program-focused:not(.mat-tab-disabled),.mat-tab-nav-bar.mat-background-primary .mat-tab-label.cdk-keyboard-focused:not(.mat-tab-disabled),.mat-tab-nav-bar.mat-background-primary .mat-tab-label.cdk-program-focused:not(.mat-tab-disabled),.mat-tab-nav-bar.mat-background-primary .mat-tab-link.cdk-keyboard-focused:not(.mat-tab-disabled),.mat-tab-nav-bar.mat-background-primary .mat-tab-link.cdk-program-focused:not(.mat-tab-disabled) {
-background-color:rgba(209,196,233,.3);
+/* background-color:rgba(209,196,233,.3); */
 }
 
 .mat-tab-group.mat-background-primary>.mat-tab-header,.mat-tab-group.mat-background-primary>.mat-tab-link-container,.mat-tab-group.mat-background-primary>.mat-tab-header-pagination,.mat-tab-nav-bar.mat-background-primary>.mat-tab-header,.mat-tab-nav-bar.mat-background-primary>.mat-tab-link-container,.mat-tab-nav-bar.mat-background-primary>.mat-tab-header-pagination {
@@ -2539,7 +2540,7 @@ color:#fff;
 }
 
 .mat-tab-group.mat-background-primary>.mat-tab-header .mat-tab-label.mat-tab-disabled,.mat-tab-group.mat-background-primary>.mat-tab-link-container .mat-tab-link.mat-tab-disabled,.mat-tab-nav-bar.mat-background-primary>.mat-tab-header .mat-tab-label.mat-tab-disabled,.mat-tab-nav-bar.mat-background-primary>.mat-tab-link-container .mat-tab-link.mat-tab-disabled {
-color:rgba(255,255,255,.4);
+/* color:rgba(255,255,255,.4); */
 }
 
 .mat-tab-group.mat-background-primary>.mat-tab-header .mat-tab-header-pagination-chevron,.mat-tab-group.mat-background-primary>.mat-tab-header-pagination .mat-tab-header-pagination-chevron,.mat-tab-group.mat-background-primary>.mat-tab-link-container .mat-focus-indicator::before,.mat-tab-group.mat-background-primary>.mat-tab-header .mat-focus-indicator::before,.mat-tab-nav-bar.mat-background-primary>.mat-tab-header .mat-tab-header-pagination-chevron,.mat-tab-nav-bar.mat-background-primary>.mat-tab-header-pagination .mat-tab-header-pagination-chevron,.mat-tab-nav-bar.mat-background-primary>.mat-tab-link-container .mat-focus-indicator::before,.mat-tab-nav-bar.mat-background-primary>.mat-tab-header .mat-focus-indicator::before {

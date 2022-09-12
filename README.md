@@ -25,7 +25,7 @@ npm install
 3. To setup the database, run the commands included in '_DB Setup.sql' via postgreSQL.
 4. Navigate to the project folder in the terminal and run:
 ```
-npm run test
+npm run compilerun
 ```
 5. Webapp can now be reached at:
 ```

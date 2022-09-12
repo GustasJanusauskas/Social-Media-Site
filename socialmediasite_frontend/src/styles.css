@@ -154,17 +154,11 @@ textarea {
 	vertical-align: middle;
 }
 
-#Bottom {
-	display: grid;
-	grid-template-columns: 0.5fr 1fr 0.5fr;
-}
-
 #FriendbarMain, #FriendbarInner {
 	margin-left: 0.25em;
 	
 	display: flex;
 	flex-direction: column;
-	justify-content: top;
 	overflow-y: auto;
 }
 
@@ -175,10 +169,6 @@ textarea {
 
 #SidebarMain {
 	margin-right: 0.25em;
-	
-	display: flex;
-	flex-direction: column;
-	justify-content: top;
 }
 
 .BackgroundElement {
@@ -217,4 +207,28 @@ textarea {
 .MessageInputField {
 	margin-top: 0.75em;
 	width: 100%;
+}
+
+.MobileSidebarContent {
+	padding: 20px;
+}
+
+.MobileSidebar {
+	width: 50%;
+}
+
+@media only screen and (max-width: 900px) {
+	#SidebarMain, #FriendbarMain {
+		display: none;
+	}
+}
+
+@media only screen and (min-width: 900px) {
+	#Bottom {
+		display: grid;
+		grid-template-columns: 0.5fr 1fr 0.5fr;
+	}
+	#MenuPanelButton, #FriendsPanelButton {
+		display: none;
+	}
 }

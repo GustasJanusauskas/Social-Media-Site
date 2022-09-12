@@ -1,6 +1,9 @@
 <div class="Main">
 	<div id="Top">
 		<div id="Topbar" class="BackgroundElement">
+			<button type="button" class="TopbarButton" id="MenuPanelButton" (click)="menudrawer.toggle(); frienddrawer.close()"> <mat-icon>menu</mat-icon> </button>
+			<button type="button" class="TopbarButton" id="FriendsPanelButton" (click)="frienddrawer.toggle(); menudrawer.close()"> <mat-icon>group</mat-icon> </button>
+
 			<button *ngIf="userinfo.session == ''" class="TopbarButton" id="LoginButton" (click)="setMain('login');">Login</button>
 			<button *ngIf="userinfo.session == ''" class="TopbarButton" id="RegisterButton" (click)="setMain('register');">Register</button>
 
@@ -16,38 +19,21 @@
 			</mat-autocomplete>
 		</div>
 	</div>
+	<mat-drawer-container id="MobileSidebarContainer" hasBackdrop="false" autosize>
 	<div id="Bottom">
+			<mat-drawer #menudrawer class="MobileSidebar" mode="over">
+				<div class="MobileSidebarContent">
+					<app-sidebar [userinfo]="userinfo" [rootComponent]="this"></app-sidebar>
+				</div>
+			</mat-drawer>
+			<mat-drawer #frienddrawer class="MobileSidebar" mode="over">
+				<div class="MobileSidebarContent">
+					<app-friends [userinfo]="userinfo" [rootComponent]="this"></app-friends>
+				</div>
+			</mat-drawer>
+		  
 		<div id="SidebarMain" class="BackgroundElement" style="height: 1000em;" #backgroundDiv>
-			<h2>Navigation</h2>
-			<button class="SidebarButton" id="FirstButton" (click)="setMain('feed',undefined,true,true);">
-				<mat-icon class="SidebarIcon">home</mat-icon>
-				Public Feed
-			</button>
-
-			<button *ngIf="userinfo.session != ''" class="SidebarButton" (click)="setMain('feed');">
-				<mat-icon class="SidebarIcon">feed</mat-icon>
-				Personal Feed
-			</button>
-
-			<button *ngIf="userinfo.session != ''" class="SidebarButton" (click)="setMain('post');">
-				<mat-icon class="SidebarIcon">post_add</mat-icon>
-				Add Post
-			</button>
-
-			<button *ngIf="userinfo.session != ''" class="SidebarButton" (click)="selectProfile(userinfo);">
-				<mat-icon class="SidebarIcon">account_circle</mat-icon>
-				My profile
-			</button>
-
-			<button *ngIf="userinfo.session != ''" class="SidebarButton" (click)="setMain('ownprofile');">
-				<mat-icon class="SidebarIcon">edit</mat-icon>
-				Edit profile
-			</button>
-
-			<button class="SidebarButton" (click)="setMain('about');">
-				<mat-icon class="SidebarIcon">help</mat-icon>
-				About / Contacts
-			</button>
+			<app-sidebar [userinfo]="userinfo" [rootComponent]="this"></app-sidebar>
 		</div>
 		<div id="BodyMain" class="BackgroundElement" style="height: 1000em;" #backgroundDiv>
 			<app-login *ngIf="bodyHTML=='login'" [rootComponent]="this" [friendsComponent]="friendsComponent.first"></app-login>
@@ -79,4 +65,5 @@
 			<app-friends [userinfo]="userinfo" [rootComponent]="this"></app-friends>
 		</div>
 	</div>
+	</mat-drawer-container>	 
 </div>

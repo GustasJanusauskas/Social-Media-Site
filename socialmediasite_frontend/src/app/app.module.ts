@@ -16,6 +16,8 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatInputModule } from '@angular/material/input';
 import { MatCheckboxModule } from "@angular/material/checkbox";
 import { MatIconModule } from "@angular/material/icon";
+import {MatSidenavModule} from '@angular/material/sidenav';
+
 import { CommentsComponent } from './comments/comments.component';
 import { PostComponent } from './post/post.component';
 import { ProfileComponent } from './profile/profile.component';
@@ -24,6 +26,7 @@ import { NewPostComponent } from './new-post/new-post.component';
 import { FriendsComponent } from './friends/friends.component';
 import { RegisterComponent } from './register/register.component';
 import { LoginComponent } from './login/login.component';
+import { SidebarComponent } from './sidebar/sidebar.component';
 
 @NgModule({
   declarations: [
@@ -35,7 +38,8 @@ import { LoginComponent } from './login/login.component';
     NewPostComponent,
     FriendsComponent,
     RegisterComponent,
-    LoginComponent
+    LoginComponent,
+    SidebarComponent
   ],
   imports: [
     BrowserModule,
@@ -51,7 +55,8 @@ import { LoginComponent } from './login/login.component';
     MatDividerModule,
     MatInputModule,
     MatCheckboxModule,
-    MatIconModule
+    MatIconModule,
+    MatSidenavModule
   ],
   providers: [],
   bootstrap: [AppComponent]

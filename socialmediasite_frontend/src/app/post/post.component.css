@@ -20,7 +20,7 @@
 
 .PostBody, .PostTitle {
 	text-align: justify;
-	word-break: break-all;
+	word-break: break-word;
 }
 
 .PostedDateText {

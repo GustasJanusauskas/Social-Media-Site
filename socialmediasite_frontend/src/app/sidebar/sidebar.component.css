@@ -1,0 +1,4 @@
+.SidebarContent {
+	display: flex;
+	flex-direction: column;
+}

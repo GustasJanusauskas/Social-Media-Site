@@ -14,3 +14,10 @@
 	border-width: 1px;
 	border-radius: 0.75em;
 }
+
+@media only screen and (max-width: 900px) {
+	#SearchInput {
+		width: 50%;
+		margin-left: 0em;
+	}
+}

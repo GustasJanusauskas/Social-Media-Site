@@ -1,0 +1,32 @@
+<div class="SidebarContent">
+    <h2>Navigation</h2>
+    <button class="SidebarButton" id="FirstButton" (click)="rootComponent.setMain('feed',undefined,true,true);">
+        <mat-icon class="SidebarIcon">home</mat-icon>
+        Public Feed
+    </button>
+    
+    <button *ngIf="userinfo.session != ''" class="SidebarButton" (click)="rootComponent.setMain('feed');">
+        <mat-icon class="SidebarIcon">feed</mat-icon>
+        Personal Feed
+    </button>
+    
+    <button *ngIf="userinfo.session != ''" class="SidebarButton" (click)="rootComponent.setMain('post');">
+        <mat-icon class="SidebarIcon">post_add</mat-icon>
+        Add Post
+    </button>
+    
+    <button *ngIf="userinfo.session != ''" class="SidebarButton" (click)="rootComponent.selectProfile(userinfo);">
+        <mat-icon class="SidebarIcon">account_circle</mat-icon>
+        My profile
+    </button>
+    
+    <button *ngIf="userinfo.session != ''" class="SidebarButton" (click)="rootComponent.setMain('ownprofile');">
+        <mat-icon class="SidebarIcon">edit</mat-icon>
+        Edit profile
+    </button>
+    
+    <button class="SidebarButton" (click)="rootComponent.setMain('about');">
+        <mat-icon class="SidebarIcon">help</mat-icon>
+        About / Contacts
+    </button>
+</div>

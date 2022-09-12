@@ -4,10 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "cd socialmediasite_frontend && ng build && cd .. && npm start",
+    "compilerun": "cd socialmediasite_frontend && ng build && cd .. && npm start",
     "dev": "cd socialmediasite_frontend && npm start",
-    "start": "node server/index.js",
-    "build": "cd client && npm install && npm run build"
+    "start": "node server/index.js"
   },
   "keywords": [],
   "proxy": "http://localhost:3001",
