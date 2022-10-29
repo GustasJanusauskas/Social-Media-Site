@@ -2,14 +2,14 @@
   "name": "socialmediasite",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "server/index.js",
   "scripts": {
     "compilerun": "cd socialmediasite_frontend && ng build && cd .. && npm start",
     "dev": "cd socialmediasite_frontend && npm start",
     "start": "node server/index.js"
   },
   "keywords": [],
-  "proxy": "http://localhost:3001",
+  "proxy": "",
   "author": "",
   "license": "ISC",
   "dependencies": {
@@ -18,5 +18,9 @@
     "pg": "^8.7.3",
     "sanitize-html": "^2.7.0",
     "ws": "^8.5.0"
+  },
+  "engines": {
+    "node": ">=16.15.1",
+    "npm": ">=8.11.0"
   }
 }
